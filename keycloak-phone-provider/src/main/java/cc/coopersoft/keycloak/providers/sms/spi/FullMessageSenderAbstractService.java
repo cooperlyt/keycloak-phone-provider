@@ -10,7 +10,7 @@ public abstract class FullMessageSenderAbstractService implements MessageSenderS
     public void sendMessage(TokenCodeType type, String realmName, String phoneNumber, String code , int expires) throws MessageSendException{
 
 
-        final String MESSAGE = String.format("%s - " + type.getLabel() + " code: %s ", realmName, code);
+        final String MESSAGE = String.format("%s - " + type.getLabel() + " code: %s, expires: %s minute ", realmName, code, expires / 60);
         sendMessage(phoneNumber,MESSAGE);
     }
 }

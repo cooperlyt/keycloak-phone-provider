@@ -19,7 +19,7 @@ services:
 
 
   keycloak:
-    image: coopersoft/keycloak-sms-yuntongxun:snapshot
+    image: coopersoft/keycloak-phone-yuntongxun:snapshot
 #    restart: always
     ports:
       - 8901:8080

@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.authenticators.sms;
 
+import cc.coopersoft.keycloak.UserUtil;
 import cc.coopersoft.keycloak.authenticators.BaseDirectGrantAuthenticator;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -27,12 +28,7 @@ public class PhoneNumberAuthenticator extends BaseDirectGrantAuthenticator {
     }
 
     protected UserModel findUser(AuthenticationFlowContext context) {
-        List<UserModel> users = context.getSession().users().searchForUserByUserAttribute(
-                "phoneNumber", context.getHttpRequest().getDecodedFormParameters().getFirst("phone_number"), context.getRealm());
-        if (users.isEmpty()) {
-            return null;
-        }
-        return users.get(0);
+        return UserUtil.findUserByPhone(context.getSession().users(),context.getRealm(),context.getHttpRequest().getDecodedFormParameters().getFirst("phone_number"));
     }
 
     @Override

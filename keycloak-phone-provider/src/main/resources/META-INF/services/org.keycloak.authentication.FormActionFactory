@@ -1,0 +1,3 @@
+cc.coopersoft.keycloak.registration.sms.RegistrationPhoneNumber
+cc.coopersoft.keycloak.registration.RegistrationRequestParamReader
+cc.coopersoft.keycloak.registration.RegistrationFastOnPhone

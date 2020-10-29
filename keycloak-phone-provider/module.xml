@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<module xmlns="urn:jboss:module:1.1" name="keycloak-sms-provider">
+<module xmlns="urn:jboss:module:1.1" name="keycloak-phone-provider">
 
   <resources>
-    <resource-root path="keycloak-sms-provider.jar"/>
+    <resource-root path="keycloak-phone-provider.jar"/>
   </resources>
 
   <dependencies>

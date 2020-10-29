@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.providers.sms.rest;
 
+import cc.coopersoft.keycloak.providers.sms.constants.TokenCodeType;
 import cc.coopersoft.keycloak.providers.sms.spi.PhoneMessageService;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
@@ -11,25 +12,27 @@ import javax.ws.rs.core.Response;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
-public class AuthenticationCodeResource {
+public class TokenCodeResource {
 
-    private static final Logger logger = Logger.getLogger(AuthenticationCodeResource.class);
-    private final KeycloakSession session;
+    private static final Logger logger = Logger.getLogger(TokenCodeResource.class);
+    protected final KeycloakSession session;
+    protected final TokenCodeType tokenCodeType;
 
-    AuthenticationCodeResource(KeycloakSession session) {
+    TokenCodeResource(KeycloakSession session, TokenCodeType tokenCodeType) {
         this.session = session;
+        this.tokenCodeType = tokenCodeType;
     }
 
     @GET
     @NoCache
     @Path("")
     @Produces(APPLICATION_JSON)
-    public Response getAuthenticationCode(@QueryParam("phoneNumber") String phoneNumber) {
+    public Response getTokenCode(@QueryParam("phoneNumber") String phoneNumber) {
 
         if (phoneNumber == null) throw new BadRequestException("Must inform a phone number");
 
-        logger.info(String.format("Requested authentication code to %s", phoneNumber));
-        int tokenExpiresIn = session.getProvider(PhoneMessageService.class).sendAuthenticationCode(phoneNumber);
+        logger.info(String.format("Requested %s code to %s",tokenCodeType.getLabel(), phoneNumber));
+        int tokenExpiresIn = session.getProvider(PhoneMessageService.class).sendTokenCode(phoneNumber,tokenCodeType);
 
         String response = String.format("{\"expiresIn\":%s}", tokenExpiresIn);
 

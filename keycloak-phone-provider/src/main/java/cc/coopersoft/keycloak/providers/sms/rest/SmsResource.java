@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.providers.sms.rest;
 
+import cc.coopersoft.keycloak.providers.sms.constants.TokenCodeType;
 import org.keycloak.models.KeycloakSession;
 
 import javax.ws.rs.Path;
@@ -18,7 +19,19 @@ public class SmsResource {
     }
 
     @Path("authentication-code")
-    public AuthenticationCodeResource getAuthenticationCodeResource() {
-        return new AuthenticationCodeResource(session);
+    public TokenCodeResource getAuthenticationCodeResource() {
+        return new TokenCodeResource(session, TokenCodeType.OTP);
     }
+
+    @Path("registration-code")
+    public TokenCodeResource getRegistrationCodeResource() {
+        return new TokenCodeResource(session, TokenCodeType.REGISTRATION);
+    }
+
+    @Path("reset-code")
+    public TokenCodeResource getResetCodeResource() {
+        return new TokenCodeResource(session, TokenCodeType.RESET);
+    }
+
+
 }

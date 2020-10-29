@@ -35,9 +35,6 @@ directory will contain all jars correctly placed in a WildFly-like folder struct
   service provider and expiration time of tokens. (iii) Execute the additional step specified on selected service provider
   module README.md.
   3. Start Keycloak.
-  4. Now in Authentication page, copy the browser flow and add a subflow to the forms, then adding `OTP Over SMS` as a
-  new execution. Don't forget to bind this flow copy as the de facto browser flow.
-  5. Finally, register the required actions `Update Phone Number` and `Configure OTP over SMS` in the Required Actions tab.
 
 i. add modules defs
 ```xml
@@ -61,14 +58,44 @@ ii. set provider and token expiration time
     </provider>
 </spi>
 ```
-Under Authentication > Flows:
 
+**User and password login after verification phone by sms**
+
+  in Authentication page, copy the browser flow and add a subflow to the forms, then adding `OTP Over SMS` as a
+  new execution. Don't forget to bind this flow copy as the de facto browser flow.
+  Finally, register the required actions `Update Phone Number` and `Configure OTP over SMS` in the Required Actions tab.
+
+
+**Only use phone login or get Access token use endpoints:**
+
+Under Authentication > Flows:
 Copy the 'Direct Grant' flow to 'Direct grant with phone' flow
 Click on 'Actions > Add execution' on the 'Provide Phone Number' line
 Click on 'Actions > Add execution' on the 'Provide Verification Code' line
+Delete or disable other
 Set both of 'Provide Phone Number' and 'Provide Verification Code' to 'REQUIRED'
 
+Under 'Clients > $YOUR_CLIENT > Authentication Flow Overrides' or 'Authentication > Bindings' 
+Set Direct Grant Flow to 'Direct grant with phone' 
 
+
+**Reset credential**
+ Testing , coming soon!
+
+**Fast registration by phone**
+Under Authentication > Flows:
+Copy the 'Registration' flow to 'Registration fast by phone' flow
+Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Fast Registration By Phone' line
+Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Provide Phone Validation' line
+Delete or disable 'Password Validation'
+
+**registration add http request param to user attribute**
+Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Request Param Reader' line
+
+Set both of 'Provide Phone Number' and 'Provide Verification Code' and 'Request Param Reader' to 'REQUIRED'
+
+Under Authentication > Bindings
+Set Registration Flow to 'Registration fast by phone' 
 
 **About the API endpoints:** 
 

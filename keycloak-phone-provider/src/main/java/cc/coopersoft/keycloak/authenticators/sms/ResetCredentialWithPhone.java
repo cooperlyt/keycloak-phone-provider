@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.authenticators.sms;
 
+import cc.coopersoft.keycloak.UserUtil;
 import cc.coopersoft.keycloak.providers.sms.constants.TokenCodeType;
 import cc.coopersoft.keycloak.providers.sms.spi.TokenCodeService;
 import org.jboss.logging.Logger;
@@ -74,9 +75,8 @@ public class ResetCredentialWithPhone extends ResetCredentialChooseUser {
 
         if (user == null) {
 
-            List<UserModel> users = context.getSession().users().searchForUserByUserAttribute(
-                    "phoneNumber", phoneNumber, context.getRealm());
-            if (users.isEmpty() || !validateVerificationCode(context,users.get(0))) {
+            user = UserUtil.findUserByPhone(context.getSession().users(),context.getRealm(),phoneNumber);
+            if ((user == null) || !validateVerificationCode(context,user)) {
                 Response challenge = context.form()
                         .setError(Messages.INVALID_USER)
 //                        .setAttribute("captchaKey", siteKey)
@@ -85,7 +85,7 @@ public class ResetCredentialWithPhone extends ResetCredentialChooseUser {
                 context.failureChallenge(AuthenticationFlowError.INVALID_USER, challenge);
                 return;
             }
-            user = users.get(0);
+
 
             context.getAuthenticationSession().setAuthNote(NOT_SEND_EMAIL, "");
         }

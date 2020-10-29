@@ -1,7 +1,7 @@
 module add --name=keycloak-phone-provider --resources=keycloak-phone-provider.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-common,org.hibernate,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-services,org.keycloak.keycloak-model-jpa,org.jboss.logging,javax.api,javax.ws.rs.api,javax.transaction.api,javax.persistence.api,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,org.apache.commons.lang,javax.xml.bind.api
 module add --name=keycloak-sms-provider-dummy --resources=keycloak-sms-provider-dummy.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider
 module add --name=cloopen-sms-sdk --resources=java-sms-sdk-1.0.3.jar --dependencies=javax.xml.bind.api,com.google.code.gson
-module add --name=keycloak-sms-provider-cloopen --resources=keycloak-sms-provider-cloopen.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-sms-provider,cloopen-phone-sdk
+module add --name=keycloak-sms-provider-cloopen --resources=keycloak-sms-provider-cloopen.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,cloopen-sms-sdk
 
 embed-server --server-config=standalone-ha.xml --std-out=echo
 batch

@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.providers.sms.rest;
 
+import cc.coopersoft.keycloak.providers.sms.constants.TokenCodeType;
 import cc.coopersoft.keycloak.providers.sms.spi.PhoneMessageService;
 import cc.coopersoft.keycloak.providers.sms.spi.TokenCodeService;
 import org.jboss.logging.Logger;
@@ -15,35 +16,19 @@ import javax.ws.rs.core.Response;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
-public class VerificationCodeResource {
+public class VerificationCodeResource extends TokenCodeResource {
 
     private static final Logger logger = Logger.getLogger(VerificationCodeResource.class);
-    private final KeycloakSession session;
+
     private final AuthResult auth;
 
     VerificationCodeResource(KeycloakSession session) {
-        this.session = session;
+        super(session, TokenCodeType.VERIFY);
         this.auth = new AppAuthManager().authenticateBearerToken(session, session.getContext().getRealm());
     }
 
     private TokenCodeService getTokenCodeService() {
         return session.getProvider(TokenCodeService.class);
-    }
-
-    @GET
-    @NoCache
-    @Path("")
-    @Produces(APPLICATION_JSON)
-    public Response getVerificationCode(@QueryParam("phoneNumber") String phoneNumber) {
-
-        if (phoneNumber == null) throw new BadRequestException("Must inform a phone number");
-
-        logger.info(String.format("Requested verification code to %s", phoneNumber));
-        int tokenExpiresIn = session.getProvider(PhoneMessageService.class).sendVerificationCode(phoneNumber);
-
-        String response = String.format("{\"expiresIn\":%s}", tokenExpiresIn);
-
-        return Response.ok(response, APPLICATION_JSON_TYPE).build();
     }
 
     @POST

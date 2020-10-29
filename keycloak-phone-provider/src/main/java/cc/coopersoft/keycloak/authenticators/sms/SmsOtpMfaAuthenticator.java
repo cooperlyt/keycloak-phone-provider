@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.authenticators.sms;
 
+import cc.coopersoft.keycloak.providers.sms.constants.TokenCodeType;
 import cc.coopersoft.keycloak.providers.sms.spi.PhoneMessageService;
 import org.jboss.resteasy.spi.HttpResponse;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -83,7 +84,7 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
         String phoneNumber = context.getUser().getFirstAttribute("phoneNumber");
         Response challenge;
         try {
-            phoneMessageService.sendAuthenticationCode(phoneNumber);
+            phoneMessageService.sendTokenCode(phoneNumber, TokenCodeType.OTP);
             challenge = context.form().createForm("login-sms-otp.ftl");
         } catch (ForbiddenException e) {
             challenge = context.form().setError("abusedMessageService").createForm("login-sms-otp.ftl");
