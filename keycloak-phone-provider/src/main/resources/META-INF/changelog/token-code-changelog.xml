@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+  <changeSet author="mths0x5f@gmail.com" id="token-code-6.0">
+
+    <createTable tableName="PHONE_MESSAGE_TOKEN_CODE">
+      <column name="ID" type="VARCHAR(36)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="REALM_ID" type="VARCHAR(36)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="PHONE_NUMBER" type="VARCHAR(20)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CODE" type="VARCHAR(6)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="TYPE" type="VARCHAR(20)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CREATED_AT" type="DATETIME">
+        <constraints nullable="false"/>
+      </column>
+      <column name="EXPIRES_AT" type="DATETIME">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CONFIRMED" type="BOOLEAN" defaultValueBoolean="false"/>
+      <column name="BY_WHOM" type="VARCHAR(36)"/>
+    </createTable>
+
+    <addPrimaryKey constraintName="PK_PHONE_MESSAGE_TOKEN_CODE"
+                   tableName="PHONE_MESSAGE_TOKEN_CODE"
+                   columnNames="ID"/>
+
+    <createIndex indexName="PHONE_MESSAGE_TOKEN_CODE_PHONE_NUMBER" tableName="PHONE_MESSAGE_TOKEN_CODE">
+      <column name="REALM_ID" type="VARCHAR(36)"/>
+      <column name="PHONE_NUMBER" type="VARCHAR(20)"/>
+    </createIndex>
+
+  </changeSet>
+</databaseChangeLog>

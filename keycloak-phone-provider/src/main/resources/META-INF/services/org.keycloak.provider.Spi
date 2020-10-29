@@ -1,0 +1,3 @@
+cc.coopersoft.keycloak.providers.sms.spi.TokenCodeServiceSpi
+cc.coopersoft.keycloak.providers.sms.spi.PhoneMessageServiceSpi
+cc.coopersoft.keycloak.providers.sms.spi.MessageSenderServiceSpi
