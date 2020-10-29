@@ -51,7 +51,7 @@ public class SmsOtpCredentialProvider implements CredentialProvider<SmsOtpCreden
         if (code == null) return false;
 
         try {
-            getTokenCodeService().validateCode(user, phoneNumber, code, TokenCodeType.OTP_MESSAGE);
+            getTokenCodeService().validateCode(user, phoneNumber, code, TokenCodeType.OTP);
             return true;
         } catch (Exception e) {
             return false;

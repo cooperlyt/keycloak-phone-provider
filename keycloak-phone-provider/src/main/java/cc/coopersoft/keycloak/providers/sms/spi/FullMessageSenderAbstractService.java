@@ -8,7 +8,9 @@ public abstract class FullMessageSenderAbstractService implements MessageSenderS
     public abstract void sendMessage(String phoneNumber, String message) throws MessageSendException;
 
     public void sendMessage(TokenCodeType type, String realmName, String phoneNumber, String code , int expires) throws MessageSendException{
-        final String MESSAGE = String.format("%s - " + (TokenCodeType.VERIFY_PHONE_NUMBER.equals(type) ? "" : "登录") + " 验证码: %s , %s 分钟内有效.", realmName, code, String.valueOf(expires / 60));
+
+
+        final String MESSAGE = String.format("%s - " + type.getLabel() + " code: %s ", realmName, code);
         sendMessage(phoneNumber,MESSAGE);
     }
 }

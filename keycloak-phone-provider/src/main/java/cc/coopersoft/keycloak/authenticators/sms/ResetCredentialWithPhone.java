@@ -1,14 +1,13 @@
 package cc.coopersoft.keycloak.authenticators.sms;
 
 import cc.coopersoft.keycloak.providers.sms.constants.TokenCodeType;
-import cc.coopersoft.keycloak.providers.sms.jpa.TokenCode;
+import cc.coopersoft.keycloak.providers.sms.spi.TokenCodeService;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAuthenticator;
 import org.keycloak.authentication.authenticators.resetcred.ResetCredentialChooseUser;
-import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
@@ -17,12 +16,8 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.messages.Messages;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.TemporalType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,7 +76,7 @@ public class ResetCredentialWithPhone extends ResetCredentialChooseUser {
 
             List<UserModel> users = context.getSession().users().searchForUserByUserAttribute(
                     "phoneNumber", phoneNumber, context.getRealm());
-            if (users.isEmpty() || !validateVerificationCode(context)) {
+            if (users.isEmpty() || !validateVerificationCode(context,users.get(0))) {
                 Response challenge = context.form()
                         .setError(Messages.INVALID_USER)
 //                        .setAttribute("captchaKey", siteKey)
@@ -115,38 +110,16 @@ public class ResetCredentialWithPhone extends ResetCredentialChooseUser {
     }
 
 
-    private boolean validateVerificationCode(AuthenticationFlowContext context) {
+    private boolean validateVerificationCode(AuthenticationFlowContext context, UserModel user) {
         String phoneNumber = Optional.ofNullable(context.getHttpRequest().getDecodedFormParameters().getFirst("phone_number")).orElse(
                 context.getHttpRequest().getDecodedFormParameters().getFirst("phoneNumber"));
         String code = context.getHttpRequest().getDecodedFormParameters().getFirst("code");
-
         try {
-            EntityManager entityManager = context.getSession().getProvider(JpaConnectionProvider.class).getEntityManager();
-
-            TokenCode entity = entityManager
-                    .createNamedQuery("ongoingProcess", TokenCode.class)
-                    .setParameter("realmId", context.getRealm().getId())
-                    .setParameter("phoneNumber", phoneNumber)
-                    .setParameter("now", new Date(), TemporalType.TIMESTAMP)
-                    .setParameter("type", TokenCodeType.VERIFY_PHONE_NUMBER.name())
-                    .getSingleResult();
-
-            logger.info(String.format("valid code by phone reset pwd %s = %s", entity.getCode(), code));
-            return entity.getCode().equals(code);
-
-//            Integer veriCode = entityManager.createNamedQuery("VerificationCode.validateVerificationCode", Integer.class)
-//                    .setParameter("realmId", context.getRealm().getId())
-//                    .setParameter("phoneNumber", phoneNumber)
-//                    .setParameter("code", code)
-//                    .setParameter("now", new Date(), TemporalType.TIMESTAMP)
-//                    .setParameter("kind", VERIFICATION_CODE_KIND)
-//                    .getSingleResult();
-//            if (veriCode == 1) {
-//                return true;
-//            }
+            context.getSession().getProvider(TokenCodeService.class).validateCode(user, phoneNumber, code, TokenCodeType.RESET);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
-        catch (NoResultException err){ }
-        return false;
     }
 
     @Override

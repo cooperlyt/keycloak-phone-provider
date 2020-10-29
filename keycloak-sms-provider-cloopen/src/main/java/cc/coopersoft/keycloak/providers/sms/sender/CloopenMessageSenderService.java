@@ -51,7 +51,7 @@ public class CloopenMessageSenderService implements MessageSenderService{
         //请使用管理控制台中已创建应用的APPID
         String appId = config.get(realmName + "_appId");
         client.setAppId(appId);
-        String templateId= config.get(realmName + "_" + (TokenCodeType.VERIFY_PHONE_NUMBER.equals(type) ? "v" : "a") + "_templateId");
+        String templateId= config.get(realmName + "_" + type.name() + "_templateId");
         String[] datas = {code, String.valueOf(expires / 60) };
 
 //        String subAppend="1234";  //可选 扩展码，四位数字 0~9999

@@ -110,21 +110,20 @@ public class TokenCodeServiceImpl implements TokenCodeService {
 
     @Override
     public void validateCode(UserModel user, String phoneNumber, String code) {
-        validateCode(user, phoneNumber, code, TokenCodeType.VERIFY_PHONE_NUMBER);
+        validateCode(user, phoneNumber, code, TokenCodeType.VERIFY);
     }
 
     @Override
     public void validateCode(UserModel user, String phoneNumber, String code, TokenCodeType tokenCodeType) {
 
-        String type = TokenCodeType.OTP_MESSAGE == tokenCodeType ? "authentication" : "verification";
 
         TokenCodeRepresentation tokenCode = ongoingProcess(phoneNumber, tokenCodeType);
         if (tokenCode == null)
-            throw new BadRequestException(String.format("There is no valid ongoing %s process", type));
+            throw new BadRequestException(String.format("There is no valid ongoing %s process", tokenCodeType.getLabel()));
 
         if (!tokenCode.getCode().equals(code)) throw new ForbiddenException("Code does not match with expected value");
 
-        logger.info(String.format("User %s correctly answered the %s code", user.getId(), type));
+        logger.info(String.format("User %s correctly answered the %s code", user.getId(), tokenCodeType.getLabel()));
         session.users()
                 .searchForUserByUserAttribute("phoneNumber", phoneNumber, session.getContext().getRealm())
                 .stream().filter(u -> !u.getId().equals(user.getId()))
