@@ -79,7 +79,7 @@ You'll get 2 extra endpoints that are useful to do the verification from a custo
 
 You'll get 2 extra endpoints that are useful to do the OTP from a custom application.
   + GET /auth/realms/{realmName}/sms/authentication-code?phoneNumber=+5534990001234 (To request a number verification. No auth required.)
-  + POST http://192.168.1.21:8901/auth/realms/shuashua/protocol/openid-connect/token
+  + POST /auth/realms/shuashua/protocol/openid-connect/token
     Content-Type: application/x-www-form-urlencoded
     grant_type=password&phone_number=$PHONE_NUMBER&code=$VERIFICATION_CODE&client_id=$CLIENT_ID&client_secret=CLIENT_SECRECT
 
