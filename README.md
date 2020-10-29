@@ -1,13 +1,16 @@
-# Keycloak SMS Provider
+# Keycloak Phone Provider
 
 With this provider you can **enforce authentication policies based on a verification token sent to users' mobile phones**.
-Currently, there are implementations of Twilio and TotalVoice SMS sender services. That said, is nice to note that more
+Currently, there are implementations of Twilio and TotalVoice and YunTongXun SMS sender services. That said, is nice to note that more
 services can be used with ease thankfully for the adopted modularity and in fact, nothing stop you from implementing a 
 sender of TTS calls or WhatsApp messages. 
 
 This is what you can do for now:
   + Check ownership of a phone number (Forms and HTTP API)
   + Use SMS as second factor in 2FA method (Browser flow)
+  + Reset Password by phone
+  + Authentication by phone
+  + only use phone Register
   
 Two user attributes are going to be used by this provider: _phoneNumberVerified_ (bool) and _phoneNumber_ (str). Many
 users can have the same _phoneNumber_, but only one of them is getting _phoneNumberVerified_ = true at the end of a 
@@ -67,19 +70,24 @@ Set both of 'Provide Phone Number' and 'Provide Verification Code' to 'REQUIRED'
 
 
 
-**About the API endpoints:** You'll get 2 extra endpoints that are useful to do the verification from a custom application.
+**About the API endpoints:** 
+
+You'll get 2 extra endpoints that are useful to do the verification from a custom application.
 
   + GET /auth/realms/{realmName}/sms/verification-code?phoneNumber=+5534990001234 (To request a number verification. No auth required.)
   + POST /auth/realms/{realmName}/sms/verification-code?phoneNumber=+5534990001234&code=123456 (To verify the process. User must be authenticated.)
 
+You'll get 2 extra endpoints that are useful to do the OTP from a custom application.
+  + GET /auth/realms/{realmName}/sms/authentication-code?phoneNumber=+5534990001234 (To request a number verification. No auth required.)
+  + POST http://192.168.1.21:8901/auth/realms/shuashua/protocol/openid-connect/token
+    Content-Type: application/x-www-form-urlencoded
+    grant_type=password&phone_number=$PHONE_NUMBER&code=$VERIFICATION_CODE&client_id=$CLIENT_ID&client_secret=CLIENT_SECRECT
+
+
 And then use Verification Code authentication flow with the code to obtain an access code.
 
-curl -X POST \
-  http://localhost:8081/auth/realms/$YOUR_REALM/protocol/openid-connect/token \
-  -H 'authorization: Basic c2h1bmRhby1hZG1pbjoxODc3MGYxMi02NjE4LTQwOTctYThmYi1kMjA0Mzg0Mzg4OTk=' \
-  -H 'content-type: application/x-www-form-urlencoded' \
-  -d 'grant_type=password&phone_number=$PHONE_NUMBER&code=$VERIFICATION_CODE'
+
 ## Thanks
-Some code written is based on existing ones in these two projects: [keycloak-phone-authenticator](https://github.com/FX-HAO/keycloak-phone-authenticator)
-and [keycloak-sms-authenticator](https://github.com/gwallet/keycloak-sms-authenticator). Certainly I would have many problems
+Some code written is based on existing ones in these two projects: [keycloak-sms-provider](https://github.com/mths0x5f/keycloak-sms-provider)
+and [keycloak-phone-authenticator](https://github.com/FX-HAO/keycloak-phone-authenticator). Certainly I would have many problems
 coding all those providers blindly. Thank you!
