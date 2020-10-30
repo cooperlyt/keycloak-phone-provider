@@ -1,3 +1,4 @@
-cc.coopersoft.keycloak.registration.sms.RegistrationPhoneNumber
-cc.coopersoft.keycloak.registration.RegistrationRequestParamReader
-cc.coopersoft.keycloak.registration.RegistrationFastOnPhone
+cc.coopersoft.keycloak.phone.authentication.forms.RegistrationPhoneNumber
+cc.coopersoft.keycloak.phone.authentication.forms.RegistrationRequestParamReader
+cc.coopersoft.keycloak.phone.authentication.forms.RegistrationLeast
+cc.coopersoft.keycloak.phone.authentication.forms.RegistrationPhoneAsUserNameCreation

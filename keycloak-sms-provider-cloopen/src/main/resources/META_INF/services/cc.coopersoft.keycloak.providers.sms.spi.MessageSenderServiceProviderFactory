@@ -1,1 +1,1 @@
-cc.coopersoft.keycloak.providers.sms.sender.CloopenMessageSenderServiceProviderFactory
+cc.coopersoft.keycloak.phone.providers.sms.sender.CloopenMessageSenderServiceProviderFactory

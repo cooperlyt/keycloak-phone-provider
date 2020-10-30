@@ -1,1 +1,1 @@
-cc.coopersoft.keycloak.providers.sms.rest.SmsResourceProviderFactory
+cc.coopersoft.keycloak.phone.providers.rest.SmsResourceProviderFactory

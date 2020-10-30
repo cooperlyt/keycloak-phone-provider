@@ -9,6 +9,31 @@
         <div id="vue-app">
         <form id="kc-register-form" class="${properties.kcFormClass!}" action="${url.registrationAction}" method="post">
 
+
+
+            <#if !registrationLeast??>
+                <div class="${properties.kcFormGroupClass!} ${messagesPerField.printIfExists('firstName',properties.kcFormGroupErrorClass!)}">
+                    <div class="${properties.kcLabelWrapperClass!}">
+                        <label for="firstName" class="${properties.kcLabelClass!}">${msg("firstName")}</label>
+                    </div>
+                    <div class="${properties.kcInputWrapperClass!}">
+                        <input type="text" id="firstName" class="${properties.kcInputClass!}" name="firstName" value="${(register.formData.firstName!'')}" />
+                    </div>
+                </div>
+
+                <div class="${properties.kcFormGroupClass!} ${messagesPerField.printIfExists('lastName',properties.kcFormGroupErrorClass!)}">
+                    <div class="${properties.kcLabelWrapperClass!}">
+                        <label for="lastName" class="${properties.kcLabelClass!}">${msg("lastName")}</label>
+                    </div>
+                    <div class="${properties.kcInputWrapperClass!}">
+                        <input type="text" id="lastName" class="${properties.kcInputClass!}" name="lastName" value="${(register.formData.lastName!'')}" />
+                    </div>
+                </div>
+
+
+
+            </#if>
+
             <#if phoneNumberRequired??>
 
 
@@ -27,9 +52,9 @@
 
 
 
-                <div class=" ${properties.kcFormGroupClass!}} row">
+                <div class=" ${properties.kcFormGroupClass!} row">
 
-                    <div class="${properties.kcLabelWrapperClass!}">
+                    <div class="${properties.kcLabelWrapperClass!}" style="padding: 0">
                         <label for="registerCode" class="${properties.kcLabelClass!}">${msg("verificationCode")}</label>
                     </div>
                     <div class="col-xs-8" style="padding: 0 5px 0 0">
@@ -51,25 +76,7 @@
 
             </#if>
 
-            <#if !fastRegistration??>
-                <div class="${properties.kcFormGroupClass!} ${messagesPerField.printIfExists('firstName',properties.kcFormGroupErrorClass!)}">
-                    <div class="${properties.kcLabelWrapperClass!}">
-                        <label for="firstName" class="${properties.kcLabelClass!}">${msg("firstName")}</label>
-                    </div>
-                    <div class="${properties.kcInputWrapperClass!}">
-                        <input type="text" id="firstName" class="${properties.kcInputClass!}" name="firstName" value="${(register.formData.firstName!'')}" />
-                    </div>
-                </div>
-
-                <div class="${properties.kcFormGroupClass!} ${messagesPerField.printIfExists('lastName',properties.kcFormGroupErrorClass!)}">
-                    <div class="${properties.kcLabelWrapperClass!}">
-                        <label for="lastName" class="${properties.kcLabelClass!}">${msg("lastName")}</label>
-                    </div>
-                    <div class="${properties.kcInputWrapperClass!}">
-                        <input type="text" id="lastName" class="${properties.kcInputClass!}" name="lastName" value="${(register.formData.lastName!'')}" />
-                    </div>
-                </div>
-
+            <#if   realm.registrationEmailAsUsername ||  !registrationLeast??>
                 <div class="${properties.kcFormGroupClass!} ${messagesPerField.printIfExists('email',properties.kcFormGroupErrorClass!)}">
                     <div class="${properties.kcLabelWrapperClass!}">
                         <label for="email" class="${properties.kcLabelClass!}">${msg("email")}</label>
@@ -78,8 +85,10 @@
                         <input type="text" id="email" class="${properties.kcInputClass!}" name="email" value="${(register.formData.email!'')}" autocomplete="email" />
                     </div>
                 </div>
+            </#if>
 
-                <#if !realm.registrationEmailAsUsername>
+
+                <#if !realm.registrationEmailAsUsername && !registrationPhoneAsUsername??>
                     <div class="${properties.kcFormGroupClass!} ${messagesPerField.printIfExists('username',properties.kcFormGroupErrorClass!)}">
                         <div class="${properties.kcLabelWrapperClass!}">
                             <label for="username" class="${properties.kcLabelClass!}">${msg("username")}</label>
@@ -89,6 +98,8 @@
                         </div>
                     </div>
                 </#if>
+
+
 
                 <#if passwordRequired??>
                     <div class="${properties.kcFormGroupClass!} ${messagesPerField.printIfExists('password',properties.kcFormGroupErrorClass!)}">
@@ -110,7 +121,7 @@
                     </div>
                 </#if>
 
-            </#if>
+
 
             <#if recaptchaRequired??>
                 <div class="form-group">

@@ -1,5 +1,5 @@
-cc.coopersoft.keycloak.authenticators.sms.SmsOtpMfaAuthenticatorFactory
-cc.coopersoft.keycloak.authenticators.sms.ResetCredentialWithPhone
-cc.coopersoft.keycloak.authenticators.sms.ResetCredentialEmailWithPhone
-cc.coopersoft.keycloak.authenticators.sms.AuthenticationCodeAuthenticatorFactory
-cc.coopersoft.keycloak.authenticators.sms.PhoneNumberAuthenticatorFactory
+cc.coopersoft.keycloak.phone.authentication.authenticators.browser.SmsOtpMfaAuthenticatorFactory
+cc.coopersoft.keycloak.phone.authentication.authenticators.resetcred.ResetCredentialWithPhone
+cc.coopersoft.keycloak.phone.authentication.authenticators.resetcred.ResetCredentialEmailWithPhone
+cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant.AuthenticationCodeAuthenticatorFactory
+cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant.PhoneNumberAuthenticatorFactory

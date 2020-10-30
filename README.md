@@ -1,5 +1,12 @@
 # Keycloak Phone Provider
 
+ + Phone support like e-mail 
+ + OTP by phone, 
+
+sms
+voice
+phone one key login
+
 With this provider you can **enforce authentication policies based on a verification token sent to users' mobile phones**.
 Currently, there are implementations of Twilio and TotalVoice and YunTongXun SMS sender services. That said, is nice to note that more
 services can be used with ease thankfully for the adopted modularity and in fact, nothing stop you from implementing a 
@@ -82,17 +89,30 @@ Set Direct Grant Flow to 'Direct grant with phone'
 **Reset credential**
  Testing , coming soon!
 
-**Fast registration by phone**
+**Phone registration support**
+
 Under Authentication > Flows:
-Copy the 'Registration' flow to 'Registration fast by phone' flow
-Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Fast Registration By Phone' line
-Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Provide Phone Validation' line
-Delete or disable 'Password Validation'
+ + Create flows from registration:
+    Copy the 'Registration' flow to 'Registration fast by phone' flow.
+ 
+ + (Optional) Phone number used as username for new user:  
+    Delete or disable 'Registration User Creation'.
+    Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Registration Phone As Username Creation' line.
+    Move this item to first.
+    
+ +  Add phone number to profile
+    Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Phone Validation' line
 
-**registration add http request param to user attribute**
-Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Request Param Reader' line
+ + (Optional)Hidden all other field phone except :   
+    Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Registration Least' line
 
-Set both of 'Provide Phone Number' and 'Provide Verification Code' and 'Request Param Reader' to 'REQUIRED'
+ + (Optional)Read Http request params add to user attribute:
+        Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Request Param Reader' line
+
+ + (Optional)Hidden password field:
+    Delete or disable 'Password Validation'.
+    
+ Set All add item as Required.
 
 Under Authentication > Bindings
 Set Registration Flow to 'Registration fast by phone' 
@@ -113,6 +133,7 @@ You'll get 2 extra endpoints that are useful to do the OTP from a custom applica
 
 And then use Verification Code authentication flow with the code to obtain an access code.
 
+http://192.168.1.21:8901/auth/realms/shuashua/protocol/openid-connect/registrations?client_id=mobile&response_type=code&scope=openid%20email&redirect_uri=http://your-application-domain.com/page-you-want-to-return
 
 ## Thanks
 Some code written is based on existing ones in these two projects: [keycloak-sms-provider](https://github.com/mths0x5f/keycloak-sms-provider)
