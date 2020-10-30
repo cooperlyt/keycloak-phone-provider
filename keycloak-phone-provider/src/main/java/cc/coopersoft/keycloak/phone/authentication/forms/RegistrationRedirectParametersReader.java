@@ -1,27 +1,34 @@
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
+import com.openshift.internal.restclient.URLBuilder;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
 import org.keycloak.authentication.FormActionFactory;
 import org.keycloak.authentication.FormContext;
 import org.keycloak.authentication.ValidationContext;
-import org.keycloak.authentication.forms.RegistrationPage;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.*;
 import org.keycloak.provider.ProviderConfigProperty;
+import org.keycloak.services.validation.Validation;
 
 import javax.ws.rs.core.MultivaluedMap;
-import java.util.ArrayList;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
-public class RegistrationRequestParamReader implements  FormActionFactory, FormAction {
+public class RegistrationRedirectParametersReader implements  FormActionFactory, FormAction {
 
-    private static final Logger logger = Logger.getLogger(RegistrationRequestParamReader.class);
+    private static final Logger logger = Logger.getLogger(RegistrationRedirectParametersReader.class);
 
 
-    public static final String PROVIDER_ID = "registration-http-request-param";
+    public static final String PROVIDER_ID = "registration-query-parameter";
 
     private static AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
             AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED };
@@ -31,14 +38,19 @@ public class RegistrationRequestParamReader implements  FormActionFactory, FormA
             "session_code",
             "client_id",
             "tab_id",
+            "nonce",
             "response_type",
+            "response_mode",
             "scope",
-            "redirect_uri"
+            "redirect_uri",
+            "state",
+            "phoneNumber",
+            "phoneNumberVerified"
     };
 
     @Override
     public String getDisplayType() {
-        return "Request param reader";
+        return "Query parameter reader";
     }
 
     @Override
@@ -64,7 +76,7 @@ public class RegistrationRequestParamReader implements  FormActionFactory, FormA
 
     @Override
     public String getHelpText() {
-        return "Read http request param add to user attribute";
+        return "Read query parameter add to user attribute";
     }
 
     @Override
@@ -106,26 +118,21 @@ public class RegistrationRequestParamReader implements  FormActionFactory, FormA
 
     @Override
     public void validate(ValidationContext validationContext) {
-        MultivaluedMap<String, String> formData = validationContext.getHttpRequest().getDecodedFormParameters();
-        validationContext.validationError(formData, new ArrayList<>());
         validationContext.success();
     }
 
     @Override
     public void success(FormContext context) {
 
-        MultivaluedMap<String, String> parameters = context.getUriInfo().getQueryParameters();
-        UserModel user = context.getUser();
-        parameters.forEach((k,v) -> {
-            if (Arrays.stream(QUERY_PARAM_BLACKLIST).noneMatch(item -> item.equals(k))){
-                if (v.size() > 1){
-                    user.setAttribute(k,v);
-                }else if (!v.isEmpty()){
-                    user.setSingleAttribute(k,v.stream().findFirst().orElseThrow());
-                }
-            }
-        });
+        String url = context.getHttpRequest().getMutableHeaders().getFirst("Referer");
+        if (!Validation.isBlank(url)) {
+            UserModel user = context.getUser();
+            URLEncodedUtils.parse(url, StandardCharsets.UTF_8)
+                    .stream()
+                    .filter(v -> !Validation.isBlank(v.getName()) && v.getName().length() < 32 && !Validation.isBlank(v.getValue())  && Arrays.stream(QUERY_PARAM_BLACKLIST).noneMatch(item -> item.equals(v.getName())))
+                    .forEach(v -> user.setSingleAttribute(v.getName(), v.getValue()));
 
+        }
     }
 
     @Override

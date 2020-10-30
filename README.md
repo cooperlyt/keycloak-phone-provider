@@ -106,8 +106,8 @@ Under Authentication > Flows:
  + (Optional)Hidden all other field phone except :   
     Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Registration Least' line
 
- + (Optional)Read Http request params add to user attribute:
-        Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Request Param Reader' line
+ + (Optional)Read query parameter add to user attribute:
+        Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Query Parameter Reader' line
 
  + (Optional)Hidden password field:
     Delete or disable 'Password Validation'.
@@ -118,7 +118,7 @@ Under Authentication > Bindings
 Set Registration Flow to 'Registration fast by phone' 
 
 test:
-http://<url>/auth/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
+http://<addr>/auth/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
 
 
 **About the API endpoints:** 
