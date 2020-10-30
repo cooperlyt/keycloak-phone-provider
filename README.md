@@ -117,6 +117,10 @@ Under Authentication > Flows:
 Under Authentication > Bindings
 Set Registration Flow to 'Registration fast by phone' 
 
+test:
+http://<url>/auth/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
+
+
 **About the API endpoints:** 
 
 You'll get 2 extra endpoints that are useful to do the verification from a custom application.
@@ -133,7 +137,6 @@ You'll get 2 extra endpoints that are useful to do the OTP from a custom applica
 
 And then use Verification Code authentication flow with the code to obtain an access code.
 
-http://192.168.1.21:8901/auth/realms/shuashua/protocol/openid-connect/registrations?client_id=mobile&response_type=code&scope=openid%20email&redirect_uri=http://your-application-domain.com/page-you-want-to-return
 
 ## Thanks
 Some code written is based on existing ones in these two projects: [keycloak-sms-provider](https://github.com/mths0x5f/keycloak-sms-provider)

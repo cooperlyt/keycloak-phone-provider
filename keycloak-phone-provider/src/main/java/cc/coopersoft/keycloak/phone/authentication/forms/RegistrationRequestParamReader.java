@@ -6,12 +6,14 @@ import org.keycloak.authentication.FormAction;
 import org.keycloak.authentication.FormActionFactory;
 import org.keycloak.authentication.FormContext;
 import org.keycloak.authentication.ValidationContext;
+import org.keycloak.authentication.forms.RegistrationPage;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.*;
 import org.keycloak.provider.ProviderConfigProperty;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RegistrationRequestParamReader implements  FormActionFactory, FormAction {
@@ -24,6 +26,15 @@ public class RegistrationRequestParamReader implements  FormActionFactory, FormA
     private static AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
             AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED };
 
+    private static String[] QUERY_PARAM_BLACKLIST = {
+            "execution",
+            "session_code",
+            "client_id",
+            "tab_id",
+            "response_type",
+            "scope",
+            "redirect_uri"
+    };
 
     @Override
     public String getDisplayType() {
@@ -101,12 +112,20 @@ public class RegistrationRequestParamReader implements  FormActionFactory, FormA
     }
 
     @Override
-    public void success(FormContext formContext) {
-        logger.info("registration request reader success!");
-        logger.info(String.format("request reader uri : %s",formContext.getHttpRequest().getUri()));
-        formContext.getHttpRequest().getDecodedFormParameters().keySet().forEach(v -> logger.info(String.format("request reader form param: %s" , v)));
+    public void success(FormContext context) {
 
-        formContext.getHttpRequest().getAttributeNames().asIterator().forEachRemaining(it -> logger.info(String.format("request reader attr param: %s -> %s",it, formContext.getHttpRequest().getAttribute(it))));
+        MultivaluedMap<String, String> parameters = context.getUriInfo().getQueryParameters();
+        UserModel user = context.getUser();
+        parameters.forEach((k,v) -> {
+            if (Arrays.stream(QUERY_PARAM_BLACKLIST).noneMatch(item -> item.equals(k))){
+                if (v.size() > 1){
+                    user.setAttribute(k,v);
+                }else if (!v.isEmpty()){
+                    user.setSingleAttribute(k,v.stream().findFirst().orElseThrow());
+                }
+            }
+        });
+
     }
 
     @Override
