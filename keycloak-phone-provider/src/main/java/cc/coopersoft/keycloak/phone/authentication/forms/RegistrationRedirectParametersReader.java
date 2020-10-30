@@ -1,14 +1,18 @@
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
 import com.openshift.internal.restclient.URLBuilder;
+import okhttp3.HttpUrl;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.spi.touri.URIResolver;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
 import org.keycloak.authentication.FormActionFactory;
 import org.keycloak.authentication.FormContext;
 import org.keycloak.authentication.ValidationContext;
+import org.keycloak.common.util.UriUtils;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.*;
 import org.keycloak.provider.ProviderConfigProperty;
@@ -124,13 +128,14 @@ public class RegistrationRedirectParametersReader implements  FormActionFactory,
     @Override
     public void success(FormContext context) {
 
-        String url = context.getHttpRequest().getMutableHeaders().getFirst("Referer");
-        if (!Validation.isBlank(url)) {
+        HttpUrl url = HttpUrl.parse(context.getHttpRequest().getMutableHeaders().getFirst("Referer"));
+        if (url != null) {
             UserModel user = context.getUser();
-            URLEncodedUtils.parse(url, StandardCharsets.UTF_8)
+
+            url.queryParameterNames()
                     .stream()
-                    .filter(v -> !Validation.isBlank(v.getName()) && v.getName().length() < 32 && !Validation.isBlank(v.getValue())  && Arrays.stream(QUERY_PARAM_BLACKLIST).noneMatch(item -> item.equals(v.getName())))
-                    .forEach(v -> user.setSingleAttribute(v.getName(), v.getValue()));
+                    .filter(v -> !Validation.isBlank(v) && v.length() < 32 && Arrays.stream(QUERY_PARAM_BLACKLIST).noneMatch(item -> item.equals(v)))
+                    .forEach(v -> user.setAttribute(v, url.queryParameterValues(v)));
 
         }
     }
