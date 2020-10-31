@@ -30,8 +30,16 @@ the default like Kerberos or LDAP. I may try to help you but I cannot guarantee.
 
 ## Usage
 
-**Build:** To build the project simply run `mvn package` after cloning the repository. At the end of the goal, the `build`
-directory will contain all jars correctly placed in a WildFly-like folder structure. 
+docker image is [coopersoft/keycloak-phone:10.0.2](https://hub.docker.com/layers/coopersoft/keycloak-phone/10.0.2/images/sha256-cfb890c723a2b9970c59f0bf3e0310499bb6e27e33d685edbc77d992ae15c4c9?context=repo)
+for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/keycloak-phone-provider/master/examples/docker-compose.yml)
+run as `docker-compose up` , docker-compose is required!
+
+
+**Build:** To build the project simply run `mvn clean package` after cloning the repository. 
+At the end of the goal.
+local keycloak installed: copt the `target` directory  all jars correctly placed in a WildFly-like folder structure. 
+docker image build: for examples [run-local.sh](https://github.com/cooper-lyt/keycloak-phone-provider/blob/master/examples/snapshot/run-local.sh) or [run-remote.sh](https://github.com/cooper-lyt/keycloak-phone-provider/blob/master/examples/snapshot/run-remote.sh)
+
 
 **Installing:**
  
