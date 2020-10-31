@@ -16,9 +16,7 @@ COPY modules/keycloak-sms-provider-dummy/main/keycloak-sms-provider-dummy.jar .
 COPY modules/keycloak-sms-provider-cloopen/main/keycloak-sms-provider-cloopen.jar .
 
 COPY module-add.cli cli/
-
 RUN $JBOSS_HOME/bin/jboss-cli.sh --file=cli/module-add.cli
-
 COPY standalone/deployments/keycloak-phone-provider.resources.jar $JBOSS_HOME/standalone/deployments/
 
 

@@ -1,0 +1,7 @@
+
+cd $REMOTE_PATH/keycloak/
+docker-compose  down
+docker rmi keycloak-phone:snapshot
+docker load<keycloak-phone.tar \
+  && rm -f keycloak-phone.tar \
+  && docker-compose  up

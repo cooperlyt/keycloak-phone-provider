@@ -1,0 +1,39 @@
+version: '3'
+services:
+
+
+  database:
+    image: coopersoft/mariadb-min:v1
+#    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - "/home/data/db:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: p0stgr@s
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: k@ycl0ck
+      TZ: Asia/Shanghai
+
+
+
+  keycloak:
+    image: keycloak-phone:snapshot
+#    restart: always
+    ports:
+      - 8901:8080
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      DB_VENDOR: mariadb
+      DB_ADDR: database
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: k@ycl0ck
+      DB_PORT: 3306
+    links:
+      - database:database
+    depends_on:
+      - database
+

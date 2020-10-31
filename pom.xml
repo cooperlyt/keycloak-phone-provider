@@ -94,20 +94,12 @@
                 </executions>
             </plugin>
             <plugin>
-                <inherited>false</inherited>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>0.4.10</version>
                 <configuration>
-                    <skipDockerBuild>true</skipDockerBuild>
                     <imageName>${docker.image.name}:${version.keycloak}</imageName>
                     <dockerDirectory>${basedir}/target</dockerDirectory>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                        </resource>
-                    </resources>
                 </configuration>
                 <dependencies>
                     <dependency>
