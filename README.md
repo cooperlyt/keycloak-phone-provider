@@ -74,7 +74,7 @@ ii. set provider and token expiration time
 </spi>
 ```
 
-**User and password login after verification phone by sms**
+**OTP by Phone**
 
   in Authentication page, copy the browser flow and add a subflow to the forms, then adding `OTP Over SMS` as a
   new execution. Don't forget to bind this flow copy as the de facto browser flow.
@@ -96,6 +96,9 @@ Set Direct Grant Flow to 'Direct grant with phone'
 
 **Reset credential**
  Testing , coming soon!
+ 
+**Phone one key longin**
+  Testing , coming soon!
 
 **Phone registration support**
 
