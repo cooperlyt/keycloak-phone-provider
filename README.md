@@ -37,8 +37,8 @@ run as `docker-compose up` , docker-compose is required!
 
 **Build:** To build the project simply run `mvn clean package` after cloning the repository. 
 At the end of the goal.
-local keycloak installed: copt the `target` directory  all jars correctly placed in a WildFly-like folder structure. 
-docker image build: for examples [run-local.sh](https://github.com/cooper-lyt/keycloak-phone-provider/blob/master/examples/snapshot/run-local.sh) or [run-remote.sh](https://github.com/cooper-lyt/keycloak-phone-provider/blob/master/examples/snapshot/run-remote.sh)
+ + local keycloak installed: copt the `target` directory  all jars correctly placed in a WildFly-like folder structure. 
+ + docker image build: for examples [run-local.sh](https://github.com/cooper-lyt/keycloak-phone-provider/blob/master/examples/snapshot/run-local.sh) or [run-remote.sh](https://github.com/cooper-lyt/keycloak-phone-provider/blob/master/examples/snapshot/run-remote.sh).
 
 
 **Installing:**
