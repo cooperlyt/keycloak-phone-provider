@@ -12,7 +12,7 @@ mvn -f ../../pom.xml clean package \
   && scp ../../target/keycloak-phone.tar root@$REMOTE_ADDR:$REMOTE_PATH/keycloak/ \
   && rm -f ../../target/keycloak-phone.tar \
   && echo "REMOTE_PATH=${REMOTE_PATH}" | cat - remote.run.template > temp && mv temp ../../target/remote_run.sh \
-  && scp ../../target/remote_run.sh root@$REMOTE_ADDR:$REMOTE_PATH/keycloak/run.sh && rm ../../target/remote_run.sh \
+  && scp ../../target/remote_run.sh root@$REMOTE_ADDR:$REMOTE_PATH/keycloak/run.sh && rm -f ../../target/remote_run.sh \
   && ssh -t root@$REMOTE_ADDR "sh ${REMOTE_PATH}/keycloak/run.sh"
 
 #  run as local
