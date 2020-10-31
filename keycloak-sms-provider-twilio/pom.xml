@@ -29,6 +29,16 @@
   <build>
     <plugins>
       <plugin>
+        <inherited>false</inherited>
+        <groupId>com.spotify</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>0.4.10</version>
+        <configuration>
+          <skipDockerBuild>true</skipDockerBuild>
+          <skipDockerTag>true</skipDockerTag>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
@@ -62,7 +72,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
               </artifactItems>
-              <outputDirectory>../build/modules/${project.artifactId}/main</outputDirectory>
+              <outputDirectory>../target/modules/${project.artifactId}/main</outputDirectory>
               <stripClassifier>true</stripClassifier>
               <stripVersion>true</stripVersion>
             </configuration>
@@ -78,7 +88,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>../build/modules/${project.artifactId}/main</outputDirectory>
+              <outputDirectory>../target/modules/${project.artifactId}/main</outputDirectory>
               <resources>
                 <resource>
                   <directory>${project.basedir}</directory>

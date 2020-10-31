@@ -14,6 +14,9 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <version.keycloak>10.0.2</version.keycloak>
+
+        <docker.image.name>coopersoft/keycloak-phone</docker.image.name>
+
     </properties>
 
     <modules>
@@ -57,4 +60,64 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+
+    <build>
+        <plugins>
+            <!-- We use the Resources plugin to filer Dockerfile and run.sh, it inserts actual JAR filename -->
+            <!-- The final Dockerfile will be created in target/dockerfile/Dockerfile -->
+            <plugin>
+                <inherited>false</inherited>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <!-- here the phase you need -->
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>docker</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>jboss-cli</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <inherited>false</inherited>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.4.10</version>
+                <configuration>
+                    <skipDockerBuild>true</skipDockerBuild>
+                    <imageName>${docker.image.name}:${version.keycloak}</imageName>
+                    <dockerDirectory>${basedir}/target</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                        </resource>
+                    </resources>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.activation</groupId>
+                        <artifactId>activation</artifactId>
+                        <version>1.1.1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+        </plugins>
+    </build>
 </project>

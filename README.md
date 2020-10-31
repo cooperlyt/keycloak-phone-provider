@@ -117,6 +117,9 @@ Under Authentication > Flows:
 Under Authentication > Bindings
 Set Registration Flow to 'Registration fast by phone' 
 
+Under Realm Settings > Themes
+Set Login Theme as 'phone'
+
 test:
 http://<addr>/auth/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
 
