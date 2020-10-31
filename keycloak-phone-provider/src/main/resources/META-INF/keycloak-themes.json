@@ -1,6 +1,6 @@
 {
   "themes": [{
-    "name" : "base of phone",
+    "name" : "phone",
     "types": [ "login" ]
   }]
 }
