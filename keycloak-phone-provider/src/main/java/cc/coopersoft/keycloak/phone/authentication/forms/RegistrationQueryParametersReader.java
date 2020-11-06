@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+//keycloak 11.0.3 can`t get referer, can`t use this
 public class RegistrationQueryParametersReader implements  FormActionFactory, FormAction {
 
     private static final Logger logger = Logger.getLogger(RegistrationQueryParametersReader.class);
@@ -131,7 +132,11 @@ public class RegistrationQueryParametersReader implements  FormActionFactory, Fo
     public void success(FormContext context) {
 
         String referer = context.getHttpRequest().getMutableHeaders().getFirst("Referer");
-        logger.debug("add user attribute form referer:" + referer);
+        logger.info("add user attribute form referer:" + referer);
+        if (Validation.isBlank(referer)){
+            logger.error("no referer. cant get param in keycloak version");
+            return;
+        }
         HttpUrl url = HttpUrl.parse(referer);
         if (url != null) {
             UserModel user = context.getUser();
