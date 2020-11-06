@@ -33,15 +33,6 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>0.4.10</version>
                 <configuration>
-                    <skipDockerTag>true</skipDockerTag>
-                    <skipDockerBuild>true</skipDockerBuild>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.4.10</version>
-                <configuration>
                     <skipDockerBuild>true</skipDockerBuild>
                     <skipDockerTag>true</skipDockerTag>
                 </configuration>

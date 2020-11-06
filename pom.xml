@@ -26,6 +26,9 @@
         <module>keycloak-sms-provider-totalvoice</module>
         <module>keycloak-sms-provider-twilio</module>
         <module>keycloak-sms-provider-cloopen</module>
+        <module>keycloak-sms-provider-yunxin</module>
+        <module>keycloak-sms-provider-aliyun</module>
+        <module>keycloak-sms-provider-tencent</module>
     </modules>
 
     <dependencies>
@@ -72,8 +75,7 @@
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-                        <!-- here the phase you need -->
-                        <phase>validate</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -93,6 +95,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>

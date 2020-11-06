@@ -152,8 +152,7 @@ public class RegistrationPhoneAsUserNameCreation implements FormActionFactory, F
         String username = formData.getFirst(RegistrationPhoneNumber.FIELD_PHONE_NUMBER);
 
         context.getEvent().detail(Details.USERNAME, username)
-                .detail(Details.REGISTER_METHOD, "form")
-        ;
+                .detail(Details.REGISTER_METHOD, "form");
         UserModel user = context.getSession().users().addUser(context.getRealm(), username);
         user.setEnabled(true);
 

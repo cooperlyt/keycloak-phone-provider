@@ -12,7 +12,7 @@ public class TotalVoiceMessageSenderServiceProviderFactory implements MessageSen
 
     @Override
     public MessageSenderService create(KeycloakSession session) {
-        return new TotalVoiceSmsSenderService(config);
+        return new TotalVoiceSmsSenderServiceProvider(config, session.getContext().getRealm().getDisplayName());
     }
 
     @Override
@@ -30,6 +30,6 @@ public class TotalVoiceMessageSenderServiceProviderFactory implements MessageSen
 
     @Override
     public String getId() {
-        return "TotalVoice";
+        return "totalvoice";
     }
 }

@@ -35,7 +35,7 @@ for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/
 run as `docker-compose up` , docker-compose is required!
 
 
-If you want to build the project, simply run `mvn clean package` after cloning the repository. 
+If you want to build the project, simply run `mvn clean package docker:build` after cloning the repository. 
 At the end of the goal.
  + local keycloak installed: copt the `target` directory  all jars correctly placed in a WildFly-like folder structure. 
  + docker image build: for examples [run-local.sh](https://github.com/cooper-lyt/keycloak-phone-provider/blob/master/examples/snapshot/run-local.sh) or [run-remote.sh](https://github.com/cooper-lyt/keycloak-phone-provider/blob/master/examples/snapshot/run-remote.sh).
@@ -119,6 +119,7 @@ Under Authentication > Flows:
 
  + (Optional)Read query parameter add to user attribute:
         Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Query Parameter Reader' line
+        Click on 'Registration Fast By Phone Registration Form > Actions > configure' add accept param name in to 
 
  + (Optional)Hidden password field:
     Delete or disable 'Password Validation'.

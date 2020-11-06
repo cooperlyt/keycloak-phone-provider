@@ -10,6 +10,10 @@ public class DummySmsSenderService extends FullSmsSenderAbstractService {
 
     private static final Logger logger = Logger.getLogger(DummySmsSenderService.class);
 
+    public DummySmsSenderService(String realmDisplay) {
+        super(realmDisplay);
+    }
+
     @Override
     public void sendMessage(String phoneNumber, String message) throws MessageSendException {
 

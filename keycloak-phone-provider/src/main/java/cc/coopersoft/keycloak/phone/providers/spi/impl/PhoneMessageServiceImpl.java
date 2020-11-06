@@ -18,13 +18,12 @@ public class PhoneMessageServiceImpl implements PhoneMessageService {
 
     private static final Logger logger = Logger.getLogger(PhoneMessageServiceImpl.class);
     private final KeycloakSession session;
-    private final String realmName;
     private final String service;
     private final int tokenExpiresIn;
 
     PhoneMessageServiceImpl(KeycloakSession session, Scope config) {
         this.session = session;
-        this.realmName = session.getContext().getRealm().getName();
+
         this.service = session.listProviderIds(MessageSenderService.class)
                 .stream().filter(s -> s.equals(config.get("service")))
                 .findFirst().orElse(
@@ -58,7 +57,7 @@ public class PhoneMessageServiceImpl implements PhoneMessageService {
         TokenCodeRepresentation token = TokenCodeRepresentation.forPhoneNumber(phoneNumber);
 
         try {
-            session.getProvider(MessageSenderService.class, service).sendSmsMessage(type,realmName,phoneNumber,token.getCode(),tokenExpiresIn);
+            session.getProvider(MessageSenderService.class, service).sendSmsMessage(type,phoneNumber,token.getCode(),tokenExpiresIn);
             getTokenCodeService().persistCode(token, type, tokenExpiresIn);
 
             logger.info(String.format("Sent %s code to %s over %s",type.getLabel(), phoneNumber, service));

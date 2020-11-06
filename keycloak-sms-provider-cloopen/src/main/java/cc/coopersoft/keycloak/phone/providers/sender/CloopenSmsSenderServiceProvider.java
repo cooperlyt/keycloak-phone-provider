@@ -7,31 +7,34 @@ import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
+import org.keycloak.models.RealmModel;
 
 import java.util.Map;
 
-public class CloopenMessageSenderService implements MessageSenderService {
+public class CloopenSmsSenderServiceProvider implements MessageSenderService {
 
 
-    private static final Logger logger = Logger.getLogger(CloopenMessageSenderService.class);
+    private static final Logger logger = Logger.getLogger(CloopenSmsSenderServiceProvider.class);
     private final CCPRestSmsSDK client;
 
     private final Config.Scope config;
+    private final RealmModel realm;
 
-    public CloopenMessageSenderService(Config.Scope config) {
+    public CloopenSmsSenderServiceProvider(Config.Scope config, RealmModel realm) {
 
         this.config = config;
-
+        this.realm = realm;
 
         //生产环境请求地址：app.cloopen.com
         String serverIp = "app.cloopen.com";
         //请求端口
         String serverPort = "8883";
         //主账号,登陆云通讯网站后,可在控制台首页看到开发者主账号ACCOUNT SID和主账号令牌AUTH TOKEN
-        String accountSId = config.get("accountSId");
+        String accountSId = config.get("account");
         String accountToken = config.get("authToken");
 
 
+        logger.info(String.format("cloopen account: %s ; accountToken: %s", accountSId, accountToken));
 
         client = new CCPRestSmsSDK();
         client.init(serverIp, serverPort);
@@ -47,11 +50,13 @@ public class CloopenMessageSenderService implements MessageSenderService {
     }
 
     @Override
-    public void sendSmsMessage(TokenCodeType type, String realmName, String phoneNumber, String code, int expires) throws MessageSendException {
+    public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code, int expires) throws MessageSendException {
         //请使用管理控制台中已创建应用的APPID
-        String appId = config.get(realmName + "_appId");
+        String appId = config.get(realm.getName().toUpperCase() + "_APP_ID");
         client.setAppId(appId);
-        String templateId= config.get(realmName + "_" + type.name() + "_templateId");
+        String templateId= config.get(realm.getName().toUpperCase() + "_" + type.name().toUpperCase() + "_TEMPLATE");
+        logger.info(String.format("cloopen appId: %s ; templateId: %s", appId, templateId));
+
         String[] datas = {code, String.valueOf(expires / 60) };
 
 //        String subAppend="1234";  //可选 扩展码，四位数字 0~9999
@@ -61,7 +66,7 @@ public class CloopenMessageSenderService implements MessageSenderService {
         if("000000".equals(result.get("statusCode"))){
             //正常返回输出data包体信息（map）
             Map<String,Object> data = (Map<String, Object>) result.get("data");
-            logger.debug("cloopen send message result: " + data.toString());
+            logger.info("cloopen send message result: " + data.toString());
 //            Set<String> keySet = data.keySet();
 //            for(String key:keySet){
 //                Object object = data.get(key);

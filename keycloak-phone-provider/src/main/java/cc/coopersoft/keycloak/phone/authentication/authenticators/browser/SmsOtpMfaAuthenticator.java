@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.browser;
 
+import cc.coopersoft.keycloak.phone.authentication.requiredactions.ConfigSmsOtpRequiredAction;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
@@ -120,7 +121,7 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
 
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
-        user.addRequiredAction("CONFIGURE_SMS_OTP");
+        user.addRequiredAction(ConfigSmsOtpRequiredAction.PROVIDER_ID);
     }
 
     @Override

@@ -12,7 +12,7 @@ public class TwilioMessageSenderServiceProviderFactory implements MessageSenderS
 
     @Override
     public MessageSenderService create(KeycloakSession session) {
-        return new TwilioSmsSenderService(config);
+        return new TwilioSmsSenderServiceProvider(config,session.getContext().getRealm().getDisplayName());
     }
 
     @Override
@@ -30,6 +30,6 @@ public class TwilioMessageSenderServiceProviderFactory implements MessageSenderS
 
     @Override
     public String getId() {
-        return "Twilio";
+        return "twilio";
     }
 }

@@ -1,38 +1,42 @@
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
-import com.openshift.internal.restclient.URLBuilder;
 import okhttp3.HttpUrl;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.jboss.logging.Logger;
-import org.jboss.resteasy.spi.touri.URIResolver;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
 import org.keycloak.authentication.FormActionFactory;
 import org.keycloak.authentication.FormContext;
 import org.keycloak.authentication.ValidationContext;
-import org.keycloak.common.util.UriUtils;
+import org.keycloak.component.ComponentModel;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.*;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.services.validation.Validation;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
-public class RegistrationRedirectParametersReader implements  FormActionFactory, FormAction {
+public class RegistrationQueryParametersReader implements  FormActionFactory, FormAction {
 
-    private static final Logger logger = Logger.getLogger(RegistrationRedirectParametersReader.class);
+    private static final Logger logger = Logger.getLogger(RegistrationQueryParametersReader.class);
 
+    private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
     public static final String PROVIDER_ID = "registration-query-parameter";
+
+    public static final String PARAM_NAMES = "registration.parameter.accept";
+
+    static {
+        ProviderConfigProperty acceptParamName;
+        acceptParamName = new ProviderConfigProperty();
+        acceptParamName.setName(PARAM_NAMES);
+        acceptParamName.setLabel("Accept query param");
+        acceptParamName.setType(ProviderConfigProperty.MULTIVALUED_STRING_TYPE);
+        acceptParamName.setHelpText("Registration query param accept names.");
+        configProperties.add(acceptParamName);
+    }
 
     private static AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
             AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED };
@@ -64,9 +68,13 @@ public class RegistrationRedirectParametersReader implements  FormActionFactory,
 
     @Override
     public boolean isConfigurable() {
-        return false;
+        return true;
     }
 
+    @Override
+    public List<ProviderConfigProperty> getConfigProperties() {
+        return configProperties;
+    }
 
     @Override
     public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
@@ -81,11 +89,6 @@ public class RegistrationRedirectParametersReader implements  FormActionFactory,
     @Override
     public String getHelpText() {
         return "Read query parameter add to user attribute";
-    }
-
-    @Override
-    public List<ProviderConfigProperty> getConfigProperties() {
-        return null;
     }
 
     @Override
@@ -117,7 +120,6 @@ public class RegistrationRedirectParametersReader implements  FormActionFactory,
 
     @Override
     public void buildPage(FormContext formContext, LoginFormsProvider loginFormsProvider) {
-
     }
 
     @Override
@@ -128,13 +130,22 @@ public class RegistrationRedirectParametersReader implements  FormActionFactory,
     @Override
     public void success(FormContext context) {
 
-        HttpUrl url = HttpUrl.parse(context.getHttpRequest().getMutableHeaders().getFirst("Referer"));
+        String referer = context.getHttpRequest().getMutableHeaders().getFirst("Referer");
+        logger.debug("add user attribute form referer:" + referer);
+        HttpUrl url = HttpUrl.parse(referer);
         if (url != null) {
             UserModel user = context.getUser();
-
+            String[] paramNames = null;
+            AuthenticatorConfigModel authenticatorConfig = context.getAuthenticatorConfig();
+            if (authenticatorConfig != null && authenticatorConfig.getConfig() != null) {
+                paramNames = Optional.ofNullable(context.getAuthenticatorConfig().getConfig().get(PARAM_NAMES)).orElse("").split("##");
+            }
+            String[] finalParamNames = paramNames;
+            logger.info("allow query param names:" + finalParamNames);
             url.queryParameterNames()
                     .stream()
-                    .filter(v -> !Validation.isBlank(v) && v.length() < 32 && Arrays.stream(QUERY_PARAM_BLACKLIST).noneMatch(item -> item.equals(v)))
+                    .filter(v -> (finalParamNames != null && finalParamNames.length > 0) ? Arrays.asList(finalParamNames).contains(v) : !Validation.isBlank(v) && v.length() < 32 && Arrays.stream(QUERY_PARAM_BLACKLIST).noneMatch(item -> item.equals(v)) )
+
                     .forEach(v -> user.setAttribute(v, url.queryParameterValues(v)));
 
         }

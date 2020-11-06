@@ -8,6 +8,7 @@ import org.keycloak.events.Errors;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.services.validation.Validation;
 
 import javax.ws.rs.core.Response;
 
@@ -25,18 +26,18 @@ public class PhoneNumberAuthenticator extends BaseDirectGrantAuthenticator {
         user.addRequiredAction("PHONE_NUMBER_GRANT_CONFIG");
     }
 
-    protected UserModel findUser(AuthenticationFlowContext context) {
-        return UserUtils.findUserByPhone(context.getSession().users(),context.getRealm(),context.getHttpRequest().getDecodedFormParameters().getFirst("phone_number"));
-    }
-
     @Override
     public void authenticate(AuthenticationFlowContext context) {
-        UserModel user = findUser(context);
+
+        String phoneNumber = getPhoneNumber(context);
+
+        if (Validation.isBlank(phoneNumber)){
+            invalidCredentials(context);
+            return;
+        }
+        UserModel user = UserUtils.findUserByPhone(context.getSession().users(),context.getRealm(),phoneNumber);
         if (user == null) {
-            context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
-            Response challenge = errorResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "invalid_grant", "Invalid user credentials");
-            context.failure(AuthenticationFlowError.INVALID_USER, challenge);
-            logger.info("Grant authenticator valid phone failure");
+            invalidCredentials(context);
             return;
         }
 

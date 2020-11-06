@@ -3,3 +3,4 @@ cc.coopersoft.keycloak.phone.authentication.authenticators.resetcred.ResetCreden
 cc.coopersoft.keycloak.phone.authentication.authenticators.resetcred.ResetCredentialEmailWithPhone
 cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant.AuthenticationCodeAuthenticatorFactory
 cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant.PhoneNumberAuthenticatorFactory
+cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant.EverybodyPhoneAuthenticatorFactory

@@ -1,24 +1,79 @@
-module add --name=okio --resources=okio-1.17.2.jar
-module add --name=okhttp --resources=okhttp-3.14.2.jar --dependencies=okio
-module add --name=keycloak-phone-provider --resources=keycloak-phone-provider.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-common,org.hibernate,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-services,org.keycloak.keycloak-model-jpa,org.jboss.logging,javax.api,javax.ws.rs.api,javax.transaction.api,javax.persistence.api,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,org.apache.commons.lang,javax.xml.bind.api,okhttp
 
+
+
+# main provider
+module add --name=keycloak-phone-provider --resources=keycloak-phone-provider.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-common,org.hibernate,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-services,org.keycloak.keycloak-model-jpa,org.jboss.logging,javax.api,javax.ws.rs.api,javax.transaction.api,javax.persistence.api,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,org.apache.commons.lang,javax.xml.bind.api,com.squareup.okhttp3
+
+# dummy provider
 module add --name=keycloak-sms-provider-dummy --resources=keycloak-sms-provider-dummy.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider
 
-module add --name=cloopen-sms-sdk --resources=java-sms-sdk-1.0.3.jar --dependencies=javax.xml.bind.api,com.google.code.gson
+# cloopen provider
+  # need gson 2.8.6, keycloak 10.0.2 gson version is low need higher
+module add --name=com.google.code.gson.higher --resources=gson-2.8.6.jar --dependencies=javax.sql.api,sun.jdk
+
+module add --name=cloopen-sms-sdk --resources=java-sms-sdk-1.0.3.jar --dependencies=javax.xml.bind.api,com.google.code.gson.higher,org.dom4j,org.apache.httpcomponents,org.apache.commons.codec,org.apache.commons.logging
 module add --name=keycloak-sms-provider-cloopen --resources=keycloak-sms-provider-cloopen.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,cloopen-sms-sdk
+
+# totalvoice provider
+module add --name=totalvoice.sdk --resources=totalvoice-java-1.1.1.jar --dependencies=org.apache.httpcomponents
+module add --name=keycloak-sms-provider-totalvoice --resources=keycloak-sms-provider-totalvoice.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,totalvoice.sdk
+
+# twilio provider
+module add --name=twilio.sdk --resources=twilio-7.53.0.jar  --dependencies=com.google.guava,org.apache.httpcomponents,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-annotations,com.fasterxml.jackson.core.jackson-databind,javax.xml.bind.api
+module add --name=keycloak-sms-provider-twilio --resources=keycloak-sms-provider-twilio.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,twilio.sdk
+
+# aliyun provider
+module add --name=aliyun-java-sdk --resources=aliyun-java-sdk-core-4.5.3.jar --dependencies=com.google.code.gson,org.apache.httpcomponents,org.apache.commons.logging,javax.xml.bind.api,org.slf4j,io.opentracing.opentracing-api,io.opentracing.opentracing-util
+module add --name=keycloak-sms-provider-aliyun --resources=keycloak-sms-provider-aliyun.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,aliyun-java-sdk
+
+# yunxin provider
+module add --name=keycloak-sms-provider-yunxin --resources=keycloak-sms-provider-yunxin.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,org.apache.httpcomponents
+
+# tencent provider
+module add --name=tencentcloud-sdk --resources=tencentcloud-sdk-java-3.1.158.jar  --dependencies=javax.xml.bind.api,com.google.code.gson,org.apache.commons.logging,com.squareup.okhttp3
+module add --name=keycloak-sms-provider-tencent --resources=keycloak-sms-provider-tencent.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,tencentcloud-sdk
 
 
 embed-server --server-config=standalone-ha.xml --std-out=echo
 batch
-/subsystem=keycloak-server:list-add(name=providers,value=module:okio)
-/subsystem=keycloak-server:list-add(name=providers,value=module:okhttp)
-/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-phone-provider)
 
+# main provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-phone-provider)
+/subsystem=keycloak-server/spi=phoneMessageService/:add
+/subsystem=keycloak-server/spi=phoneMessageService/provider=default/:add(enabled=true,properties={service => ${env.SMS_PROVIDER_SERVER:} , tokenExpiresIn => ${env.SMS_TOKEN_EXPIRES:180}})
+
+/subsystem=keycloak-server/spi=messageSenderService/:add
+
+
+# dummy provider
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-dummy)
 
-/subsystem=keycloak-server:list-add(name=providers,value=module:cloopen-sms-sdk)
+# cloopen provider
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-cloopen)
+/subsystem=keycloak-server/spi=messageSenderService/provider=cloopen/:add(enabled=true,properties={account => ${env.CLOOPEN_ACCOUNT_ID:} , authToken => ${env.CLOOPEN_AUTH_TOKEN:}})
+# -- add $realmName_APP_ID , $realmName_$type.name_TEMPLATE  in your project cli
 
+
+# totalvoice provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-totalvoice)
+/subsystem=keycloak-server/spi=messageSenderService/provider=totalvoice/:add(enabled=true,properties={authToken => ${env.TOTALVOICE_AUTH_TOKEN:}})
+
+# twilio provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-twilio)
+/subsystem=keycloak-server/spi=messageSenderService/provider=twilio/:add(enabled=true,properties={accountSId => ${env.TWILIO_ACCOUNT_ID:} , authToken => ${env.TWILIO_AUTH_TOKEN:},twilioPhoneNumber => ${env.TWILIO_SEND_PHONE_NUMBER:} })
+
+
+# aliyun provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-aliyun)
+/subsystem=keycloak-server/spi=messageSenderService/provider=aliyun/:add(enabled=true,properties={accessKeyId => ${env.ALIYUN_ACCESS_KEY_ID:} ,accessSecret => ${env.ALIYUN_ACCESS_SECRET:}})
+
+# tencent provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-tencent)
+/subsystem=keycloak-server/spi=messageSenderService/provider=tencent/:add(enabled=true,properties={secretId => ${env.TENCENT_SECRET_ID:} ,secretKey => ${env.TENCENT_SECRET_KEY:}})
+
+# yunxin provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-yunxin)
+/subsystem=keycloak-server/spi=messageSenderService/provider=yunxin/:add(enabled=true,properties={APP_SECRET => ${env.YUNXIN_APP_SECRET:}})
 
 
 run-batch
@@ -27,14 +82,45 @@ stop-embedded-server
 embed-server --server-config=standalone.xml --std-out=echo
 batch
 
-/subsystem=keycloak-server:list-add(name=providers,value=module:okio)
-/subsystem=keycloak-server:list-add(name=providers,value=module:okhttp)
-/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-phone-provider)
 
+# main provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-phone-provider)
+/subsystem=keycloak-server/spi=phoneMessageService/:add
+/subsystem=keycloak-server/spi=phoneMessageService/provider=default/:add(enabled=true,properties={service => ${env.SMS_PROVIDER_SERVER:} , tokenExpiresIn => ${env.SMS_TOKEN_EXPIRES:180}})
+
+/subsystem=keycloak-server/spi=messageSenderService/:add
+
+
+# dummy provider
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-dummy)
 
-/subsystem=keycloak-server:list-add(name=providers,value=module:cloopen-sms-sdk)
+# cloopen provider
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-cloopen)
+/subsystem=keycloak-server/spi=messageSenderService/provider=cloopen/:add(enabled=true,properties={account => ${env.CLOOPEN_ACCOUNT_ID:} , authToken => ${env.CLOOPEN_AUTH_TOKEN:}})
+# -- add $realmName_APP_ID , $realmName_$type.name_TEMPLATE  in your project cli
+
+
+# totalvoice provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-totalvoice)
+/subsystem=keycloak-server/spi=messageSenderService/provider=totalvoice/:add(enabled=true,properties={authToken => ${env.TOTALVOICE_AUTH_TOKEN:}})
+
+# twilio provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-twilio)
+/subsystem=keycloak-server/spi=messageSenderService/provider=twilio/:add(enabled=true,properties={accountSId => ${env.TWILIO_ACCOUNT_ID:} , authToken => ${env.TWILIO_AUTH_TOKEN:},twilioPhoneNumber => ${env.TWILIO_SEND_PHONE_NUMBER:} })
+
+
+# aliyun provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-aliyun)
+/subsystem=keycloak-server/spi=messageSenderService/provider=aliyun/:add(enabled=true,properties={accessKeyId => ${env.ALIYUN_ACCESS_KEY_ID:} ,accessSecret => ${env.ALIYUN_ACCESS_SECRET:}})
+
+# tencent provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-tencent)
+/subsystem=keycloak-server/spi=messageSenderService/provider=tencent/:add(enabled=true,properties={secretId => ${env.TENCENT_SECRET_ID:} ,secretKey => ${env.TENCENT_SECRET_KEY:}})
+
+# yunxin provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-yunxin)
+/subsystem=keycloak-server/spi=messageSenderService/provider=yunxin/:add(enabled=true,properties={APP_SECRET => ${env.YUNXIN_APP_SECRET:}})
+
 
 run-batch
 stop-embedded-server

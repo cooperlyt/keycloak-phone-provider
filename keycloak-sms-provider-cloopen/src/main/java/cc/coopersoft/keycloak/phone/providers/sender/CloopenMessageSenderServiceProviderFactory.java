@@ -11,8 +11,9 @@ public class CloopenMessageSenderServiceProviderFactory implements MessageSender
     private Config.Scope config;
 
     @Override
-    public MessageSenderService create(KeycloakSession keycloakSession) {
-        return new CloopenMessageSenderService(config);
+    public MessageSenderService create(KeycloakSession session) {
+
+        return new CloopenSmsSenderServiceProvider(config,session.getContext().getRealm());
     }
 
     @Override
@@ -30,6 +31,6 @@ public class CloopenMessageSenderServiceProviderFactory implements MessageSender
 
     @Override
     public String getId() {
-        return "Cloopen";
+        return "cloopen";
     }
 }

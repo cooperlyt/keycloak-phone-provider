@@ -10,8 +10,8 @@ import org.keycloak.provider.Provider;
  */
 public interface MessageSenderService extends Provider {
 
-    //void sendVoiceMessage((TokenCodeType type, String realmName, String phoneNumber, String code , int expires) throws MessageSendException;
+    //void sendVoiceMessage((TokenCodeType type, String realmName, String realmDisplayName, String phoneNumber, String code , int expires) throws MessageSendException;
 
 
-    void sendSmsMessage(TokenCodeType type, String realmName, String phoneNumber, String code , int expires) throws MessageSendException;
+    void sendSmsMessage(TokenCodeType type, String phoneNumber, String code , int expires) throws MessageSendException;
 }

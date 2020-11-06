@@ -62,7 +62,7 @@ public class AuthenticationCodeAuthenticatorFactory implements AuthenticatorFact
         return configProperties;
     }
 
-    private static final List<ProviderConfigProperty> configProperties = new ArrayList<ProviderConfigProperty>();
+    private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
     static {
         ProviderConfigProperty maxAge;
@@ -73,13 +73,13 @@ public class AuthenticationCodeAuthenticatorFactory implements AuthenticatorFact
         maxAge.setHelpText("Max age in seconds of the verification codes.");
         configProperties.add(maxAge);
 
-        ProviderConfigProperty kind = new ProviderConfigProperty();
-        kind.setName(KIND);
-        kind.setLabel("Verification Code Kind");
-        kind.setType(ProviderConfigProperty.STRING_TYPE);
-        kind.setHelpText("a string that identifies what the verification code is used for, if this is set, " +
-                "a parameter of 'kind' is required to be equal with set value");
-        configProperties.add(kind);
+//        ProviderConfigProperty kind = new ProviderConfigProperty();
+//        kind.setName(KIND);
+//        kind.setLabel("Verification Code Kind");
+//        kind.setType(ProviderConfigProperty.STRING_TYPE);
+//        kind.setHelpText("a string that identifies what the verification code is used for, if this is set, " +
+//                "a parameter of 'kind' is required to be equal with set value");
+//        configProperties.add(kind);
     }
 
     @Override
