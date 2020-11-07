@@ -9,9 +9,9 @@ module add --name=keycloak-sms-provider-dummy --resources=keycloak-sms-provider-
 
 # cloopen provider
   # need gson 2.8.6, keycloak 10.0.2 gson version is low need higher
-module add --name=com.google.code.gson.higher --resources=gson-2.8.6.jar --dependencies=javax.sql.api,sun.jdk
+# module add --name=com.google.code.gson.higher --resources=gson-2.8.6.jar --dependencies=javax.sql.api,sun.jdk
 
-module add --name=cloopen-sms-sdk --resources=java-sms-sdk-1.0.3.jar --dependencies=javax.xml.bind.api,com.google.code.gson.higher,org.dom4j,org.apache.httpcomponents,org.apache.commons.codec,org.apache.commons.logging
+module add --name=cloopen-sms-sdk --resources=java-sms-sdk-1.0.3.jar --dependencies=javax.xml.bind.api,com.google.code.gson,org.dom4j,org.apache.httpcomponents,org.apache.commons.codec,org.apache.commons.logging
 module add --name=keycloak-sms-provider-cloopen --resources=keycloak-sms-provider-cloopen.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,cloopen-sms-sdk
 
 # totalvoice provider

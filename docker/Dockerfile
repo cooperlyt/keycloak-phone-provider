@@ -14,7 +14,7 @@ RUN curl -fSL https://repo1.maven.org/maven2/com/cloopen/java-sms-sdk/1.0.3/java
     && curl -fSL https://repo1.maven.org/maven2/com/aliyun/aliyun-java-sdk-core/4.5.3/aliyun-java-sdk-core-4.5.3.jar -o aliyun-java-sdk-core-4.5.3.jar
 
 # yuntongxin provider need gson 2.8.6, keycloak 10.0.2 gson version is low need higher
-RUN curl -fSL https://repo1.maven.org/maven2/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar -o gson-2.8.6.jar
+#RUN curl -fSL https://repo1.maven.org/maven2/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar -o gson-2.8.6.jar
 
 # main provider
 COPY modules/keycloak-phone-provider/main/keycloak-phone-provider.jar .

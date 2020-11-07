@@ -7,7 +7,6 @@ import org.keycloak.authentication.FormAction;
 import org.keycloak.authentication.FormActionFactory;
 import org.keycloak.authentication.FormContext;
 import org.keycloak.authentication.ValidationContext;
-import org.keycloak.component.ComponentModel;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.*;
 import org.keycloak.provider.ProviderConfigProperty;
@@ -18,14 +17,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-//keycloak 11.0.3 can`t get referer, can`t use this
-public class RegistrationQueryParametersReader implements  FormActionFactory, FormAction {
+public class RegistrationRedirectParametersReader implements  FormActionFactory, FormAction {
 
-    private static final Logger logger = Logger.getLogger(RegistrationQueryParametersReader.class);
+    private static final Logger logger = Logger.getLogger(RegistrationRedirectParametersReader.class);
 
     private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
-    public static final String PROVIDER_ID = "registration-query-parameter";
+    public static final String PROVIDER_ID = "registration-redirect-parameter";
 
     public static final String PARAM_NAMES = "registration.parameter.accept";
 
@@ -59,7 +57,7 @@ public class RegistrationQueryParametersReader implements  FormActionFactory, Fo
 
     @Override
     public String getDisplayType() {
-        return "Query parameter reader";
+        return "Redirect parameter reader";
     }
 
     @Override
@@ -131,13 +129,17 @@ public class RegistrationQueryParametersReader implements  FormActionFactory, Fo
     @Override
     public void success(FormContext context) {
 
-        String referer = context.getHttpRequest().getMutableHeaders().getFirst("Referer");
-        logger.info("add user attribute form referer:" + referer);
-        if (Validation.isBlank(referer)){
+
+
+
+        String redirectUri = context.getAuthenticationSession().getRedirectUri();
+        logger.info("add user attribute form redirectUri:" + redirectUri);
+        if (Validation.isBlank(redirectUri)){
             logger.error("no referer. cant get param in keycloak version");
             return;
         }
-        HttpUrl url = HttpUrl.parse(referer);
+
+        HttpUrl url = HttpUrl.parse(redirectUri);
         if (url != null) {
             UserModel user = context.getUser();
             String[] paramNames = null;
