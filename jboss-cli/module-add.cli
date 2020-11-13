@@ -50,7 +50,7 @@ batch
 
 # cloopen provider
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-cloopen)
-/subsystem=keycloak-server/spi=messageSenderService/provider=cloopen/:add(enabled=true,properties={account => ${env.CLOOPEN_ACCOUNT_ID:} , authToken => ${env.CLOOPEN_AUTH_TOKEN:}})
+/subsystem=keycloak-server/spi=messageSenderService/provider=cloopen/:add(enabled=true,properties={account => ${env.CLOOPEN_ACCOUNT_ID:} , authToken => ${env.CLOOPEN_AUTH_TOKEN:}, APP_ID => ${env.CLOOPEN_APP_ID:}, VERIFY_TEMPLATE => ${env.CLOOPEN_VERIFY_TEMPLATE:}, OTP_TEMPLATE => ${env.CLOOPEN_OTP_TEMPLATE:},RESET_TEMPLATE => ${env.CLOOPEN_RESET_TEMPLATE:},REGISTRATION_TEMPLATE => ${env.CLOOPEN_REGISTRATION_TEMPLATE:}})
 # -- add $realmName_APP_ID , $realmName_$type.name_TEMPLATE  in your project cli
 
 
@@ -69,7 +69,7 @@ batch
 
 # tencent provider
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-tencent)
-/subsystem=keycloak-server/spi=messageSenderService/provider=tencent/:add(enabled=true,properties={secretId => ${env.TENCENT_SECRET_ID:} ,secretKey => ${env.TENCENT_SECRET_KEY:}})
+/subsystem=keycloak-server/spi=messageSenderService/provider=tencent/:add(enabled=true,properties={secretId => ${env.TENCENT_SECRET_ID:} ,secretKey => ${env.TENCENT_SECRET_KEY:} , APP_ID => ${env.TENCENT_APP_ID:}, VERIFY_TEMPLATE => ${env.TENCENT_VERIFY_TEMPLATE:}, OTP_TEMPLATE => ${env.TENCENT_OTP_TEMPLATE:},RESET_TEMPLATE => ${env.TENCENT_RESET_TEMPLATE:},REGISTRATION_TEMPLATE => ${env.TENCENT_REGISTRATION_TEMPLATE:}})
 
 # yunxin provider
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-yunxin)
@@ -81,7 +81,6 @@ stop-embedded-server
 
 embed-server --server-config=standalone.xml --std-out=echo
 batch
-
 
 # main provider
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-phone-provider)
@@ -96,7 +95,7 @@ batch
 
 # cloopen provider
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-cloopen)
-/subsystem=keycloak-server/spi=messageSenderService/provider=cloopen/:add(enabled=true,properties={account => ${env.CLOOPEN_ACCOUNT_ID:} , authToken => ${env.CLOOPEN_AUTH_TOKEN:}})
+/subsystem=keycloak-server/spi=messageSenderService/provider=cloopen/:add(enabled=true,properties={account => ${env.CLOOPEN_ACCOUNT_ID:} , authToken => ${env.CLOOPEN_AUTH_TOKEN:}, APP_ID => ${env.CLOOPEN_APP_ID:}, VERIFY_TEMPLATE => ${env.CLOOPEN_VERIFY_TEMPLATE:}, OTP_TEMPLATE => ${env.CLOOPEN_OTP_TEMPLATE:},RESET_TEMPLATE => ${env.CLOOPEN_RESET_TEMPLATE:},REGISTRATION_TEMPLATE => ${env.CLOOPEN_REGISTRATION_TEMPLATE:}})
 # -- add $realmName_APP_ID , $realmName_$type.name_TEMPLATE  in your project cli
 
 
@@ -115,7 +114,7 @@ batch
 
 # tencent provider
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-tencent)
-/subsystem=keycloak-server/spi=messageSenderService/provider=tencent/:add(enabled=true,properties={secretId => ${env.TENCENT_SECRET_ID:} ,secretKey => ${env.TENCENT_SECRET_KEY:}})
+/subsystem=keycloak-server/spi=messageSenderService/provider=tencent/:add(enabled=true,properties={secretId => ${env.TENCENT_SECRET_ID:} ,secretKey => ${env.TENCENT_SECRET_KEY:} , APP_ID => ${env.TENCENT_APP_ID:}, VERIFY_TEMPLATE => ${env.TENCENT_VERIFY_TEMPLATE:}, OTP_TEMPLATE => ${env.TENCENT_OTP_TEMPLATE:},RESET_TEMPLATE => ${env.TENCENT_RESET_TEMPLATE:},REGISTRATION_TEMPLATE => ${env.TENCENT_REGISTRATION_TEMPLATE:}})
 
 # yunxin provider
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-yunxin)

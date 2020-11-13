@@ -1,4 +1,4 @@
-FROM jboss/keycloak:10.0.2
+FROM coopersoft/keycloak-callback:11.0.3
 
 WORKDIR /tmp
 

@@ -18,20 +18,6 @@ public class EverybodyPhoneAuthenticator extends AuthenticationCodeAuthenticator
     super(session);
   }
 
-  private UserModel createUser(AuthenticationFlowContext context, String username){
-
-//    context.getEvent().detail(Details.USERNAME, username)
-//            .detail(Details.REGISTER_METHOD, "form");
-    if (context.getSession().users().getUserByUsername(username, context.getRealm()) != null){
-
-    }
-
-    UserModel user = context.getSession().users().addUser(context.getRealm(), username);
-    user.setEnabled(true);
-    context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, username);
-    return user;
-  }
-
   @Override
   public boolean requiresUser() {
     return false;
@@ -49,11 +35,14 @@ public class EverybodyPhoneAuthenticator extends AuthenticationCodeAuthenticator
     UserModel user = UserUtils.findUserByPhone(context.getSession().users(),
             context.getRealm(),phoneNumber);
     if (user == null){
-      user = createUser(context,phoneNumber);
-    }
-    if (user == null){
-      invalidCredentials(context,AuthenticationFlowError.USER_CONFLICT);
-      return;
+
+      if (context.getSession().users().getUserByUsername(phoneNumber, context.getRealm()) != null){
+        invalidCredentials(context,AuthenticationFlowError.USER_CONFLICT);
+        return;
+      }
+      user = context.getSession().users().addUser(context.getRealm(), phoneNumber);
+      user.setEnabled(true);
+      context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, phoneNumber);
     }
 
     context.setUser(user);

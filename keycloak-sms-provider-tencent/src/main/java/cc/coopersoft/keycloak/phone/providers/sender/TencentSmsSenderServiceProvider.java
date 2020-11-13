@@ -13,7 +13,12 @@ import com.tencentcloudapi.sms.v20190711.models.SendSmsResponse;
 import org.keycloak.Config;
 import org.keycloak.models.RealmModel;
 
+import java.util.Optional;
+
 public class TencentSmsSenderServiceProvider implements MessageSenderService {
+
+  private static final String APP_ID_PARAM_NAME = "APP_ID";
+  private static final String TEMPLATE_PARAM_NAME = "TEMPLATE";
 
   private final Config.Scope config;
   private final RealmModel realm;
@@ -78,8 +83,10 @@ public class TencentSmsSenderServiceProvider implements MessageSenderService {
        * sms helper：https://cloud.tencent.com/document/product/382/3773 */
 
       /* 短信应用 ID: 在 [短信控制台] 添加应用后生成的实际 SDKAppID，例如1400006666 */
-      String appid = config.get(realm.getName().toUpperCase() + "_APP_ID");
-      req.setSmsSdkAppid(appid);
+
+      String appId = Optional.ofNullable(config.get(realm.getName().toUpperCase() + "_" + APP_ID_PARAM_NAME))
+              .orElse(config.get(APP_ID_PARAM_NAME));
+      req.setSmsSdkAppid(appId);
 
       /* 短信签名内容: 使用 UTF-8 编码，必须填写已审核通过的签名，可登录 [短信控制台] 查看签名信息 */
       String sign = realm.getDisplayName();
@@ -98,7 +105,8 @@ public class TencentSmsSenderServiceProvider implements MessageSenderService {
 //      req.setExtendCode(extendcode);
 
       /* 模板 ID: 必须填写已审核通过的模板 ID，可登录 [短信控制台] 查看模板 ID */
-      String templateId= config.get(realm.getName().toUpperCase() + "_" + type.name().toUpperCase() + "_TEMPLATE");
+      String templateId= Optional.ofNullable(config.get(realm.getName().toUpperCase() + "_" + type.name().toUpperCase() + "_" + TEMPLATE_PARAM_NAME))
+              .orElse(type.name().toUpperCase() + "_" + config.get(APP_ID_PARAM_NAME));
       req.setTemplateID(templateId);
 
       /* 下发手机号码，采用 e.164 标准，+[国家或地区码][手机号]
