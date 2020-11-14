@@ -59,7 +59,7 @@ public class CloopenSmsSenderServiceProvider implements MessageSenderService {
                 .orElse(config.get(APP_ID_PARAM_NAME));
         client.setAppId(appId);
         String templateId= Optional.ofNullable(config.get(realm.getName().toUpperCase() + "_" + type.name().toUpperCase() + "_" + TEMPLATE_PARAM_NAME))
-                .orElse(type.name().toUpperCase() + "_" + config.get(APP_ID_PARAM_NAME));
+                .orElse(type.name().toUpperCase() + "_" + config.get(TEMPLATE_PARAM_NAME));
 
         logger.info(String.format("cloopen appId: %s ; templateId: %s", appId, templateId));
 

@@ -87,7 +87,6 @@ public class TencentSmsSenderServiceProvider implements MessageSenderService {
       String appId = Optional.ofNullable(config.get(realm.getName().toUpperCase() + "_" + APP_ID_PARAM_NAME))
               .orElse(config.get(APP_ID_PARAM_NAME));
       req.setSmsSdkAppid(appId);
-
       /* 短信签名内容: 使用 UTF-8 编码，必须填写已审核通过的签名，可登录 [短信控制台] 查看签名信息 */
       String sign = realm.getDisplayName();
       req.setSign(sign);
@@ -106,7 +105,7 @@ public class TencentSmsSenderServiceProvider implements MessageSenderService {
 
       /* 模板 ID: 必须填写已审核通过的模板 ID，可登录 [短信控制台] 查看模板 ID */
       String templateId= Optional.ofNullable(config.get(realm.getName().toUpperCase() + "_" + type.name().toUpperCase() + "_" + TEMPLATE_PARAM_NAME))
-              .orElse(type.name().toUpperCase() + "_" + config.get(APP_ID_PARAM_NAME));
+              .orElse(type.name().toUpperCase() + "_" + config.get(TEMPLATE_PARAM_NAME));
       req.setTemplateID(templateId);
 
       /* 下发手机号码，采用 e.164 标准，+[国家或地区码][手机号]

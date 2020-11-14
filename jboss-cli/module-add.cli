@@ -23,7 +23,9 @@ module add --name=twilio.sdk --resources=twilio-7.53.0.jar  --dependencies=com.g
 module add --name=keycloak-sms-provider-twilio --resources=keycloak-sms-provider-twilio.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,twilio.sdk
 
 # aliyun provider
-module add --name=aliyun-java-sdk --resources=aliyun-java-sdk-core-4.5.3.jar --dependencies=com.google.code.gson,org.apache.httpcomponents,org.apache.commons.logging,javax.xml.bind.api,org.slf4j,io.opentracing.opentracing-api,io.opentracing.opentracing-util
+module add --name=org.ini4j --resources=ini4j-0.5.4.jar
+module add --name=org.jacoco.agent --resources=org.jacoco.agent-0.8.5-runtime.jar
+module add --name=aliyun-java-sdk --resources=aliyun-java-sdk-core-4.5.3.jar --dependencies=com.google.code.gson,org.apache.httpcomponents,org.apache.commons.logging,javax.xml.bind.api,org.slf4j,io.opentracing.opentracing-api,io.opentracing.opentracing-util,org.ini4j,org.jacoco.agent
 module add --name=keycloak-sms-provider-aliyun --resources=keycloak-sms-provider-aliyun.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,aliyun-java-sdk
 
 # yunxin provider
