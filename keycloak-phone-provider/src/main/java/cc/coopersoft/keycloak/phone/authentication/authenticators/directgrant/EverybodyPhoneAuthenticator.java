@@ -1,5 +1,8 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant;
 
+import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
+import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
+import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
 import cc.coopersoft.keycloak.phone.utils.UserUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -27,7 +30,22 @@ public class EverybodyPhoneAuthenticator extends AuthenticationCodeAuthenticator
   public void authenticate(AuthenticationFlowContext context){
     String phoneNumber = getPhoneNumber(context);
 
-    if (Validation.isBlank(phoneNumber) || !validateVerificationCode(context,phoneNumber)){
+    if (Validation.isBlank(phoneNumber)){
+      invalidCredentials(context);
+      return;
+    }
+
+    String code = getAuthenticationCode(context);
+
+    if (Validation.isBlank(code)){
+      invalidCredentials(context);
+      return;
+    }
+
+    TokenCodeService tokenCodeService = context.getSession().getProvider(TokenCodeService.class);
+    TokenCodeRepresentation tokenCode = tokenCodeService.ongoingProcess(phoneNumber, TokenCodeType.OTP);
+
+    if(tokenCode == null || !tokenCode.getCode().equals(code)){
       invalidCredentials(context);
       return;
     }
@@ -44,8 +62,10 @@ public class EverybodyPhoneAuthenticator extends AuthenticationCodeAuthenticator
       user.setEnabled(true);
       context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, phoneNumber);
     }
-
     context.setUser(user);
+
+    tokenCodeService.tokenValidated(user,phoneNumber,tokenCode.getId());
+
     context.success();
   }
 }

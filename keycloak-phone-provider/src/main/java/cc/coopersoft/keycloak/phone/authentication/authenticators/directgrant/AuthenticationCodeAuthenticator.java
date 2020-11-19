@@ -46,9 +46,9 @@ public class AuthenticationCodeAuthenticator extends BaseDirectGrantAuthenticato
 
 
 
-    protected boolean validateVerificationCode(AuthenticationFlowContext context, String phoneNumber) {
+    private boolean validateVerificationCode(AuthenticationFlowContext context, String phoneNumber) {
 
-        String code = context.getHttpRequest().getDecodedFormParameters().getFirst("code");
+        String code = getAuthenticationCode(context);
 
 //        String kind = null;
 //        AuthenticatorConfigModel authenticatorConfig = context.getAuthenticatorConfig();
@@ -60,7 +60,7 @@ public class AuthenticationCodeAuthenticator extends BaseDirectGrantAuthenticato
             context.getSession().getProvider(TokenCodeService.class).validateCode(context.getUser(), phoneNumber, code, TokenCodeType.OTP);
             return true;
         } catch (Exception e) {
-            logger.info("Grant authenticator valid code failure");
+            logger.info("Grant authenticator valid code failure",e);
             return false;
         }
 

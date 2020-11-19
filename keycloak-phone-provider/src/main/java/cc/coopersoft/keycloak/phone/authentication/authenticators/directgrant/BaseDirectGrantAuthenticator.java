@@ -25,6 +25,10 @@ public abstract class BaseDirectGrantAuthenticator implements Authenticator {
                 context.getHttpRequest().getDecodedFormParameters().getFirst("phoneNumber"));
     }
 
+    protected String getAuthenticationCode(AuthenticationFlowContext context){
+        return context.getHttpRequest().getDecodedFormParameters().getFirst("code");
+    }
+
     protected void invalidCredentials(AuthenticationFlowContext context,AuthenticationFlowError error){
         context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
         Response challenge = errorResponse(Response.Status.UNAUTHORIZED.getStatusCode(), "invalid_grant", "Invalid user credentials");

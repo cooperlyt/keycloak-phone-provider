@@ -84,15 +84,25 @@ ii. set provider and token expiration time
 **Only use phone login or get Access token use endpoints:**
 
 Under Authentication > Flows:
-Copy the 'Direct Grant' flow to 'Direct grant with phone' flow
-Click on 'Actions > Add execution' on the 'Provide Phone Number' line
-Click on 'Actions > Add execution' on the 'Provide Verification Code' line
-Delete or disable other
-Set both of 'Provide Phone Number' and 'Provide Verification Code' to 'REQUIRED'
+ + Copy the 'Direct Grant' flow to 'Direct grant with phone' flow
+ + Click on 'Actions > Add execution' on the 'Provide Phone Number' line
+ + Click on 'Actions > Add execution' on the 'Provide Verification Code' line
+ + Delete or disable other
+ + Set both of 'Provide Phone Number' and 'Provide Verification Code' to 'REQUIRED'
 
 Under 'Clients > $YOUR_CLIENT > Authentication Flow Overrides' or 'Authentication > Bindings' 
 Set Direct Grant Flow to 'Direct grant with phone' 
 
+**Everybody phone number( if not exists create user by phone number) get Access token use endpoints:**
+
+Under Authentication > Flows:
+ + Copy the 'Direct Grant' flow to 'Direct grant everybody with phone' flow
+ + Click on 'Actions > Add execution' on the 'Authentication Everybody By Phone' line
+ + Delete or disable other
+ + Set 'Authentication Everybody By Phone' to 'REQUIRED'
+
+Under 'Clients > $YOUR_CLIENT > Authentication Flow Overrides' or 'Authentication > Bindings' 
+Set Direct Grant Flow to 'Direct grant everybody with phone' 
 
 **Reset credential**
  Testing , coming soon!
