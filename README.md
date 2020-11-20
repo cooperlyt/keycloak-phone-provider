@@ -159,7 +159,7 @@ You'll get 2 extra endpoints that are useful to do the verification from a custo
   + GET /auth/realms/{realmName}/sms/verification-code?phoneNumber=+5534990001234 (To request a number verification. No auth required.)
   + POST /auth/realms/{realmName}/sms/verification-code?phoneNumber=+5534990001234&code=123456 (To verify the process. User must be authenticated.)
 
-You'll get 2 extra endpoints that are useful to do the OTP from a custom application.
+You'll get 2 extra endpoints that are useful to do the access token from a custom application.
   + GET /auth/realms/{realmName}/sms/authentication-code?phoneNumber=+5534990001234 (To request a number verification. No auth required.)
   + POST /auth/realms/shuashua/protocol/openid-connect/token
     Content-Type: application/x-www-form-urlencoded
