@@ -25,12 +25,12 @@ verification process. This accommodates the use case of pre-paid numbers that ge
 
 ## Compatibility
 
-This was initially developed using 10.0.2 version of Keycloak as baseline, and I did not test another user storage beyond
+This was initially developed using 11.0.3 version of Keycloak as baseline, and I did not test another user storage beyond
 the default like Kerberos or LDAP. I may try to help you but I cannot guarantee.
 
 ## Usage
 
-docker image is [coopersoft/keycloak-phone:10.0.2](https://hub.docker.com/layers/coopersoft/keycloak-phone/10.0.2/images/sha256-cfb890c723a2b9970c59f0bf3e0310499bb6e27e33d685edbc77d992ae15c4c9?context=repo)
+docker image is [coopersoft/keycloak-phone:11.0.3](https://hub.docker.com/layers/coopersoft/keycloak-phone/11.0.3/images/sha256-cfb890c723a2b9970c59f0bf3e0310499bb6e27e33d685edbc77d992ae15c4c9?context=repo)
 for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/keycloak-phone-provider/master/examples/docker-compose.yml)
 run as `docker-compose up` , docker-compose is required!
 
