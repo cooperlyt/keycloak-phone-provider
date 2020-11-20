@@ -1,7 +1,9 @@
 # Keycloak Phone Provider
 
  + Phone support like e-mail 
- + OTP by phone, 
+ + OTP by phone
+ + Register with phone
+ + Authentication by phone
 
 sms
 voice
@@ -15,9 +17,13 @@ sender of TTS calls or WhatsApp messages.
 This is what you can do for now:
   + Check ownership of a phone number (Forms and HTTP API)
   + Use SMS as second factor in 2FA method (Browser flow)
-  + Reset Password by phone
-  + Authentication by phone
-  + only use phone Register
+  + Reset Password by phone (Testing)
+  + Authentication by phone (HTTP API)
+  + Authentication everybody by phone, auto create user on Grant(HTTP API)
+  + Register with phone 
+  + Register only phone (user name is phone number)
+  + Register add user attribute with redirect_uri params
+
   
 Two user attributes are going to be used by this provider: _phoneNumberVerified_ (bool) and _phoneNumber_ (str). Many
 users can have the same _phoneNumber_, but only one of them is getting _phoneNumberVerified_ = true at the end of a 
