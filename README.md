@@ -38,7 +38,7 @@ the default like Kerberos or LDAP. I may try to help you but I cannot guarantee.
 
 docker image is [coopersoft/keycloak-phone:11.0.3](https://hub.docker.com/layers/coopersoft/keycloak-phone/11.0.3/images/sha256-cfb890c723a2b9970c59f0bf3e0310499bb6e27e33d685edbc77d992ae15c4c9?context=repo)
 for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/keycloak-phone-provider/master/examples/docker-compose.yml)
-run as `docker-compose up` , docker-compose is required!
+run as `docker-compose up` , docker-compose is required! (image base on [keycloak-callback:11.0.3](https://github.com/cooper-lyt/keycloak-callback-provider) provide registration callback for http get , post , rocketmq , or else)
 
 
 If you want to build the project, simply run `mvn clean package docker:build` after cloning the repository. 
