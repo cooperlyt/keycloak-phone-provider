@@ -29,7 +29,7 @@ Two user attributes are going to be used by this provider: _phoneNumberVerified_
 users can have the same _phoneNumber_, but only one of them is getting _phoneNumberVerified_ = true at the end of a 
 verification process. This accommodates the use case of pre-paid numbers that get recycled if inactive for too much time.
 
-**Client:**
+## Client:
 see my project [KeycloakClient](https://github.com/cooper-lyt/KeycloakClient) ,is android client, nothing stop you from implementing other java program.
 
 ## Compatibility
