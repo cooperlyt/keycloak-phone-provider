@@ -29,6 +29,9 @@ Two user attributes are going to be used by this provider: _phoneNumberVerified_
 users can have the same _phoneNumber_, but only one of them is getting _phoneNumberVerified_ = true at the end of a 
 verification process. This accommodates the use case of pre-paid numbers that get recycled if inactive for too much time.
 
+**Client:**
+see my project [KeycloakClient](https://github.com/cooper-lyt/KeycloakClient) ,is android client, nothing stop you from implementing other java program.
+
 ## Compatibility
 
 This was initially developed using 11.0.3 version of Keycloak as baseline, and I did not test another user storage beyond
@@ -45,6 +48,7 @@ If you want to build the project, simply run `mvn clean package docker:build` af
 At the end of the goal.
  + local keycloak installed: copt the `target` directory  all jars correctly placed in a WildFly-like folder structure. 
  + docker image build: for examples [run-local.sh](https://github.com/cooper-lyt/keycloak-phone-provider/blob/master/examples/snapshot/run-local.sh) or [run-remote.sh](https://github.com/cooper-lyt/keycloak-phone-provider/blob/master/examples/snapshot/run-remote.sh).
+
 
 
 **Installing:**
