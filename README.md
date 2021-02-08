@@ -67,7 +67,7 @@ i. add modules defs
     <web-context>auth</web-context>
     <providers>
         <provider>classpath:${jboss.home.dir}/providers/*</provider>
-        <provider>module:keycloak-sms-provider</provider>
+        <provider>module:keycloak-phone-provider</provider>
         <provider>module:keycloak-sms-provider-dummy</provider>
     </providers>
 ...
