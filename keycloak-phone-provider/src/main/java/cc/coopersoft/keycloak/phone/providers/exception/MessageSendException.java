@@ -15,10 +15,6 @@ public class MessageSendException extends Exception {
     private String errorCode = "";
     private String errorMessage = "";
 
-    public MessageSendException() {
-
-    }
-
     public MessageSendException(String message, Throwable cause) {
         super(message, cause);
     }
