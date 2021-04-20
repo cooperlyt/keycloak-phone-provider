@@ -22,6 +22,7 @@
     <modules>
         <module>keycloak-phone-provider</module>
         <module>keycloak-phone-provider.resources</module>
+        <module>keycloak-sms-provider-aws-sns</module>
         <module>keycloak-sms-provider-dummy</module>
         <module>keycloak-sms-provider-totalvoice</module>
         <module>keycloak-sms-provider-twilio</module>
