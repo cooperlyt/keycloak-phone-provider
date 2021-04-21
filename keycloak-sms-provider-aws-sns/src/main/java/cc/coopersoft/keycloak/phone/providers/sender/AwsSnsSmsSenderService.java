@@ -37,7 +37,7 @@ public class AwsSnsSmsSenderService extends FullSmsSenderAbstractService {
                     .withDataType("String"));
         }
 
-        logger.debug(String.format("Sending phone verification code via aws sns: %s >>> %s", phoneNumber, message));
+        logger.debug("Sending phone verification code via aws sns");
 
         try {
             sendSMSMessage(snsClient, message, phoneNumber, smsAttributes);
@@ -55,7 +55,7 @@ public class AwsSnsSmsSenderService extends FullSmsSenderAbstractService {
                 .withPhoneNumber(phoneNumber)
                 .withMessageAttributes(smsAttributes));
 
-        logger.debug(String.format("Sent phone verification code via aws sns: %s >>> %s with message id %s", phoneNumber, message, result.getMessageId()));
+        logger.debug(String.format("Sent phone verification code via aws sns with message id %s", result.getMessageId()));
     }
 
     @Override

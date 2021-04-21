@@ -87,7 +87,7 @@ public class TokenCodeServiceImpl implements TokenCodeService {
                 .setParameter("type", tokenCodeType.name())
                 .getResultList();
 
-        return entities.size() > 3;
+        return entities.size() > 5;
     }
 
     @Override
