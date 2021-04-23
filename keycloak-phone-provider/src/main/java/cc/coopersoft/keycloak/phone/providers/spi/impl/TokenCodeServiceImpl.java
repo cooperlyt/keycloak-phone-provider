@@ -9,6 +9,7 @@ import cc.coopersoft.keycloak.phone.providers.jpa.TokenCode;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
 import org.jboss.logging.Logger;
+import org.keycloak.Config;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
@@ -29,12 +30,23 @@ import java.util.concurrent.TimeUnit;
 public class TokenCodeServiceImpl implements TokenCodeService {
 
     private static final Logger logger = Logger.getLogger(TokenCodeServiceImpl.class);
+    private static final int hourlyAbuseThresholdDefault = 3;
+    private int hourlyAbuseThreshold;
     private final KeycloakSession session;
 
-    TokenCodeServiceImpl(KeycloakSession session) {
+    TokenCodeServiceImpl(KeycloakSession session, Config.Scope config) {
         this.session = session;
         if (getRealm() == null) {
             throw new IllegalStateException("The service cannot accept a session without a realm in its context.");
+        }
+        try {
+            int configuredHourlyThreshold = config.getInt("abuse_hourly_threshold", hourlyAbuseThresholdDefault);
+            if (configuredHourlyThreshold == 0) {
+                this.hourlyAbuseThreshold = Integer.MAX_VALUE;
+            }
+        } catch (NumberFormatException e) {
+            logger.warn("Could not parse configured value for abuse_hourly_threshold as int", e);
+            hourlyAbuseThreshold = hourlyAbuseThresholdDefault;
         }
     }
 
@@ -77,6 +89,8 @@ public class TokenCodeServiceImpl implements TokenCodeService {
     @Override
     public boolean isAbusing(String phoneNumber, TokenCodeType tokenCodeType) {
 
+
+
         Date oneHourAgo = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1));
 
         List<TokenCode> entities = getEntityManager()
@@ -87,7 +101,7 @@ public class TokenCodeServiceImpl implements TokenCodeService {
                 .setParameter("type", tokenCodeType.name())
                 .getResultList();
 
-        return entities.size() > 3;
+        return entities.size() > this.hourlyAbuseThreshold;
     }
 
     @Override

@@ -8,13 +8,16 @@ import org.keycloak.models.KeycloakSessionFactory;
 
 public class TokenCodeServiceProviderFactoryImpl implements TokenCodeServiceProviderFactory {
 
+    private Config.Scope config;
+
     @Override
     public TokenCodeService create(KeycloakSession session) {
-        return new TokenCodeServiceImpl(session);
+        return new TokenCodeServiceImpl(session, config);
     }
 
     @Override
-    public void init(Config.Scope scope) {
+    public void init(Config.Scope config) {
+        this.config = config;
     }
 
     @Override
