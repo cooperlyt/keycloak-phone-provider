@@ -3,7 +3,7 @@ services:
 
 
   database:
-    image: coopersoft/mariadb-min:v1
+    image: mariadb:latest
 #    restart: always
     ports:
       - "3306:3306"
@@ -24,6 +24,14 @@ services:
     ports:
       - 8901:8080
     environment:
+      SMS_PROVIDER_SERVER: twilio
+      SMS_TOKEN_EXPIRES: 180
+      SMS_HOUR_MAXIMUM: 3
+      TWILIO_ACCOUNT_ID: "your id"
+      TWILIO_AUTH_TOKEN:  "your auth token"
+      TWILIO_SEND_PHONE_NUMBER: "your send phone number"
+
+
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
       DB_VENDOR: mariadb

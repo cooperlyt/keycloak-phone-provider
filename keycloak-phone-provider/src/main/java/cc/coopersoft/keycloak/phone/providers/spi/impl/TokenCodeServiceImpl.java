@@ -75,7 +75,7 @@ public class TokenCodeServiceImpl implements TokenCodeService {
     }
 
     @Override
-    public boolean isAbusing(String phoneNumber, TokenCodeType tokenCodeType) {
+    public boolean isAbusing(String phoneNumber, TokenCodeType tokenCodeType,int hourMaximum) {
 
         Date oneHourAgo = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1));
 
@@ -87,7 +87,7 @@ public class TokenCodeServiceImpl implements TokenCodeService {
                 .setParameter("type", tokenCodeType.name())
                 .getResultList();
 
-        return entities.size() > 3;
+        return entities.size() > hourMaximum;
     }
 
     @Override

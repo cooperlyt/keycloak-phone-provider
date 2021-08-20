@@ -42,7 +42,7 @@ batch
 # main provider
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-phone-provider)
 /subsystem=keycloak-server/spi=phoneMessageService/:add
-/subsystem=keycloak-server/spi=phoneMessageService/provider=default/:add(enabled=true,properties={service => ${env.SMS_PROVIDER_SERVER:} , tokenExpiresIn => ${env.SMS_TOKEN_EXPIRES:180}})
+/subsystem=keycloak-server/spi=phoneMessageService/provider=default/:add(enabled=true,properties={service => ${env.SMS_PROVIDER_SERVER:}, hourMaximum => ${env.SMS_HOUR_MAXIMUM:3}, tokenExpiresIn => ${env.SMS_TOKEN_EXPIRES:180}})
 
 /subsystem=keycloak-server/spi=messageSenderService/:add
 
