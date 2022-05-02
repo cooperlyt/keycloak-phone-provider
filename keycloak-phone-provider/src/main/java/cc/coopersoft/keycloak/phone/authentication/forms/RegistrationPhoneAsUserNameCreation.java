@@ -157,7 +157,7 @@ public class RegistrationPhoneAsUserNameCreation implements FormActionFactory, F
         user.setEnabled(true);
 
         context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, username);
-        AttributeFormDataProcessor.process(formData, context.getRealm(), user);
+        AttributeFormDataProcessor.process(formData);
         context.setUser(user);
         context.getEvent().user(user);
         context.getEvent().success();

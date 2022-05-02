@@ -1,5 +1,5 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout displayInfo=true displayWide=false; section>
+<@layout.registrationLayout displayInfo=true; section>
     <#if section = "header">
         ${msg("updatePhoneNumber")}
     <#elseif section = "form">
