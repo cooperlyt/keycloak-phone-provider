@@ -39,12 +39,11 @@ the default like Kerberos or LDAP. I may try to help you but I cannot guarantee.
 **Installing:**
 
 + Docker
-  1. docker image is [coopersoft/keycloak:arm64-19.0.1_phone-2.0](https://hub.docker.com/repository/docker/coopersoft/keycloak)
+  1. docker image is [coopersoft/keycloak:x86_64-19.0.1_phone-2.0 OR coopersoft/keycloak:arm64-19.0.1_phone-2.0](https://hub.docker.com/repository/docker/coopersoft/keycloak)
   2. for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/keycloak-phone-provider/master/examples/docker-compose.yml)
   3. run as `docker-compose up` , docker-compose is required!
 
 If you want to build the project, simply run  `examples/docker-build.sh` after cloning the repository.
-
 
 + Local
   1. local keycloak installed: copy the `target\providers` to keycloak home directory
@@ -59,9 +58,6 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
     --spi-phone-message-service-default-hour-maximum=3 # How many send sms count in one hour. 
     ...  # provider param refer provider`s readme.md
 ```
-
-  
-
 
 **Phone registration support**
 
@@ -94,6 +90,12 @@ Set Bind 'Registration fast by phone' to Registration flow
 Under Realm Settings > Themes
 Set Login Theme as 'phone'
 
+![Authentication setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a0.jpg)
+![full user profile](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a1.jpg)
+![Phone number is username](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a2.jpg)
+![No password](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a3.jpg)
+![Only phone registration](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a4.jpg)
+
 test:
 http://<addr>/auth/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
 
@@ -107,6 +109,7 @@ verification process. This accommodates the use case of pre-paid numbers that ge
   in Authentication page, copy the browser flow and replace OTP to  `OTP Over SMS` . Don't forget to bind this flow copy as the de facto browser flow.
   Finally, register the required actions `Update Phone Number` and `Configure OTP over SMS` in the Required Actions tab.
 
+![OTP](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/b0.jpg)
 
 **Only use phone login or get Access token use endpoints:**
 
@@ -119,6 +122,8 @@ Under Authentication > Flows:
 
 Under 'Clients > $YOUR_CLIENT > Advanced > Authentication Flow Overrides' 
 Set Direct Grant Flow to 'Direct grant with phone' 
+
+![Setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/c0.jpg)
 
 **Everybody phone number( if not exists create user by phone number) get Access token use endpoints:**
 
