@@ -20,7 +20,7 @@ ${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-message-service-default-service=te
 
 ```
 templateId is: [realm-]<type>-<template>
-SignName is realm id.
+
 
 type: 
     VERIFY("verification"),
