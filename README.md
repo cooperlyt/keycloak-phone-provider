@@ -36,7 +36,7 @@ the default like Kerberos or LDAP. I may try to help you but I cannot guarantee.
 
 ## Usage
 
-**Installing:**
+### **Installing:**
 
 + Docker
   1. docker image is [coopersoft/keycloak:x86_64-19.0.1_phone-2.0 OR coopersoft/keycloak:arm64-19.0.1_phone-2.0](https://hub.docker.com/repository/docker/coopersoft/keycloak)
@@ -59,7 +59,7 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
     ...  # provider param refer provider`s readme.md
 ```
 
-**Phone registration support**
+### **Phone registration support**
 
 Under Authentication > Flows:
 + Create flows from registration:
@@ -99,7 +99,7 @@ Set Login Theme as 'phone'
 test:
 http://<addr>/auth/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
 
-**OTP by Phone**
+### **OTP by Phone**
 
 Two user attributes are going to be used by this provider: _phoneNumberVerified_ (bool) and _phoneNumber_ (str). Many
 users can have the same _phoneNumber_, but only one of them is getting _phoneNumberVerified_ = true at the end of a
@@ -111,7 +111,7 @@ verification process. This accommodates the use case of pre-paid numbers that ge
 
 ![OTP](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/b0.jpg)
 
-**Only use phone login or get Access token use endpoints:**
+### **Only use phone login or get Access token use endpoints:**
 
 Under Authentication > Flows:
  + Copy the 'Direct Grant' flow to 'Direct grant with phone' flow
@@ -125,7 +125,7 @@ Set Direct Grant Flow to 'Direct grant with phone'
 
 ![Setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/c0.jpg)
 
-**Everybody phone number( if not exists create user by phone number) get Access token use endpoints:**
+### **Everybody phone number( if not exists create user by phone number) get Access token use endpoints:**
 
 Under Authentication > Flows:
  + Copy the 'Direct Grant' flow to 'Direct grant everybody with phone' flow
