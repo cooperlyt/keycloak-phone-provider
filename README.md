@@ -15,13 +15,13 @@ services can be used with ease thankfully for the adopted modularity and in fact
 sender of TTS calls or WhatsApp messages. 
 
 This is what you can do for now:
-  + Check ownership of a phone number (Forms and HTTP API)
+  + Check ownership of a phone number (Forms and Rest API)
   + Use SMS as second factor in 2FA method (Browser flow)
   + Reset Password by phone (Testing)
-  + Authentication by phone (HTTP API)
-  + Authentication everybody by phone, auto create user on Grant(HTTP API)
+  + Authentication by phone (Rest API)
+  + Authentication everybody by phone, auto create user on Grant(Rest API)
   + Register with phone 
-  + Register only phone (user name is phone number)
+  + Register only phone (username is phone number)
   + Register add user attribute with redirect_uri params
 
   
@@ -31,7 +31,7 @@ see my project [KeycloakClient](https://github.com/cooper-lyt/KeycloakClient) ,i
 
 ## Compatibility
 
-This was initially developed using 19.0.1 version of Keycloak as baseline, and I did not test another user storage beyond
+This was initially developed using 19.0.1 version of Quarkus Keycloak as baseline,Wildfily keycloak is not support again, and I did not test another user storage beyond
 the default like Kerberos or LDAP. I may try to help you but I cannot guarantee.
 
 ## Usage
