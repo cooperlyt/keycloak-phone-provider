@@ -159,14 +159,16 @@ public class TokenCodeServiceImpl implements TokenCodeService {
     @Override
     public void cleanUpAction(UserModel user) {
         user.removeRequiredAction(UpdatePhoneNumberRequiredAction.PROVIDER_ID);
-        PhoneOtpCredentialProvider socp = (PhoneOtpCredentialProvider)
+        PhoneOtpCredentialProvider ocp = (PhoneOtpCredentialProvider)
                 session.getProvider(CredentialProvider.class, PhoneOtpCredentialProviderFactory.PROVIDER_ID);
-        if (socp.isConfiguredFor(getRealm(), user, PhoneOtpCredentialModel.TYPE)) {
-            CredentialModel credential = session.userCredentialManager()
-                    .getStoredCredentialsByType(getRealm(), user, PhoneOtpCredentialModel.TYPE).get(0);
+        if (ocp.isConfiguredFor(getRealm(), user, PhoneOtpCredentialModel.TYPE)) {
+            CredentialModel credential = user.credentialManager()
+                .getStoredCredentialsByTypeStream(PhoneOtpCredentialModel.TYPE)
+                .findFirst().orElseThrow();
             credential.setCredentialData("{\"phoneNumber\":\"" + user.getFirstAttribute("phoneNumber") + "\"}");
             PhoneOtpCredentialModel credentialModel = PhoneOtpCredentialModel.createFromCredentialModel(credential);
-            session.userCredentialManager().updateCredential(getRealm(), user, credentialModel);
+            user.credentialManager().updateStoredCredential(credentialModel);
+//            session.userCredentialManager().updateCredential(getRealm(), user, credentialModel);
         }
     }
 

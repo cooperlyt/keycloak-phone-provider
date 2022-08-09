@@ -14,9 +14,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <version.keycloak>19.0.1</version.keycloak>
-
-
-        <docker.image.name>coopersoft/keycloak-phone</docker.image.name>
+        <docker.image.name>coopersoft/keycloak</docker.image.name>
 
     </properties>
 

@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.resetcred;
 
+import org.apache.commons.lang.StringUtils;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.authenticators.resetcred.ResetCredentialEmail;
 import org.keycloak.models.AuthenticationExecutionModel.Requirement;
@@ -7,6 +8,12 @@ import org.keycloak.models.AuthenticationExecutionModel.Requirement;
 public class ResetCredentialEmailWithPhone extends ResetCredentialEmail {
     public static final Requirement[] REQUIREMENT_CHOICES;
 
+    static {
+        REQUIREMENT_CHOICES = new Requirement[]{
+            Requirement.CONDITIONAL,
+            Requirement.DISABLED
+        };
+    }
     @Override
     public void authenticate(AuthenticationFlowContext context) {
         if (context.getExecution().isRequired() ||
@@ -19,10 +26,8 @@ public class ResetCredentialEmailWithPhone extends ResetCredentialEmail {
     }
 
     protected boolean configuredFor(AuthenticationFlowContext context) {
-        if (context.getAuthenticationSession().getAuthNote(ResetCredentialWithPhone.NOT_SEND_EMAIL) == null) {
-            return true;
-        }
-        return false;
+        String sendNote = context.getAuthenticationSession().getAuthNote(ResetCredentialWithPhone.NOT_SEND_EMAIL);
+        return !"false".equalsIgnoreCase(sendNote);
     }
 
     @Override
@@ -40,14 +45,7 @@ public class ResetCredentialEmailWithPhone extends ResetCredentialEmail {
         return "Send email to user if not phone provided.";
     }
 
-    static {
-        REQUIREMENT_CHOICES = new Requirement[]{
-                Requirement.REQUIRED,
-                Requirement.ALTERNATIVE,
-                Requirement.CONDITIONAL,
-                Requirement.DISABLED
-        };
-    }
+
 
     @Override
     public Requirement[] getRequirementChoices() {

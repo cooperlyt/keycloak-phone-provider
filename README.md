@@ -1,4 +1,4 @@
-# Keycloak Phone Provider
+# Keycloak (Quarkus 19.0.1)  Phone Provider
 
  + Phone support like e-mail 
  + OTP by phone
@@ -17,7 +17,7 @@ sender of TTS calls or WhatsApp messages.
 This is what you can do for now:
   + Check ownership of a phone number (Forms and Rest API)
   + Use SMS as second factor in 2FA method (Browser flow)
-  + Reset Password by phone (Testing)
+  + Reset Password by phone
   + Authentication by phone (Rest API)
   + Authentication everybody by phone, auto create user on Grant(Rest API)
   + Register with phone 
@@ -85,7 +85,7 @@ Under Authentication > Flows:
 
 Set All add item as Required.
 
-Set Bind 'Registration fast by phone' to Registration flow
+Set Bind 'Registration fast by phone' to 'Registration flow'
 
 Under Realm Settings > Themes
 Set Login Theme as 'phone'
@@ -121,7 +121,7 @@ Under Authentication > Flows:
  + Set both of 'Provide Phone Number' and 'Provide Verification Code' to 'REQUIRED'
 
 Under 'Clients > $YOUR_CLIENT > Advanced > Authentication Flow Overrides' 
-Set Direct Grant Flow to 'Direct grant with phone' 
+Set Bind 'Direct Grant Flow' to 'Direct grant with phone' 
 
 ![Setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/c0.jpg)
 
@@ -153,8 +153,19 @@ You'll get 2 extra endpoints that are useful to do the access token from a custo
 And then use Verification Code authentication flow with the code to obtain an access code.
 
 
-**Reset credential**
- Testing , coming soon!
+## **Reset credential**
+
+Under Authentication > Flows:
++ Copy the 'Reset credentials' flow to 'Reset credentials with phone' flow
++ Click on 'Add step' on the 'Rest Credential With Phone' line
++ Click on 'Add step' on the 'Send Rest Email If Not Phone' line
++ Delete or disable other
++ set 'Send Rest Email If Not Phone' to 'Conditional'
++ Set both of 'Rest Credential With Phone' and 'Reset Password' to 'REQUIRED'
+
+Set Bind 'Reset credentials with phone' to 'Reset credentials flow'
+
+![Authentication setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/d0.jpg)
  
 **Phone one key longin**
   Testing , coming soon!
