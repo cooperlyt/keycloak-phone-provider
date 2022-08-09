@@ -15,8 +15,9 @@ import java.util.Optional;
 public class CloopenSmsSenderServiceProvider implements MessageSenderService {
 
 
-    private static final String APP_ID_PARAM_NAME = "APP_ID";
-    private static final String TEMPLATE_PARAM_NAME = "TEMPLATE";
+    private static final String APP_ID_PARAM_NAME = "app";
+
+    private static final String TEMPLATE_PARAM_NAME = "-template";
     private static final Logger logger = Logger.getLogger(CloopenSmsSenderServiceProvider.class);
     private final CCPRestSmsSDK client;
 
@@ -34,7 +35,7 @@ public class CloopenSmsSenderServiceProvider implements MessageSenderService {
         String serverPort = "8883";
         //主账号,登陆云通讯网站后,可在控制台首页看到开发者主账号ACCOUNT SID和主账号令牌AUTH TOKEN
         String accountSId = config.get("account");
-        String accountToken = config.get("authToken");
+        String accountToken = config.get("token");
 
 
         logger.info(String.format("cloopen account: %s ; accountToken: %s", accountSId, accountToken));
@@ -55,12 +56,11 @@ public class CloopenSmsSenderServiceProvider implements MessageSenderService {
     @Override
     public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code, int expires) throws MessageSendException {
         //请使用管理控制台中已创建应用的APPID
-        String appId = Optional.ofNullable(config.get(realm.getName().toUpperCase() + "_" + APP_ID_PARAM_NAME))
+        String appId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + APP_ID_PARAM_NAME))
                 .orElse(config.get(APP_ID_PARAM_NAME));
         client.setAppId(appId);
-        String templateId= Optional.ofNullable(config.get(realm.getName().toUpperCase() + "_" + type.name().toUpperCase() + "_" + TEMPLATE_PARAM_NAME))
-                .orElse(type.name().toUpperCase() + "_" + config.get(TEMPLATE_PARAM_NAME));
-
+        String templateId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + type.name().toLowerCase() + TEMPLATE_PARAM_NAME))
+            .orElse(config.get(type.name().toLowerCase() + TEMPLATE_PARAM_NAME));
         logger.info(String.format("cloopen appId: %s ; templateId: %s", appId, templateId));
 
         String[] datas = {code, String.valueOf(expires / 60) };

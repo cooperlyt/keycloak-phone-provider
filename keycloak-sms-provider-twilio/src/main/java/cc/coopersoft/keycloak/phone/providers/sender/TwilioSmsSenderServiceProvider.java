@@ -17,8 +17,8 @@ public class TwilioSmsSenderServiceProvider extends FullSmsSenderAbstractService
 
     TwilioSmsSenderServiceProvider(Scope config, String realmDisplay) {
         super(realmDisplay);
-        Twilio.init(config.get("accountSId"), config.get("authToken"));
-        this.twilioPhoneNumber = config.get("twilioPhoneNumber");
+        Twilio.init(config.get("account"), config.get("token"));
+        this.twilioPhoneNumber = config.get("number");
 
     }
 

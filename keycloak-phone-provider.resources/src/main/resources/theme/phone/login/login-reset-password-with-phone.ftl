@@ -121,7 +121,7 @@
                         params.append('kind', '${verificationCodeKind}');
 
                         axios
-                            .post(window.location.origin + '/auth/realms/${realm.name}/sms/authentication-code', params)
+                            .post(window.location.origin + '/realms/${realm.name}/sms/authentication-code', params)
                             .then(res => (console.log(res.status)));
                     }
                 }

@@ -30,6 +30,6 @@ public class AwsSnsMessageSenderServiceProviderFactory implements MessageSenderS
 
     @Override
     public String getId() {
-        return "aws-sns";
+        return "aws";
     }
 }

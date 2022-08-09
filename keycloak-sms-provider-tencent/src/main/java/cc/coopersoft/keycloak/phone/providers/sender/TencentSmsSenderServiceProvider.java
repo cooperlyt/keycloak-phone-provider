@@ -13,12 +13,13 @@ import com.tencentcloudapi.sms.v20190711.models.SendSmsResponse;
 import org.keycloak.Config;
 import org.keycloak.models.RealmModel;
 
+import java.util.Locale;
 import java.util.Optional;
 
 public class TencentSmsSenderServiceProvider implements MessageSenderService {
 
-  private static final String APP_ID_PARAM_NAME = "APP_ID";
-  private static final String TEMPLATE_PARAM_NAME = "TEMPLATE";
+  private static final String APP_ID_PARAM_NAME = "app";
+  private static final String TEMPLATE_PARAM_NAME = "template";
 
   private final Config.Scope config;
   private final RealmModel realm;
@@ -34,7 +35,7 @@ public class TencentSmsSenderServiceProvider implements MessageSenderService {
      * 本示例采用从环境变量读取的方式，需要预先在环境变量中设置这两个值
      * 您也可以直接在代码中写入密钥对，但需谨防泄露，不要将代码复制、上传或者分享给他人
      * CAM 密钥查询：https://console.cloud.tencent.com/cam/capi*/
-    Credential cred = new Credential(config.get("secretId"), config.get("secretKey"));
+    Credential cred = new Credential(config.get("secret"), config.get("key"));
 
 //      // 实例化一个 http 选项，可选，无特殊需求时可以跳过
 //      HttpProfile httpProfile = new HttpProfile();
@@ -61,7 +62,8 @@ public class TencentSmsSenderServiceProvider implements MessageSenderService {
     /* 实例化 SMS 的 client 对象
      * 第二个参数是地域信息，可以直接填写字符串 ap-guangzhou，或者引用预设的常量 */
 //      SmsClient client = new SmsClient(cred, "",clientProfile);
-    client = new SmsClient(cred, "ap-guangzhou");
+
+    client = new SmsClient(cred, config.get("region","ap-guangzhou"));
   }
 
 
@@ -84,7 +86,7 @@ public class TencentSmsSenderServiceProvider implements MessageSenderService {
 
       /* 短信应用 ID: 在 [短信控制台] 添加应用后生成的实际 SDKAppID，例如1400006666 */
 
-      String appId = Optional.ofNullable(config.get(realm.getName().toUpperCase() + "_" + APP_ID_PARAM_NAME))
+      String appId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + APP_ID_PARAM_NAME))
               .orElse(config.get(APP_ID_PARAM_NAME));
       req.setSmsSdkAppid(appId);
       /* 短信签名内容: 使用 UTF-8 编码，必须填写已审核通过的签名，可登录 [短信控制台] 查看签名信息 */
@@ -104,8 +106,8 @@ public class TencentSmsSenderServiceProvider implements MessageSenderService {
 //      req.setExtendCode(extendcode);
 
       /* 模板 ID: 必须填写已审核通过的模板 ID，可登录 [短信控制台] 查看模板 ID */
-      String templateId= Optional.ofNullable(config.get(realm.getName().toUpperCase() + "_" + type.name().toUpperCase() + "_" + TEMPLATE_PARAM_NAME))
-              .orElse(type.name().toUpperCase() + "_" + config.get(TEMPLATE_PARAM_NAME));
+      String templateId= Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + type.name().toLowerCase() + "-" + TEMPLATE_PARAM_NAME))
+              .orElse(type.name().toLowerCase() + "-" + config.get(TEMPLATE_PARAM_NAME));
       req.setTemplateID(templateId);
 
       /* 下发手机号码，采用 e.164 标准，+[国家或地区码][手机号]

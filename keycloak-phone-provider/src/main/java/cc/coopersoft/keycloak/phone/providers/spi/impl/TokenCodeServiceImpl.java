@@ -134,8 +134,8 @@ public class TokenCodeServiceImpl implements TokenCodeService {
     public void tokenValidated(UserModel user, String phoneNumber, String tokenCodeId) {
 
         session.users()
-                .searchForUserByUserAttribute("phoneNumber", phoneNumber, session.getContext().getRealm())
-                .stream().filter(u -> !u.getId().equals(user.getId()))
+                .searchForUserByUserAttributeStream(session.getContext().getRealm(),"phoneNumber", phoneNumber)
+                .filter(u -> !u.getId().equals(user.getId()))
                 .forEach(u -> {
                     logger.info(String.format("User %s also has phone number %s. Un-verifying.", u.getId(), phoneNumber));
                     u.setSingleAttribute("phoneNumberVerified", "false");

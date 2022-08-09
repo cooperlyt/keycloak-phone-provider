@@ -26,7 +26,7 @@ public class AwsSnsSmsSenderService extends FullSmsSenderAbstractService {
     @Override
     public void sendMessage(String phoneNumber, String message) throws MessageSendException {
         AmazonSNS snsClient = AmazonSNSClientBuilder.standard().build();
-        String senderId = config.get("SENDER_ID");
+        String senderId = config.get("sender");
 
         Map<String, MessageAttributeValue> smsAttributes = null;
 

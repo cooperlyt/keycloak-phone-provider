@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class YunxinSmsSenderServiceProvider implements MessageSenderService {
 
@@ -48,7 +49,7 @@ public class YunxinSmsSenderServiceProvider implements MessageSenderService {
     /*
      * 参考计算CheckSum的java代码，在上述文档的参数列表中，有CheckSum的计算文档示例
      */
-    String checkSum = CheckSumBuilder.getCheckSum(config.get("APP_SECRET"), code, curTime);
+    String checkSum = CheckSumBuilder.getCheckSum(config.get("secret"), code, curTime);
 
     // 设置请求的的参数，requestBody参数
     List<NameValuePair> nvps = new ArrayList<>();
@@ -57,7 +58,8 @@ public class YunxinSmsSenderServiceProvider implements MessageSenderService {
      * 2.参数格式是jsonArray的格式，例如 "['13888888888','13666666666']"
      * 3.params是根据你模板里面有几个参数，那里面的参数也是jsonArray格式
      */
-    String templateId= config.get(realm.getName().toUpperCase() + "_" + type.name().toUpperCase() + "_TEMPLATE");
+    String templateId= Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + type.name().toLowerCase() + "-template"))
+        .orElse(config.get(type.name().toLowerCase() + "-template"));
     nvps.add(new BasicNameValuePair("templateid", templateId));
     nvps.add(new BasicNameValuePair("mobile", phoneNumber));
     nvps.add(new BasicNameValuePair("codeLen", String.valueOf(code.length())));
@@ -72,7 +74,7 @@ public class YunxinSmsSenderServiceProvider implements MessageSenderService {
       httpPost.setEntity(new UrlEncodedFormEntity(nvps, "utf-8"));
       HttpResponse response = HttpClientBuilder.create().setDefaultHeaders(List.of(
               new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8"),
-              new BasicHeader("AppKey",config.get(realm.getName().toUpperCase() + "_APP_ID") ),
+              new BasicHeader("AppKey",Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-app")).orElse(config.get("app"))),
               new BasicHeader("Nonce",code),
               new BasicHeader("CurTime",curTime),
               new BasicHeader("CheckSum",checkSum)))

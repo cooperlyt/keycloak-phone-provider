@@ -7,8 +7,8 @@ services:
 #    restart: always
     ports:
       - "3306:3306"
-    volumes:
-      - "/home/data/db:/var/lib/mysql"
+#    volumes:
+#      - "/home/data/db:/var/lib/mysql"
     environment:
       MYSQL_ROOT_PASSWORD: p0stgr@s
       MYSQL_DATABASE: keycloak
