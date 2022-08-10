@@ -59,7 +59,6 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
     --spi-phone-message-service-default-service=[dummy|aws|aliyun|cloopen| ...]  # Which sms provider 
     --spi-phone-message-service-default-token-expires-in=60  # sms expires ,default 60 second
     --spi-phone-message-service-default-hour-maximum=3 # How many send sms count in one hour. 
-    --spi-authenticator-sms-otp-authenticator-cookie-max-age=3600 #cookie age , store OTP ANSWERED
     ...  # provider param refer provider`s readme.md
 ```
 
