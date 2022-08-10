@@ -8,6 +8,7 @@ import org.keycloak.models.AuthenticationExecutionModel.Requirement;
 public class ResetCredentialEmailWithPhone extends ResetCredentialEmail {
     public static final Requirement[] REQUIREMENT_CHOICES;
 
+    //TODO Requirement.CONDITIONAL or ALTERNATIVE ?
     static {
         REQUIREMENT_CHOICES = new Requirement[]{
             Requirement.CONDITIONAL,

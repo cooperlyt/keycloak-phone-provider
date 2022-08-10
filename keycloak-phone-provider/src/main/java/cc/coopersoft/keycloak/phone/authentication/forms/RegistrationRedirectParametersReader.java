@@ -12,30 +12,19 @@ import org.keycloak.models.*;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.services.validation.Validation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import static org.keycloak.provider.ProviderConfigProperty.MULTIVALUED_STRING_TYPE;
+import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
+
+//TODO test in 19.0.1
 public class RegistrationRedirectParametersReader implements  FormActionFactory, FormAction {
 
     private static final Logger logger = Logger.getLogger(RegistrationRedirectParametersReader.class);
 
-    private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
-
     public static final String PROVIDER_ID = "registration-redirect-parameter";
+    public static final String PARAM_NAMES = "registrationParameterAccept";
 
-    public static final String PARAM_NAMES = "registration.parameter.accept";
-
-    static {
-        ProviderConfigProperty acceptParamName;
-        acceptParamName = new ProviderConfigProperty();
-        acceptParamName.setName(PARAM_NAMES);
-        acceptParamName.setLabel("Accept query param");
-        acceptParamName.setType(ProviderConfigProperty.MULTIVALUED_STRING_TYPE);
-        acceptParamName.setHelpText("Registration query param accept names.");
-        configProperties.add(acceptParamName);
-    }
 
     private static AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
             AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED };
@@ -72,7 +61,12 @@ public class RegistrationRedirectParametersReader implements  FormActionFactory,
 
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
-        return configProperties;
+        ProviderConfigProperty rep =
+            new ProviderConfigProperty(PARAM_NAMES,
+                "Accept query param",
+                "Registration query param accept names.",
+                MULTIVALUED_STRING_TYPE, null);
+        return Collections.singletonList(rep);
     }
 
     @Override

@@ -21,6 +21,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 
+import static cc.coopersoft.keycloak.phone.authentication.authenticators.browser.SmsOtpMfaAuthenticatorFactory.COOKIE_MAX_AGE;
+
 public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidator<PhoneOtpCredentialProvider> {
 
     protected boolean hasCookie(AuthenticationFlowContext context) {
@@ -49,7 +51,7 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
         AuthenticatorConfigModel config = context.getAuthenticatorConfig();
         int maxCookieAge = 60 * 60; // 1 hour
 
-        if (config != null) maxCookieAge = Integer.parseInt(config.getConfig().get("cookie.max.age"));
+        if (config != null) maxCookieAge = Integer.parseInt(config.getConfig().get(COOKIE_MAX_AGE));
 
         URI uri = context.getUriInfo()
                 .getBaseUriBuilder()
