@@ -11,8 +11,6 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 
-import java.util.stream.Collectors;
-
 public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCredentialModel>, CredentialInputValidator {
 
     private final static Logger logger = Logger.getLogger(PhoneOtpCredentialProvider.class);
@@ -51,7 +49,7 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
         if (code == null) return false;
 
         try {
-            getTokenCodeService().validateCode(user, phoneNumber, code, TokenCodeType.OTP);
+            getTokenCodeService().validateCode(user, phoneNumber, code, TokenCodeType.AUTH);
             return true;
         } catch (Exception e) {
             return false;

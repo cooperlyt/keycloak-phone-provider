@@ -89,7 +89,7 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
         String phoneNumber = context.getUser().getFirstAttribute("phoneNumber");
         Response challenge;
         try {
-            phoneMessageService.sendTokenCode(phoneNumber, TokenCodeType.OTP);
+            phoneMessageService.sendTokenCode(phoneNumber, TokenCodeType.AUTH);
             challenge = context.form().createForm("login-sms-otp.ftl");
         } catch (ForbiddenException e) {
             challenge = context.form().setError("abusedMessageService").createForm("login-sms-otp.ftl");

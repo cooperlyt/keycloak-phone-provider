@@ -2,6 +2,8 @@
 
 https://www.yuntongxun.com
 
+**Not verify in Quarkus 19.0.1**
+
 ```sh
 cp target/providers/keycloak-phone-provider.jar ${KEYCLOAK_HOME}/providers/
 cp target/providers/keycloak-phone-provider.resources.jar ${KEYCLOAK_HOME}/providers/

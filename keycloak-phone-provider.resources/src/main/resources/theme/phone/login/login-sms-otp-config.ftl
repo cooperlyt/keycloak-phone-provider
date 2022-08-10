@@ -53,6 +53,7 @@
         </div>
       </div>
 
+<#--        TODO  extract script to common-->
       <script type="text/javascript">
           function req(phoneNumber) {
               const params = {params: {phoneNumber}}

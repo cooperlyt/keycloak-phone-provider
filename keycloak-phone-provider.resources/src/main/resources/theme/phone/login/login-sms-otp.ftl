@@ -4,6 +4,8 @@
         ${msg("authCodePhoneNumber")}
     <#elseif section = "form">
 
+<#--        TODO  add a info message  toast sms is send -->
+    <#--        TODO  add resend sms button -->
       <div id="kc-form">
         <div id="kc-form-wrapper">
           <form id="kc-form-login" action="${url.loginAction}" method="post">

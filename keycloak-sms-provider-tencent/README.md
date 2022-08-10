@@ -1,5 +1,6 @@
 # tencent  SMS Sender Provider
 
+**Not verify in Quarkus 19.0.1**
 
 ```sh
 cp target/providers/keycloak-phone-provider.jar ${KEYCLOAK_HOME}/providers/
@@ -24,7 +25,7 @@ templateId is: [realm-]<type>-<template>
 
 type: 
     VERIFY("verification"),
-    OTP("authentication"),
+    AUTH("authentication"),
     RESET("reset credential"),
     REGISTRATION("registration");
 ```

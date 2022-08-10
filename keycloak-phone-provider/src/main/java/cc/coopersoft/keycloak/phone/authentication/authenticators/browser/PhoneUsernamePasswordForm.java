@@ -117,7 +117,7 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
     }
 
     try {
-      context.getSession().getProvider(TokenCodeService.class).validateCode(user, phoneNumber, code, TokenCodeType.OTP);
+      context.getSession().getProvider(TokenCodeService.class).validateCode(user, phoneNumber, code, TokenCodeType.AUTH);
       logger.debug("verification code success!");
       return true;
     } catch (Exception e) {

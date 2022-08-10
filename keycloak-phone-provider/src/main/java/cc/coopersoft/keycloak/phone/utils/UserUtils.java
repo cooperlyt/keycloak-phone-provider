@@ -1,14 +1,11 @@
 package cc.coopersoft.keycloak.phone.utils;
 
-import org.apache.commons.collections4.comparators.BooleanComparator;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserProvider;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 /**
  *
@@ -43,4 +40,6 @@ public class UserUtils {
         //TODO isDuplicatePhoneAllowed
         return true;
     }
+
+
 }
