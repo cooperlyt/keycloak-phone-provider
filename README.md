@@ -2,8 +2,10 @@
 
  + Phone support like e-mail 
  + OTP by phone
+ + Login by phone
  + Register with phone
  + Authentication by phone
+ + Reset password by phone
 
 sms
 voice
