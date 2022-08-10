@@ -20,9 +20,12 @@ public class PhoneMessageServiceImpl implements PhoneMessageService {
     private final KeycloakSession session;
     private final String service;
     private final int tokenExpiresIn;
+    private final int hourMaximum;
 
     PhoneMessageServiceImpl(KeycloakSession session, Scope config) {
         this.session = session;
+
+        logger.info("phone message service implement server name:" + config.get("service"));
 
         this.service = session.listProviderIds(MessageSenderService.class)
                 .stream().filter(s -> s.equals(config.get("service")))
@@ -31,6 +34,7 @@ public class PhoneMessageServiceImpl implements PhoneMessageService {
                                 .stream().findFirst().orElse("")
                 );
         this.tokenExpiresIn = config.getInt("tokenExpiresIn", 60);
+        this.hourMaximum = config.getInt("hourMaximum",3);
     }
 
     @Override
@@ -44,7 +48,9 @@ public class PhoneMessageServiceImpl implements PhoneMessageService {
 
     @Override
     public int sendTokenCode(String phoneNumber,TokenCodeType type){
-        if (getTokenCodeService().isAbusing(phoneNumber, type)) {
+        logger.info("send code to:" + phoneNumber );
+
+        if (getTokenCodeService().isAbusing(phoneNumber, type,hourMaximum)) {
             throw new ForbiddenException("You requested the maximum number of messages the last hour");
         }
 

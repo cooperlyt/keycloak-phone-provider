@@ -9,7 +9,7 @@ public interface TokenCodeService extends Provider {
 
     TokenCodeRepresentation ongoingProcess(String phoneNumber, TokenCodeType tokenCodeType);
 
-    boolean isAbusing(String phoneNumber, TokenCodeType tokenCodeType);
+    boolean isAbusing(String phoneNumber, TokenCodeType tokenCodeType,int hourMaximum);
 
     void persistCode(TokenCodeRepresentation tokenCode, TokenCodeType tokenCodeType, int tokenExpiresIn);
 

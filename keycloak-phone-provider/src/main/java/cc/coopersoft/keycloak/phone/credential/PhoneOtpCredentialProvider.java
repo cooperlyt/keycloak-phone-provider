@@ -11,6 +11,8 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 
+import java.util.stream.Collectors;
+
 public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCredentialModel>, CredentialInputValidator {
 
     private final static Logger logger = Logger.getLogger(PhoneOtpCredentialProvider.class);
@@ -18,10 +20,6 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
 
     public PhoneOtpCredentialProvider(KeycloakSession session) {
         this.session = session;
-    }
-
-    private UserCredentialStore getCredentialStore() {
-        return session.userCredentialManager();
     }
 
     private TokenCodeService getTokenCodeService() {
@@ -36,11 +34,13 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
     @Override
     public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
         if (!supportsCredentialType(credentialType)) return false;
-        return !getCredentialStore().getStoredCredentialsByType(realm, user, credentialType).isEmpty();
+        return user.credentialManager().getStoredCredentialsByTypeStream(credentialType).findAny().isPresent();
+//        return !getCredentialStore().getStoredCredentialsByType(realm, user, credentialType).isEmpty();
     }
 
     @Override
     public boolean isValid(RealmModel realm, UserModel user, CredentialInput input) {
+        logger.info("---------------begnin valid otp sms");
 
         String phoneNumber = user.getFirstAttribute("phoneNumber");
         String code = input.getChallengeResponse();
@@ -68,12 +68,14 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
         if (credential.getCreatedDate() == null) {
             credential.setCreatedDate(Time.currentTimeMillis());
         }
-        return getCredentialStore().createCredential(realm, user, credential);
+        return user.credentialManager().createStoredCredential(credential);
+//        return getCredentialStore().createCredential(realm, user, credential);
     }
 
     @Override
     public boolean deleteCredential(RealmModel realm, UserModel user, String credentialId) {
-        return getCredentialStore().removeStoredCredential(realm, user, credentialId);
+        return user.credentialManager().removeStoredCredentialById(credentialId);
+//        return getCredentialStore().removeStoredCredential(realm, user, credentialId);
     }
 
     @Override

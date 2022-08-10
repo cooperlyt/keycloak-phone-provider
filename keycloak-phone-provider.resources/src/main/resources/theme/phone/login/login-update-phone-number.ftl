@@ -1,7 +1,7 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout displayInfo=true displayWide=false; section>
+<@layout.registrationLayout displayInfo=true; section>
     <#if section = "header">
-        ${msg("configSms2Fa")}
+        ${msg("updatePhoneNumber")}
     <#elseif section = "form">
 
       <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -56,8 +56,8 @@
       <script type="text/javascript">
           function req(phoneNumber) {
               const params = {params: {phoneNumber}}
-              axios.get(window.location.origin + '/auth/realms/${realm.name}/sms/verification-code', params)
-                  .then(res => app.disableSend(res.data.expiresIn))
+              axios.get(window.location.origin + '/realms/${realm.name}/sms/verification-code', params)
+                  .then(res => app.disableSend(res.data.expires_in))
                   .catch(e => app.errorMessage = e.response.data.error);
           }
 
@@ -98,6 +98,6 @@
           </#if>
       </script>
     <#elseif section = "info">
-        ${msg("configSms2FaInfo")}
+        ${msg("updatePhoneNumberInfo")}
     </#if>
 </@layout.registrationLayout>

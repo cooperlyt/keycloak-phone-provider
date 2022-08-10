@@ -34,47 +34,7 @@
 
             </#if>
 
-            <#if phoneNumberRequired??>
 
-
-                <div class="${properties.kcFormGroupClass!} ${messagesPerField.printIfExists('phoneNumber',properties.kcFormGroupErrorClass!)}">
-                    <div class="${properties.kcLabelWrapperClass!}">
-                        <label for="phoneNumber" class="${properties.kcLabelClass!}">${msg("phoneNumber")}</label>
-                    </div>
-                    <div class="${properties.kcInputWrapperClass!}">
-                        <input tabindex="1" id="phoneNumber" class="${properties.kcInputClass!}"
-                               name="phoneNumber" id="phoneNumber" type="tel"
-                               autofocus
-                               value="${(register.formData.phoneNumber!'')}"
-                               autocomplete="mobile tel"/>
-                    </div>
-                </div>
-
-
-
-                <div class=" ${properties.kcFormGroupClass!} row">
-
-                    <div class="${properties.kcLabelWrapperClass!}" style="padding: 0">
-                        <label for="registerCode" class="${properties.kcLabelClass!}">${msg("verificationCode")}</label>
-                    </div>
-                    <div class="col-xs-8" style="padding: 0 5px 0 0">
-                        <input tabindex="3" id="registerCode" name="registerCode"
-                               type="text" class="${properties.kcInputClass!}"
-                               autocomplete="off"/>
-                    </div>
-                    <div class="col-xs-4" style="padding: 0 0 0 5px">
-                        <input tabindex="2" style="height: 36px"
-                               class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
-                               v-model="sendButtonText" :disabled='sendButtonText !== initSendButtonText'
-                               v-on:click="sendVerificationCode()"
-                               type="button" value="${msg("sendVerificationCode")}"/>
-                    </div>
-
-
-                </div>
-
-
-            </#if>
 
             <#if   realm.registrationEmailAsUsername ||  !registrationLeast??>
                 <div class="${properties.kcFormGroupClass!} ${messagesPerField.printIfExists('email',properties.kcFormGroupErrorClass!)}">
@@ -121,6 +81,47 @@
                     </div>
                 </#if>
 
+            <#if phoneNumberRequired??>
+
+
+                <div class="${properties.kcFormGroupClass!} ${messagesPerField.printIfExists('phoneNumber',properties.kcFormGroupErrorClass!)}">
+                    <div class="${properties.kcLabelWrapperClass!}">
+                        <label for="phoneNumber" class="${properties.kcLabelClass!}">${msg("phoneNumber")}</label>
+                    </div>
+                    <div class="${properties.kcInputWrapperClass!}">
+                        <input tabindex="1" id="phoneNumber" class="${properties.kcInputClass!}"
+                               name="phoneNumber" id="phoneNumber" type="tel"
+                               autofocus
+                               value="${(register.formData.phoneNumber!'')}"
+                               autocomplete="mobile tel"/>
+                    </div>
+                </div>
+
+
+
+                <div class=" ${properties.kcFormGroupClass!} row">
+
+                    <div class="${properties.kcLabelWrapperClass!}" style="padding: 0">
+                        <label for="registerCode" class="${properties.kcLabelClass!}">${msg("verificationCode")}</label>
+                    </div>
+                    <div class="col-xs-8" style="padding: 0 5px 0 0">
+                        <input tabindex="3" id="registerCode" name="registerCode"
+                               type="text" class="${properties.kcInputClass!}"
+                               autocomplete="off"/>
+                    </div>
+                    <div class="col-xs-4" style="padding: 0 0 0 5px">
+                        <input tabindex="2" style="height: 36px"
+                               class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
+                               v-model="sendButtonText" :disabled='sendButtonText !== initSendButtonText'
+                               v-on:click="sendVerificationCode()"
+                               type="button" value="${msg("sendVerificationCode")}"/>
+                    </div>
+
+
+                </div>
+
+
+            </#if>
 
 
             <#if recaptchaRequired??>
@@ -153,8 +154,8 @@
             <script type="text/javascript">
                 function req(phoneNumber) {
                     const params = {params: {phoneNumber}}
-                    axios.get(window.location.origin + '/auth/realms/${realm.name}/sms/registration-code', params)
-                        .then(res => app.disableSend(res.data.expiresIn))
+                    axios.get(window.location.origin + '/realms/${realm.name}/sms/registration-code', params)
+                        .then(res => app.disableSend(res.data.expires_in))
                         .catch(e => app.errorMessage = e.response.data.error);
                 }
 

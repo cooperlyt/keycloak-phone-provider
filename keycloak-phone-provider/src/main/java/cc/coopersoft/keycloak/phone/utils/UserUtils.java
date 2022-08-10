@@ -1,9 +1,12 @@
 package cc.coopersoft.keycloak.phone.utils;
 
+import org.apache.commons.collections4.comparators.BooleanComparator;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserProvider;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,28 +19,24 @@ import java.util.stream.Collectors;
 
 public class UserUtils {
 
-    private static UserModel singleUser(List<UserModel> users){
-        if (users.isEmpty()) {
-            return null;
-        }else if (users.size() > 1){
-            return users.stream()
-                    .filter(u -> u.getAttribute("phoneNumberVerified")
-                            .stream().anyMatch("true"::equals))
-                    .findFirst().orElse(null);
-        }else
-            return users.get(0);
-    }
 
     public static UserModel findUserByPhone(UserProvider userProvider, RealmModel realm, String phoneNumber){
-        List<UserModel> users = userProvider.searchForUserByUserAttribute(
-                "phoneNumber", phoneNumber, realm);
-        return singleUser(users);
+        return userProvider
+            .searchForUserByUserAttributeStream(realm,"phoneNumber", phoneNumber)
+            .max(comparatorUser()).orElse(null);
     }
 
     public static UserModel findUserByPhone(UserProvider userProvider, RealmModel realm, String phoneNumber, String notIs){
-        List<UserModel> users = userProvider.searchForUserByUserAttribute(
-                "phoneNumber", phoneNumber, realm);
-        return singleUser(users.stream().filter(u -> !u.getId().equals(notIs)).collect(Collectors.toList()));
+        return userProvider
+            .searchForUserByUserAttributeStream(realm, "phoneNumber", phoneNumber)
+            .filter(u -> !u.getId().equals(notIs))
+            .max(comparatorUser()).orElse(null);
+    }
+
+    private static Comparator<UserModel> comparatorUser() {
+        return (u1, u2) ->
+            Boolean.compare(u1.getAttributeStream("phoneNumberVerified").anyMatch("true"::equals),
+                u2.getAttributeStream("phoneNumberVerified").anyMatch("true"::equals));
     }
 
     public static boolean isDuplicatePhoneAllowed(){

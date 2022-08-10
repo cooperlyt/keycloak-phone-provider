@@ -22,7 +22,7 @@ public class VerificationCodeResource extends TokenCodeResource {
 
     VerificationCodeResource(KeycloakSession session) {
         super(session, TokenCodeType.VERIFY);
-        this.auth = new AppAuthManager().authenticateBearerToken(session, session.getContext().getRealm());
+        this.auth = new AppAuthManager.BearerTokenAuthenticator(session).authenticate();
     }
 
     private TokenCodeService getTokenCodeService() {

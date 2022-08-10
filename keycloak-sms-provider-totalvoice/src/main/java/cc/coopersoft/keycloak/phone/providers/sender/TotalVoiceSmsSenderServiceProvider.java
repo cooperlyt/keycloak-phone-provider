@@ -14,7 +14,7 @@ public class TotalVoiceSmsSenderServiceProvider extends FullSmsSenderAbstractSer
 
     TotalVoiceSmsSenderServiceProvider(Scope config, String realmDisplay) {
         super(realmDisplay);
-        this.client = new TotalVoiceClient(config.get("authToken"));
+        this.client = new TotalVoiceClient(config.get("token"));
         this.smsClient = new Sms(client);
     }
 
@@ -30,7 +30,7 @@ public class TotalVoiceSmsSenderServiceProvider extends FullSmsSenderAbstractSer
                         response.getString("mensagem"));
             }
         } catch (Exception e) {
-            throw new MessageSendException(500, "500", "Unexpected exception");
+            throw new MessageSendException(500, "500", e.getMessage());
         }
     }
 

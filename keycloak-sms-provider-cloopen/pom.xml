@@ -5,7 +5,7 @@
     <parent>
         <groupId>cc.coopersoft</groupId>
         <artifactId>keycloak-phone-provider-parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>2.0.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,13 +15,13 @@
         <dependency>
             <groupId>cc.coopersoft</groupId>
             <artifactId>keycloak-phone-provider</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${version.project.parent}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.cloopen</groupId>
             <artifactId>java-sms-sdk</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
         </dependency>
     </dependencies>
 
@@ -29,14 +29,24 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.4.10</version>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                    <skipDockerBuild>true</skipDockerBuild>
-                    <skipDockerTag>true</skipDockerTag>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <finalName>${project.build.finalName}</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
+
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -53,31 +63,9 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>../target/modules/${project.artifactId}/main</outputDirectory>
+                            <outputDirectory>../target/providers</outputDirectory>
                             <stripClassifier>true</stripClassifier>
                             <stripVersion>true</stripVersion>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>../target/modules/${project.artifactId}/main</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}</directory>
-                                    <includes>
-                                        <include>module.xml</include>
-                                    </includes>
-                                </resource>
-                            </resources>
                         </configuration>
                     </execution>
                 </executions>

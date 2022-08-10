@@ -1,16 +1,16 @@
-# Twilio SMS Sender Provider
+# Twilio  SMS Sender Provider
 
-To set up Twilio message sender, one has to edit `standalone.xml` (or equivalent) including lines earlier mentioned and these:
 
-```xml
-<spi name="messageSenderService">
-...
-    <provider name="Twilio" enabled="true">
-        <properties>
-            <property name="accountSid" value="YOUR_ACCOUNT_SID_HERE"/>
-            <property name="authToken" value="YOUR_AUTH_TOKEN_HERE"/>
-            <property name="twilioPhoneNumber" value="YOUR_PURCHASED_TWILIO_NUMBER"/>
-        </properties>
-    </provider>
-</spi>
+```sh
+cp target/providers/keycloak-phone-provider.jar ${KEYCLOAK_HOME}/providers/
+cp target/providers/keycloak-phone-provider.resources.jar ${KEYCLOAK_HOME}/providers/
+cp target/providers/keycloak-sms-provider-twilio.jar ${KEYCLOAK_HOME}/providers/
+
+
+${KEYCLOAK_HOME}/bin/kc.sh build
+
+${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-message-service-default-service=twilio \
+  --spi-message-sender-service-twilio-account=${account} \
+  --spi-message-sender-service-twilio-token=${token} \
+  --spi-message-sender-service-twilio-number=${servicePhoneNumber} 
 ```

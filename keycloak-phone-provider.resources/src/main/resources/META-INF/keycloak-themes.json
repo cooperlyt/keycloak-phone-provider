@@ -1,6 +1,6 @@
 {
   "themes": [{
     "name" : "phone",
-    "types": [ "login" ]
+    "types": [ "login"]
   }]
 }

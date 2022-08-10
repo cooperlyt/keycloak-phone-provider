@@ -34,7 +34,7 @@ public class TokenCodeResource {
         logger.info(String.format("Requested %s code to %s",tokenCodeType.getLabel(), phoneNumber));
         int tokenExpiresIn = session.getProvider(PhoneMessageService.class).sendTokenCode(phoneNumber,tokenCodeType);
 
-        String response = String.format("{\"expiresIn\":%s}", tokenExpiresIn);
+        String response = String.format("{\"expires_in\":%s}", tokenExpiresIn);
 
         return Response.ok(response, APPLICATION_JSON_TYPE).build();
     }
