@@ -17,6 +17,7 @@ sender of TTS calls or WhatsApp messages.
 This is what you can do for now:
   + Check ownership of a phone number (Forms and Rest API)
   + Use SMS as second factor in 2FA method (Browser flow)
+  + Login by phone (Browser flow)
   + Reset Password by phone
   + Authentication by phone (Rest API)
   + Authentication everybody by phone, auto create user on Grant(Rest API)
@@ -56,6 +57,7 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
     --spi-phone-message-service-default-service=[dummy|aws|aliyun|cloopen| ...]  # Which sms provider 
     --spi-phone-message-service-default-token-expires-in=60  # sms expires ,default 60 second
     --spi-phone-message-service-default-hour-maximum=3 # How many send sms count in one hour. 
+    --spi-authenticator-sms-otp-authenticator-cookie-max-age=3600 #cookie age , store OTP ANSWERED
     ...  # provider param refer provider`s readme.md
 ```
 
@@ -98,6 +100,19 @@ Set Login Theme as 'phone'
 
 test:
 http://<addr>/auth/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
+
+### **Login by phone**
+Under Authentication > Flows:
++ Copy the 'Browser' flow to 'Browser with phone' flow
++ Replace 'Username Password Form' to 'Phone Username Password Form' 
+
+Under Realm Settings > Themes
+Set Login Theme as 'phone'
+
+Set Bind 'Browser with phone' to 'Browser flow'
+
+![Login By phone](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/e0.jpg)
+
 
 ### **OTP by Phone**
 
