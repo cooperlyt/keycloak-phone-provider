@@ -23,7 +23,7 @@ public class SmsOtpMfaAuthenticatorFactory implements AuthenticatorFactory, Conf
         property = new ProviderConfigProperty();
         property.setName("cookie.max.age");
         property.setLabel("Cookie Max Age");
-        property.setType(ProviderConfigProperty.STRING_TYPE);
+        property.setType(ProviderConfigProperty.TEXT_TYPE);
         property.setHelpText("Max age in seconds of the SMS_OTP_COOKIE.");
         configProperties.add(property);
     }
