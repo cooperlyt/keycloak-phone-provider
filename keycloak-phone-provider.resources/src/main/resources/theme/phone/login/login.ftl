@@ -1,5 +1,5 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout displayMessage=!messagesPerField.existsError('username','password') displayInfo=realm.password && realm.registrationAllowed && !registrationDisabled??; section>
+<@layout.registrationLayout displayMessage=!messagesPerField.existsError('username','password','code','phoneNumber') displayInfo=realm.password && realm.registrationAllowed && !registrationDisabled??; section>
     <#if section = "header">
         ${msg("loginAccountTitle")}
     <#elseif section = "form">
@@ -98,10 +98,17 @@
                         </div>
 
                         <#if !usernameHidden?? && loginByPhone??>
-                            <div v-show="!usernameOrPhone">
+                            <div v-if="!usernameOrPhone">
                                 <div class="${properties.kcFormGroupClass!}">
                                     <label for="phoneNumber" class="${properties.kcLabelClass!}">${msg("phoneNumber")}</label>
-                                    <input type="text" id="phoneNumber" name="phoneNumber" v-model="phoneNumber" class="${properties.kcInputClass!}" autofocus/>
+                                    <input tabindex="1" type="text" id="phoneNumber" name="phoneNumber" v-model="phoneNumber"
+                                           aria-invalid="<#if messagesPerField.existsError('code','phoneNumber')>true</#if>"
+                                           class="${properties.kcInputClass!}" autofocus/>
+                                    <#if messagesPerField.existsError('code','phoneNumber')>
+                                        <span id="input-error" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
+                                    ${kcSanitize(messagesPerField.getFirstError('phoneNumber','code'))?no_esc}
+                                        </span>
+                                    </#if>
                                 </div>
 
                                 <div class="${properties.kcFormGroupClass!} row">
@@ -109,7 +116,10 @@
                                         <label for="code" class="${properties.kcLabelClass!}">${msg("verificationCode")}</label>
                                     </div>
                                     <div class="col-xs-8" style="padding: 0 5px 0 0">
-                                        <input type="text" id="code" name="code" class="${properties.kcInputClass!}" autofocus/>
+                                        <input tabindex="2" type="text" id="code" name="code"
+                                               aria-invalid="<#if messagesPerField.existsError('code','phoneNumber')>true</#if>"
+                                               class="${properties.kcInputClass!}" autocomplete="off"/>
+
                                     </div>
                                     <div class="col-xs-4" style="padding: 0 0 0 5px">
                                         <input tabindex="2" style="height: 36px"
@@ -147,17 +157,18 @@
                     data: {
                         errorMessage: '',
                         freezeSendCodeSeconds: 0,
-                        usernameOrPhone: true,
-                        phoneNumber: '',
+                        usernameOrPhone: <#if !activePhone??>true<#else>false</#if>,
+                        phoneNumber: '${initPhoneNumber!}',
                         sendButtonText: '${msg("sendVerificationCode")}',
                         initsendButtonText: '${msg("sendVerificationCode")}',
                         disableSend: function(seconds) {
                             if (seconds <= 0) {
-                                app.sendButtonText = app.initsendButtonText;
-                                app.freezeSendCodeSeconds = 0;
+                                app.sendButtonText = app.initSendButtonText;
                             } else {
-                                app.sendButtonText = String(seconds);
-                                setTimeout(function() {
+                                const minutes = Math.floor(seconds / 60) + '';
+                                const seconds_ = seconds % 60 + '';
+                                app.sendButtonText = String(minutes.padStart(2, '0') + ":" + seconds_.padStart(2, '0'));
+                                setTimeout(function () {
                                     app.disableSend(seconds - 1);
                                 }, 1000);
                             }
@@ -173,7 +184,7 @@
                             if (this.sendButtonText !== this.initsendButtonText) {
                                 return;
                             }
-                            req(this.phoneNumber);
+                            req(phoneNumber);
 
                         }
                     }

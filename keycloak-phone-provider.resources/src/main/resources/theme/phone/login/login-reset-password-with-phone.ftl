@@ -103,11 +103,12 @@
                     initsendButtonText: '${msg("sendVerificationCode")}',
                     disableSend: function(seconds) {
                         if (seconds <= 0) {
-                            app.sendButtonText = app.initsendButtonText;
-                            app.freezeSendCodeSeconds = 0;
+                            app.sendButtonText = app.initSendButtonText;
                         } else {
-                            app.sendButtonText = String(seconds);
-                            setTimeout(function() {
+                            const minutes = Math.floor(seconds / 60) + '';
+                            const seconds_ = seconds % 60 + '';
+                            app.sendButtonText = String(minutes.padStart(2, '0') + ":" + seconds_.padStart(2, '0'));
+                            setTimeout(function () {
                                 app.disableSend(seconds - 1);
                             }, 1000);
                         }

@@ -40,7 +40,7 @@ the default like Kerberos or LDAP. I may try to help you but I cannot guarantee.
 ### **Installing:**
 
 + Docker
-  1. docker image is [coopersoft/keycloak:x86_64-19.0.1_phone-2.0 OR coopersoft/keycloak:arm64-19.0.1_phone-2.0](https://hub.docker.com/repository/docker/coopersoft/keycloak)
+  1. docker image is [coopersoft/keycloak:x86_64-19.0.1_phone-2.0.1 OR coopersoft/keycloak:arm64-19.0.1_phone-2.0.1](https://hub.docker.com/repository/docker/coopersoft/keycloak)
   2. for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/keycloak-phone-provider/master/examples/docker-compose.yml)
   3. run as `docker-compose up` , docker-compose is required!
 
