@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.browser;
 
+import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.authentication.requiredactions.ConfigSmsOtpRequiredAction;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
@@ -22,8 +23,12 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 
 import static cc.coopersoft.keycloak.phone.authentication.authenticators.browser.SmsOtpMfaAuthenticatorFactory.COOKIE_MAX_AGE;
+import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages.FIELD_PHONE_NUMBER;
 
 public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidator<PhoneOtpCredentialProvider> {
+
+
+    private static final String PAGE = "login-sms-otp.ftl";
 
     protected boolean hasCookie(AuthenticationFlowContext context) {
         Cookie cookie = context.getHttpRequest()
@@ -86,13 +91,20 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
             return;
         }
         PhoneMessageService phoneMessageService = context.getSession().getProvider(PhoneMessageService.class);
-        String phoneNumber = context.getUser().getFirstAttribute("phoneNumber");
+        String phoneNumber = context.getUser().getFirstAttribute(FIELD_PHONE_NUMBER);
         Response challenge;
         try {
-            phoneMessageService.sendTokenCode(phoneNumber, TokenCodeType.AUTH);
-            challenge = context.form().createForm("login-sms-otp.ftl");
+            int expires = phoneMessageService.sendTokenCode(phoneNumber, TokenCodeType.OTP,null);
+            challenge = context.form()
+                .setInfo("codeSent",phoneNumber)
+                .setAttribute("expires",expires)
+                .createForm(PAGE);
         } catch (ForbiddenException e) {
-            challenge = context.form().setError("abusedMessageService").createForm("login-sms-otp.ftl");
+            challenge = context.form().setError(SupportPhonePages.Errors.ABUSED.message())
+                .createForm(PAGE);
+        } catch (Exception e){
+            challenge = context.form().setError(SupportPhonePages.Errors.FAIL.message())
+                .createForm(PAGE);
         }
         context.challenge(challenge);
     }
@@ -102,8 +114,8 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
         boolean validated = validateAnswer(context);
         if (!validated) {
             Response challenge = context.form()
-                    .setError("authenticationCodeDoesNotMatch")
-                    .createForm("login-sms-otp.ftl");
+                    .setError(SupportPhonePages.Errors.NOT_MATCH.message())
+                    .createForm(PAGE);
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
             return;
         }

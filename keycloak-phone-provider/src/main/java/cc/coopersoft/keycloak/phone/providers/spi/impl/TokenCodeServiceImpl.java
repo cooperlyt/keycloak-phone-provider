@@ -143,6 +143,8 @@ public class TokenCodeServiceImpl implements TokenCodeService {
 
         user.setSingleAttribute("phoneNumberVerified", "true");
         user.setSingleAttribute("phoneNumber", phoneNumber);
+
+        //add other phoneNumber user add update phone number action
         validateProcess(tokenCodeId, user);
 
         cleanUpAction(user);

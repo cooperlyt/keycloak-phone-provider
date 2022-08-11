@@ -16,11 +16,12 @@ ${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-message-service-default-service=yu
   --spi-message-sender-service-yunxin-opt-template=${templateId} 
 ```
 ```
-templateId is: [realm-]<type>-<template>
+templateId is: [$realm-]<[$type | $kind]>-<template>
 
 type: 
     VERIFY("verification"),
-    AHTH("authentication"),
+    AUTH("authentication"),
+    OTP("OTP"),
     RESET("reset credential"),
     REGISTRATION("registration");
 ```

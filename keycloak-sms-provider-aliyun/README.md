@@ -16,16 +16,19 @@ ${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-message-service-default-service=al
   --spi-message-sender-service-aliyun-region=cn-hangzhou \
   --spi-message-sender-service-aliyun-key=${accessKey} \
   --spi-message-sender-service-aliyun-secret=${accessSecret} \
-  --spi-message-sender-service-aliyun-opt-template={templateId} 
+  --spi-message-sender-service-aliyun-otp-template={templateId} 
 ```
 
 ```
-templateId is: [realm-]<type>-<template>
+
 SignName is realm id.
+
+templateId is: [$realm-]<[$type | $kind]>-<template>
 
 type: 
     VERIFY("verification"),
     AUTH("authentication"),
+    OTP("OTP"),
     RESET("reset credential"),
     REGISTRATION("registration");
 ```

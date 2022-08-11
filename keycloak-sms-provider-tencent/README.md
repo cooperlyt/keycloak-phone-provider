@@ -20,12 +20,12 @@ ${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-message-service-default-service=te
 ```
 
 ```
-templateId is: [realm-]<type>-<template>
-
+templateId is: [$realm-]<[$type | $kind]>-<template>
 
 type: 
     VERIFY("verification"),
     AUTH("authentication"),
+    OTP("OTP"),
     RESET("reset credential"),
     REGISTRATION("registration");
 ```

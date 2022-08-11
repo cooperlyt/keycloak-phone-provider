@@ -9,5 +9,5 @@ public interface PhoneMessageService extends Provider {
     //TODO on key longin support
     //boolean Verification(String phoneNumber, String token);
 
-    int sendTokenCode(String phoneNumber, TokenCodeType type);
+    int sendTokenCode(String phoneNumber, TokenCodeType type, String kind);
 }

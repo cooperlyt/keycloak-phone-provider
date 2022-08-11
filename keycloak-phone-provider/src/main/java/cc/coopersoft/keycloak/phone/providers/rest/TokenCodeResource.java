@@ -6,6 +6,7 @@ import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.keycloak.models.KeycloakSession;
 
+import javax.validation.constraints.NotBlank;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
@@ -27,12 +28,14 @@ public class TokenCodeResource {
     @NoCache
     @Path("")
     @Produces(APPLICATION_JSON)
-    public Response getTokenCode(@QueryParam("phoneNumber") String phoneNumber) {
+    public Response getTokenCode(@NotBlank @QueryParam("phoneNumber") String phoneNumber,
+                                 @QueryParam("kind") String kind) {
 
         if (phoneNumber == null) throw new BadRequestException("Must inform a phone number");
 
         logger.info(String.format("Requested %s code to %s",tokenCodeType.getLabel(), phoneNumber));
-        int tokenExpiresIn = session.getProvider(PhoneMessageService.class).sendTokenCode(phoneNumber,tokenCodeType);
+        int tokenExpiresIn = session.getProvider(PhoneMessageService.class)
+            .sendTokenCode(phoneNumber,tokenCodeType,kind);
 
         String response = String.format("{\"expires_in\":%s}", tokenExpiresIn);
 

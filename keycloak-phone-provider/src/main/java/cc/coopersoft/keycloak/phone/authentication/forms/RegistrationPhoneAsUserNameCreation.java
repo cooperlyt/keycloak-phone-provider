@@ -118,16 +118,16 @@ public class RegistrationPhoneAsUserNameCreation implements FormActionFactory, F
         context.getEvent().detail(Details.USERNAME, phoneNumber);
 
         if (Validation.isBlank(phoneNumber)){
-            errors.add(new FormMessage(FIELD_PHONE_NUMBER, MESSAGE_MISSING_PHONE_NUMBER));
+            errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message()));
             context.error(Errors.INVALID_REGISTRATION);
             context.validationError(formData, errors);
             return;
         }
 
-        if (!UserUtils.isDuplicatePhoneAllowed() && UserUtils.findUserByPhone(context.getSession().users(),context.getRealm(),phoneNumber) != null) {
+        if (!UserUtils.isDuplicatePhoneAllowed() && UserUtils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber).isPresent()) {
             context.error(Errors.INVALID_REGISTRATION);
             formData.remove(FIELD_PHONE_NUMBER);
-            errors.add(new FormMessage(FIELD_PHONE_NUMBER, MESSAGE_PHONE_EXISTS));
+            errors.add(new FormMessage(FIELD_PHONE_NUMBER,SupportPhonePages.Errors.EXISTS.message()));
             context.validationError(formData, errors);
             return;
         }

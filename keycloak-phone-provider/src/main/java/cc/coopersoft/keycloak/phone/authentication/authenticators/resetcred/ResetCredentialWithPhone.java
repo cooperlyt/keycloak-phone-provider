@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.resetcred;
 
+import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.utils.OptionalStringUtils;
 import cc.coopersoft.keycloak.phone.utils.UserUtils;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
@@ -109,7 +110,7 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
 
       if (StringUtils.isBlank(phoneNumber)) {
         context.getEvent().error(Errors.USERNAME_MISSING);
-        Response challenge = challenge(context, FIELD_PHONE_NUMBER, MESSAGE_MISSING_PHONE_NUMBER, phoneNumber);
+        Response challenge = challenge(context, FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message(), phoneNumber);
         context.forceChallenge(challenge);
         return false;
       }

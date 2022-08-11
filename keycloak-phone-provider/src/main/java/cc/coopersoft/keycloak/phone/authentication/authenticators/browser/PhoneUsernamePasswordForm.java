@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.browser;
 
+import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
 import cc.coopersoft.keycloak.phone.utils.OptionalStringUtils;
@@ -70,7 +71,7 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
     if (StringUtils.isBlank(phoneNumber)){
       context.getEvent().error(Errors.USERNAME_MISSING);
       context.form().setAttribute(ATTEMPTED_PHONE_ACTIVATED, true);
-      Response challengeResponse = challenge(context, MESSAGE_MISSING_PHONE_NUMBER, FIELD_PHONE_NUMBER);
+      Response challengeResponse = challenge(context, SupportPhonePages.Errors.MISSING.message(), FIELD_PHONE_NUMBER);
       context.forceChallenge(challengeResponse);
       return false;
     }

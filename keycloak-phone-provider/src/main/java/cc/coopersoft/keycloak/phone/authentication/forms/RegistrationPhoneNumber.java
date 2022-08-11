@@ -122,15 +122,15 @@ public class RegistrationPhoneNumber implements FormAction, FormActionFactory {
 
 		if (Validation.isBlank(phoneNumber)) {
 			context.error(Errors.INVALID_REGISTRATION);
-			errors.add(new FormMessage(FIELD_PHONE_NUMBER, MESSAGE_MISSING_PHONE_NUMBER));
+			errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message()));
 			context.validationError(formData, errors);
 			return;
 		}
 
-		if (!UserUtils.isDuplicatePhoneAllowed() && UserUtils.findUserByPhone(session.users(),context.getRealm(),phoneNumber) != null) {
+		if (!UserUtils.isDuplicatePhoneAllowed() && UserUtils.findUserByPhone(session.users(), context.getRealm(), phoneNumber).isPresent()) {
 			formData.remove(FIELD_PHONE_NUMBER);
 			context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
-			errors.add(new FormMessage(FIELD_PHONE_NUMBER, MESSAGE_PHONE_EXISTS));
+			errors.add(new FormMessage(FIELD_PHONE_NUMBER,SupportPhonePages.Errors.EXISTS.message()));
 			context.error(Errors.INVALID_REGISTRATION);
 			context.validationError(formData, errors);
 			return;

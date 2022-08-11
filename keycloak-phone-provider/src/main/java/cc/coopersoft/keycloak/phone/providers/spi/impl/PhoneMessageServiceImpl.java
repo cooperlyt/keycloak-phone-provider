@@ -47,7 +47,7 @@ public class PhoneMessageServiceImpl implements PhoneMessageService {
     }
 
     @Override
-    public int sendTokenCode(String phoneNumber,TokenCodeType type){
+    public int sendTokenCode(String phoneNumber,TokenCodeType type, String kind){
         logger.info("send code to:" + phoneNumber );
 
         if (getTokenCodeService().isAbusing(phoneNumber, type,hourMaximum)) {
@@ -63,7 +63,7 @@ public class PhoneMessageServiceImpl implements PhoneMessageService {
         TokenCodeRepresentation token = TokenCodeRepresentation.forPhoneNumber(phoneNumber);
 
         try {
-            session.getProvider(MessageSenderService.class, service).sendSmsMessage(type,phoneNumber,token.getCode(),tokenExpiresIn);
+            session.getProvider(MessageSenderService.class, service).sendSmsMessage(type,phoneNumber,token.getCode(),tokenExpiresIn,kind);
             getTokenCodeService().persistCode(token, type, tokenExpiresIn);
 
             logger.info(String.format("Sent %s code to %s over %s",type.getLabel(), phoneNumber, service));

@@ -13,6 +13,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO add config show a check input.
 public class RegistrationLeast implements FormActionFactory, FormAction {
 
     public static final String PROVIDER_ID = "registration-least";
