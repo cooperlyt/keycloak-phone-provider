@@ -13,7 +13,7 @@ import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.services.validation.Validation;
 
 
-public class EverybodyPhoneAuthenticator extends AuthenticationCodeAuthenticator{
+public class EverybodyPhoneAuthenticator extends AuthenticationCodeAuthenticator {
 
   private static final Logger logger = Logger.getLogger(EverybodyPhoneAuthenticator.class);
 
@@ -27,45 +27,38 @@ public class EverybodyPhoneAuthenticator extends AuthenticationCodeAuthenticator
   }
 
   @Override
-  public void authenticate(AuthenticationFlowContext context){
-    String phoneNumber = getPhoneNumber(context);
+  public void authenticate(AuthenticationFlowContext context) {
+    getPhoneNumber(context)
+        .ifPresentOrElse(phoneNumber -> getAuthenticationCode(context)
+                .ifPresentOrElse(code -> authToUser(context, phoneNumber, code),
+                    ()-> invalidCredentials(context)),
+            () -> invalidCredentials(context));
+  }
 
-    if (Validation.isBlank(phoneNumber)){
-      invalidCredentials(context);
-      return;
-    }
-
-    String code = getAuthenticationCode(context);
-
-    if (Validation.isBlank(code)){
-      invalidCredentials(context);
-      return;
-    }
-
+  private void authToUser(AuthenticationFlowContext context, String phoneNumber, String code) {
     TokenCodeService tokenCodeService = context.getSession().getProvider(TokenCodeService.class);
     TokenCodeRepresentation tokenCode = tokenCodeService.ongoingProcess(phoneNumber, TokenCodeType.AUTH);
 
-    if(tokenCode == null || !tokenCode.getCode().equals(code)){
+    if (tokenCode == null || !tokenCode.getCode().equals(code)) {
       invalidCredentials(context);
       return;
     }
 
-    UserModel user = UserUtils.findUserByPhone(context.getSession().users(),
-            context.getRealm(),phoneNumber);
-    if (user == null){
-
-      if (context.getSession().users().getUserByUsername(phoneNumber, context.getRealm()) != null){
-        invalidCredentials(context,AuthenticationFlowError.USER_CONFLICT);
-        return;
-      }
-      user = context.getSession().users().addUser(context.getRealm(), phoneNumber);
-      user.setEnabled(true);
-      context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, phoneNumber);
+    UserModel user = UserUtils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber)
+        .orElseGet(() -> {
+          if (context.getSession().users().getUserByUsername(phoneNumber, context.getRealm()) != null) {
+            invalidCredentials(context, AuthenticationFlowError.USER_CONFLICT);
+            return null;
+          }
+          UserModel newUser = context.getSession().users().addUser(context.getRealm(), phoneNumber);
+          newUser.setEnabled(true);
+          context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, phoneNumber);
+          return newUser;
+        });
+    if (user != null) {
+      context.setUser(user);
+      tokenCodeService.tokenValidated(user, phoneNumber, tokenCode.getId());
+      context.success();
     }
-    context.setUser(user);
-
-    tokenCodeService.tokenValidated(user,phoneNumber,tokenCode.getId());
-
-    context.success();
   }
 }

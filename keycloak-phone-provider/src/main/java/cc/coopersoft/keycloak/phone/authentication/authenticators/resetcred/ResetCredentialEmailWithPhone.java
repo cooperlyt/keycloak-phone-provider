@@ -1,6 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.resetcred;
 
-import org.apache.commons.lang.StringUtils;
+import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.authenticators.resetcred.ResetCredentialEmail;
 import org.keycloak.models.AuthenticationExecutionModel.Requirement;
@@ -8,10 +8,20 @@ import org.keycloak.models.AuthenticationExecutionModel.Requirement;
 public class ResetCredentialEmailWithPhone extends ResetCredentialEmail {
     public static final Requirement[] REQUIREMENT_CHOICES;
 
-    //TODO Requirement.CONDITIONAL or ALTERNATIVE ?
+    private static final Logger logger = Logger.getLogger(ResetCredentialEmail.class);
+
+    //TODO Requirement.CONDITIONAL or ALTERNATIVE ? configuredFor
+
+    /**
+     *  REQUIRED ignore configuredFor always execute
+     *  ALTERNATIVE same level multi item   check configuredFor choice one
+     *  CONDITIONAL check condition item And check configuredFor
+     *  DISABLED ignore all
+     */
     static {
         REQUIREMENT_CHOICES = new Requirement[]{
             Requirement.CONDITIONAL,
+            Requirement.ALTERNATIVE,
             Requirement.DISABLED
         };
     }
@@ -28,6 +38,7 @@ public class ResetCredentialEmailWithPhone extends ResetCredentialEmail {
 
     protected boolean configuredFor(AuthenticationFlowContext context) {
         String sendNote = context.getAuthenticationSession().getAuthNote(ResetCredentialWithPhone.NOT_SEND_EMAIL);
+        logger.info("call if no phone email configuredFor:" + sendNote);
         return !"false".equalsIgnoreCase(sendNote);
     }
 

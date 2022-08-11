@@ -1,4 +1,4 @@
-<#import "template.ftl" as layout>
+g<#import "template.ftl" as layout>
 <@layout.registrationLayout; section>
     <#if section = "header">
         ${msg("registerTitle")}

@@ -5,6 +5,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.UserProvider;
 
 import java.util.Comparator;
+import java.util.Optional;
 
 
 /**
@@ -17,17 +18,17 @@ import java.util.Comparator;
 public class UserUtils {
 
 
-    public static UserModel findUserByPhone(UserProvider userProvider, RealmModel realm, String phoneNumber){
-        return userProvider
+    public static Optional<UserModel> findUserByPhone(UserProvider userProvider, RealmModel realm, String phoneNumber){
+        return Optional.ofNullable(userProvider
             .searchForUserByUserAttributeStream(realm,"phoneNumber", phoneNumber)
-            .max(comparatorUser()).orElse(null);
+            .max(comparatorUser()).orElse(null));
     }
 
-    public static UserModel findUserByPhone(UserProvider userProvider, RealmModel realm, String phoneNumber, String notIs){
-        return userProvider
+    public static Optional<UserModel> findUserByPhone(UserProvider userProvider, RealmModel realm, String phoneNumber, String notIs){
+        return Optional.ofNullable(userProvider
             .searchForUserByUserAttributeStream(realm, "phoneNumber", phoneNumber)
             .filter(u -> !u.getId().equals(notIs))
-            .max(comparatorUser()).orElse(null);
+            .max(comparatorUser()).orElse(null));
     }
 
     private static Comparator<UserModel> comparatorUser() {

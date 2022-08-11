@@ -16,30 +16,26 @@ import org.keycloak.authentication.FormAction;
 import org.keycloak.authentication.FormActionFactory;
 import org.keycloak.authentication.FormContext;
 import org.keycloak.authentication.ValidationContext;
-import org.keycloak.authentication.forms.RegistrationPage;
 import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.*;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.provider.ProviderConfigProperty;
-import org.keycloak.services.messages.Messages;
 import org.keycloak.services.validation.Validation;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages.*;
+
 public class RegistrationPhoneNumber implements FormAction, FormActionFactory {
 
 	private static final Logger logger = Logger.getLogger(RegistrationPhoneNumber.class);
 
 	public static final String PROVIDER_ID = "registration-phone";
-	public static final String FIELD_PHONE_NUMBER = "phoneNumber";
-	public static final String FIELD_VERIFICATION_CODE = "registerCode";
 
-	public static final String MISSING_PHONE_NUMBER = "requiredPhoneNumber";
-	public static final String PHONE_EXISTS = "phoneNumberExists";
 
 	@Override
 	public String getHelpText() {
@@ -126,7 +122,7 @@ public class RegistrationPhoneNumber implements FormAction, FormActionFactory {
 
 		if (Validation.isBlank(phoneNumber)) {
 			context.error(Errors.INVALID_REGISTRATION);
-			errors.add(new FormMessage(FIELD_PHONE_NUMBER, MISSING_PHONE_NUMBER));
+			errors.add(new FormMessage(FIELD_PHONE_NUMBER, MESSAGE_MISSING_PHONE_NUMBER));
 			context.validationError(formData, errors);
 			return;
 		}
@@ -134,7 +130,7 @@ public class RegistrationPhoneNumber implements FormAction, FormActionFactory {
 		if (!UserUtils.isDuplicatePhoneAllowed() && UserUtils.findUserByPhone(session.users(),context.getRealm(),phoneNumber) != null) {
 			formData.remove(FIELD_PHONE_NUMBER);
 			context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
-			errors.add(new FormMessage(FIELD_PHONE_NUMBER, PHONE_EXISTS));
+			errors.add(new FormMessage(FIELD_PHONE_NUMBER, MESSAGE_PHONE_EXISTS));
 			context.error(Errors.INVALID_REGISTRATION);
 			context.validationError(formData, errors);
 			return;

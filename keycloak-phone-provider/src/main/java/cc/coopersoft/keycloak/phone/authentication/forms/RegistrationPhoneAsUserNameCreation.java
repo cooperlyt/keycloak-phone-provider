@@ -7,8 +7,6 @@ import org.keycloak.authentication.FormAction;
 import org.keycloak.authentication.FormActionFactory;
 import org.keycloak.authentication.FormContext;
 import org.keycloak.authentication.ValidationContext;
-import org.keycloak.authentication.forms.RegistrationPage;
-import org.keycloak.authentication.forms.RegistrationUserCreation;
 import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventType;
@@ -23,6 +21,8 @@ import org.keycloak.services.validation.Validation;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.List;
+
+import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages.*;
 
 /**
  * replace  org.keycloak.authentication.forms.RegistrationUserCreation.java
@@ -114,11 +114,11 @@ public class RegistrationPhoneAsUserNameCreation implements FormActionFactory, F
         List<FormMessage> errors = new ArrayList<>();
         context.getEvent().detail(Details.REGISTER_METHOD, "form");
 
-        String phoneNumber = formData.getFirst(RegistrationPhoneNumber.FIELD_PHONE_NUMBER);
+        String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
         context.getEvent().detail(Details.USERNAME, phoneNumber);
 
         if (Validation.isBlank(phoneNumber)){
-            errors.add(new FormMessage(RegistrationPhoneNumber.FIELD_PHONE_NUMBER, RegistrationPhoneNumber.MISSING_PHONE_NUMBER));
+            errors.add(new FormMessage(FIELD_PHONE_NUMBER, MESSAGE_MISSING_PHONE_NUMBER));
             context.error(Errors.INVALID_REGISTRATION);
             context.validationError(formData, errors);
             return;
@@ -126,16 +126,16 @@ public class RegistrationPhoneAsUserNameCreation implements FormActionFactory, F
 
         if (!UserUtils.isDuplicatePhoneAllowed() && UserUtils.findUserByPhone(context.getSession().users(),context.getRealm(),phoneNumber) != null) {
             context.error(Errors.INVALID_REGISTRATION);
-            formData.remove(RegistrationPhoneNumber.FIELD_PHONE_NUMBER);
-            errors.add(new FormMessage(RegistrationPhoneNumber.FIELD_PHONE_NUMBER, RegistrationPhoneNumber.PHONE_EXISTS));
+            formData.remove(FIELD_PHONE_NUMBER);
+            errors.add(new FormMessage(FIELD_PHONE_NUMBER, MESSAGE_PHONE_EXISTS));
             context.validationError(formData, errors);
             return;
         }
 
-        if (context.getSession().users().getUserByUsername(phoneNumber, context.getRealm()) != null) {
+        if (context.getSession().users().getUserByUsername(context.getRealm(),phoneNumber) != null) {
             context.error(Errors.USERNAME_IN_USE);
-            errors.add(new FormMessage(RegistrationPhoneNumber.FIELD_PHONE_NUMBER, Messages.USERNAME_EXISTS));
-            formData.remove(RegistrationPhoneNumber.FIELD_PHONE_NUMBER);
+            errors.add(new FormMessage(FIELD_PHONE_NUMBER, Messages.USERNAME_EXISTS));
+            formData.remove(FIELD_PHONE_NUMBER);
             context.validationError(formData, errors);
             return;
         }
@@ -148,7 +148,7 @@ public class RegistrationPhoneAsUserNameCreation implements FormActionFactory, F
 
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
 
-        String username = formData.getFirst(RegistrationPhoneNumber.FIELD_PHONE_NUMBER);
+        String username = formData.getFirst(FIELD_PHONE_NUMBER);
 
         context.getEvent().detail(Details.USERNAME, username)
                 .detail(Details.REGISTER_METHOD, "form");

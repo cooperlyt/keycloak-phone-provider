@@ -102,6 +102,7 @@
                                 <div class="${properties.kcFormGroupClass!}">
                                     <label for="phoneNumber" class="${properties.kcLabelClass!}">${msg("phoneNumber")}</label>
                                     <input tabindex="1" type="text" id="phoneNumber" name="phoneNumber" v-model="phoneNumber"
+                                           value="${(login.phoneNumber!'')}"
                                            aria-invalid="<#if messagesPerField.existsError('code','phoneNumber')>true</#if>"
                                            class="${properties.kcInputClass!}" autofocus/>
                                     <#if messagesPerField.existsError('code','phoneNumber')>
