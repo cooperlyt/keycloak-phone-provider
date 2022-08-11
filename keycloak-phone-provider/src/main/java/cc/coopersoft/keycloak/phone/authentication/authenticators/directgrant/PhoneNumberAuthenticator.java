@@ -1,16 +1,11 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant;
 
-import cc.coopersoft.keycloak.phone.utils.UserUtils;
+import cc.coopersoft.keycloak.phone.Utils;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
-import org.keycloak.authentication.AuthenticationFlowError;
-import org.keycloak.events.Errors;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.services.validation.Validation;
-
-import javax.ws.rs.core.Response;
 
 public class PhoneNumberAuthenticator extends BaseDirectGrantAuthenticator {
 
@@ -31,7 +26,7 @@ public class PhoneNumberAuthenticator extends BaseDirectGrantAuthenticator {
     public void authenticate(AuthenticationFlowContext context) {
         context.clearUser();
         getPhoneNumber(context).ifPresentOrElse(phoneNumber ->
-            UserUtils.findUserByPhone(context.getSession().users(),context.getRealm(),phoneNumber)
+            Utils.findUserByPhone(context.getSession().users(),context.getRealm(),phoneNumber)
                 .ifPresentOrElse(user -> {
                     context.setUser(user);
                     context.success();

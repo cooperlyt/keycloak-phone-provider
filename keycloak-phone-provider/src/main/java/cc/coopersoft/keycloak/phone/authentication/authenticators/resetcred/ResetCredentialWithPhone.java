@@ -1,10 +1,10 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.resetcred;
 
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
-import cc.coopersoft.keycloak.phone.utils.OptionalStringUtils;
-import cc.coopersoft.keycloak.phone.utils.UserUtils;
+import cc.coopersoft.common.OptionalStringUtils;
+import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
-import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
@@ -132,7 +132,7 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
   }
 
   protected UserModel getUserByPhone(AuthenticationFlowContext context, String phoneNumber, String verificationCode) {
-    return UserUtils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber)
+    return Utils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber)
         .orElse(null);
   }
 
@@ -229,7 +229,7 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
 
   private boolean validateVerificationCode(AuthenticationFlowContext context, UserModel user, String phoneNumber, String code) {
     try {
-      context.getSession().getProvider(TokenCodeService.class).validateCode(user, phoneNumber, code, TokenCodeType.RESET);
+      context.getSession().getProvider(PhoneVerificationCodeProvider.class).validateCode(user, phoneNumber, code, TokenCodeType.RESET);
       logger.debug("verification code success!");
       return true;
     } catch (Exception e) {

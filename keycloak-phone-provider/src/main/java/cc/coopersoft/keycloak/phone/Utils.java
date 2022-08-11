@@ -1,5 +1,7 @@
-package cc.coopersoft.keycloak.phone.utils;
+package cc.coopersoft.keycloak.phone;
 
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneSupportProvider;
+import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserProvider;
@@ -15,20 +17,20 @@ import java.util.Optional;
  */
 
 
-public class UserUtils {
+public class Utils {
 
 
     public static Optional<UserModel> findUserByPhone(UserProvider userProvider, RealmModel realm, String phoneNumber){
-        return Optional.ofNullable(userProvider
+        return userProvider
             .searchForUserByUserAttributeStream(realm,"phoneNumber", phoneNumber)
-            .max(comparatorUser()).orElse(null));
+            .max(comparatorUser());
     }
 
     public static Optional<UserModel> findUserByPhone(UserProvider userProvider, RealmModel realm, String phoneNumber, String notIs){
-        return Optional.ofNullable(userProvider
+        return userProvider
             .searchForUserByUserAttributeStream(realm, "phoneNumber", phoneNumber)
             .filter(u -> !u.getId().equals(notIs))
-            .max(comparatorUser()).orElse(null));
+            .max(comparatorUser());
     }
 
     private static Comparator<UserModel> comparatorUser() {
@@ -37,9 +39,8 @@ public class UserUtils {
                 u2.getAttributeStream("phoneNumberVerified").anyMatch("true"::equals));
     }
 
-    public static boolean isDuplicatePhoneAllowed(){
-        //TODO isDuplicatePhoneAllowed
-        return true;
+    public static boolean isDuplicatePhoneAllowed(KeycloakSession session,RealmModel realm){
+        return session.getProvider(PhoneSupportProvider.class).isDuplicatePhoneAllowed(realm.getName());
     }
 
 

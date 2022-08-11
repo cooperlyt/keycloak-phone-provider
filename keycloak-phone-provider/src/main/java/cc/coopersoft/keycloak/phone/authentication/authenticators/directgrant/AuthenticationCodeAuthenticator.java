@@ -1,7 +1,7 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant;
 
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
-import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.models.KeycloakSession;
@@ -42,7 +42,7 @@ public class AuthenticationCodeAuthenticator extends BaseDirectGrantAuthenticato
 
         getAuthenticationCode(context).ifPresentOrElse(code -> {
             try {
-                context.getSession().getProvider(TokenCodeService.class).validateCode(context.getUser(), phoneNumber, code, TokenCodeType.AUTH);
+                context.getSession().getProvider(PhoneVerificationCodeProvider.class).validateCode(context.getUser(), phoneNumber, code, TokenCodeType.AUTH);
                 context.success();
             } catch (Exception e) {
                 logger.info("Grant authenticator valid code failure",e);

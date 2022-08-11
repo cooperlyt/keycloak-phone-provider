@@ -1,7 +1,7 @@
 package cc.coopersoft.keycloak.phone.providers.sender;
 
 import cc.coopersoft.keycloak.phone.providers.spi.MessageSenderService;
-import cc.coopersoft.keycloak.phone.utils.OptionalStringUtils;
+import cc.coopersoft.common.OptionalStringUtils;
 import com.cloopen.rest.sdk.BodyType;
 import com.cloopen.rest.sdk.CCPRestSmsSDK;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;

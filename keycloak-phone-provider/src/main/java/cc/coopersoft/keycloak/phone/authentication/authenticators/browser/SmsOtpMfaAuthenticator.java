@@ -1,11 +1,13 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.browser;
 
+import cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant.AuthenticationCodeAuthenticator;
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.authentication.requiredactions.ConfigSmsOtpRequiredAction;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
-import cc.coopersoft.keycloak.phone.providers.spi.PhoneMessageService;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneSupportProvider;
+import org.jboss.logging.Logger;
 import org.jboss.resteasy.spi.HttpResponse;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
@@ -27,6 +29,7 @@ import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePage
 
 public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidator<PhoneOtpCredentialProvider> {
 
+    private static final Logger logger = Logger.getLogger(SmsOtpMfaAuthenticator.class);
 
     private static final String PAGE = "login-sms-otp.ftl";
 
@@ -90,19 +93,21 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
             context.success();
             return;
         }
-        PhoneMessageService phoneMessageService = context.getSession().getProvider(PhoneMessageService.class);
+        PhoneSupportProvider phoneSupportProvider = context.getSession().getProvider(PhoneSupportProvider.class);
         String phoneNumber = context.getUser().getFirstAttribute(FIELD_PHONE_NUMBER);
         Response challenge;
         try {
-            int expires = phoneMessageService.sendTokenCode(phoneNumber, TokenCodeType.OTP,null);
+            int expires = phoneSupportProvider.sendTokenCode(phoneNumber, TokenCodeType.OTP,null);
             challenge = context.form()
                 .setInfo("codeSent",phoneNumber)
                 .setAttribute("expires",expires)
                 .createForm(PAGE);
         } catch (ForbiddenException e) {
+            logger.warn("otp send code Forbidden Exception!",e);
             challenge = context.form().setError(SupportPhonePages.Errors.ABUSED.message())
                 .createForm(PAGE);
         } catch (Exception e){
+            logger.warn("otp send code Exception!",e);
             challenge = context.form().setError(SupportPhonePages.Errors.FAIL.message())
                 .createForm(PAGE);
         }
@@ -128,6 +133,7 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
         return true;
     }
 
+    //TODO login by phone jump
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
         return getCredentialProvider(session).isConfiguredFor(realm, user, getType(session));

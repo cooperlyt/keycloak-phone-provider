@@ -2,7 +2,7 @@ package cc.coopersoft.keycloak.phone.credential;
 
 import cc.coopersoft.keycloak.phone.authentication.authenticators.browser.SmsOtpMfaAuthenticatorFactory;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
-import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import org.jboss.logging.Logger;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.*;
@@ -20,8 +20,8 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
         this.session = session;
     }
 
-    private TokenCodeService getTokenCodeService() {
-        return session.getProvider(TokenCodeService.class);
+    private PhoneVerificationCodeProvider getTokenCodeService() {
+        return session.getProvider(PhoneVerificationCodeProvider.class);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
         if (code == null) return false;
 
         try {
-            getTokenCodeService().validateCode(user, phoneNumber, code, TokenCodeType.AUTH);
+            getTokenCodeService().validateCode(user, phoneNumber, code, TokenCodeType.OTP);
             return true;
         } catch (Exception e) {
             return false;

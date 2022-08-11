@@ -2,15 +2,14 @@ package cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant;
 
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
-import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
-import cc.coopersoft.keycloak.phone.utils.UserUtils;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import cc.coopersoft.keycloak.phone.Utils;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
-import org.keycloak.services.validation.Validation;
 
 
 public class EverybodyPhoneAuthenticator extends AuthenticationCodeAuthenticator {
@@ -36,15 +35,15 @@ public class EverybodyPhoneAuthenticator extends AuthenticationCodeAuthenticator
   }
 
   private void authToUser(AuthenticationFlowContext context, String phoneNumber, String code) {
-    TokenCodeService tokenCodeService = context.getSession().getProvider(TokenCodeService.class);
-    TokenCodeRepresentation tokenCode = tokenCodeService.ongoingProcess(phoneNumber, TokenCodeType.AUTH);
+    PhoneVerificationCodeProvider phoneVerificationCodeProvider = context.getSession().getProvider(PhoneVerificationCodeProvider.class);
+    TokenCodeRepresentation tokenCode = phoneVerificationCodeProvider.ongoingProcess(phoneNumber, TokenCodeType.AUTH);
 
     if (tokenCode == null || !tokenCode.getCode().equals(code)) {
       invalidCredentials(context);
       return;
     }
 
-    UserModel user = UserUtils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber)
+    UserModel user = Utils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber)
         .orElseGet(() -> {
           if (context.getSession().users().getUserByUsername(phoneNumber, context.getRealm()) != null) {
             invalidCredentials(context, AuthenticationFlowError.USER_CONFLICT);
@@ -57,7 +56,7 @@ public class EverybodyPhoneAuthenticator extends AuthenticationCodeAuthenticator
         });
     if (user != null) {
       context.setUser(user);
-      tokenCodeService.tokenValidated(user, phoneNumber, tokenCode.getId());
+      phoneVerificationCodeProvider.tokenValidated(user, phoneNumber, tokenCode.getId());
       context.success();
     }
   }

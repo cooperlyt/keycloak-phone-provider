@@ -1,6 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
-import cc.coopersoft.keycloak.phone.utils.UserUtils;
+import cc.coopersoft.keycloak.phone.Utils;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -22,6 +22,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO phone number is username check input , if username is exists then show username input
 import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages.*;
 
 /**
@@ -29,161 +30,160 @@ import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePage
  */
 public class RegistrationPhoneAsUserNameCreation implements FormActionFactory, FormAction {
 
-    private static final Logger logger = Logger.getLogger(RegistrationPhoneAsUserNameCreation.class);
+  private static final Logger logger = Logger.getLogger(RegistrationPhoneAsUserNameCreation.class);
 
-    public static final String PROVIDER_ID = "registration-phone-username-creation";
+  public static final String PROVIDER_ID = "registration-phone-username-creation";
 
-    private static AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
-            AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED };
+  private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
+      AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED};
 
 
-    @Override
-    public String getDisplayType() {
-        return "Registration Phone As Username Creation";
+  @Override
+  public String getDisplayType() {
+    return "Registration Phone As Username Creation";
+  }
+
+  @Override
+  public String getHelpText() {
+    return "This action must always be first And Do not use Email as username! registration phone number as username. In success phase, this will create the user in the database.";
+  }
+
+  @Override
+  public String getReferenceCategory() {
+    return null;
+  }
+
+  @Override
+  public boolean isConfigurable() {
+    return false;
+  }
+
+
+  @Override
+  public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
+    return REQUIREMENT_CHOICES;
+  }
+
+  @Override
+  public boolean isUserSetupAllowed() {
+    return false;
+  }
+
+
+  @Override
+  public List<ProviderConfigProperty> getConfigProperties() {
+    return null;
+  }
+
+  @Override
+  public FormAction create(KeycloakSession session) {
+    return this;
+  }
+
+  @Override
+  public void init(Config.Scope config) {
+  }
+
+  @Override
+  public void postInit(KeycloakSessionFactory factory) {
+
+  }
+
+  @Override
+  public void close() {
+
+  }
+
+  @Override
+  public String getId() {
+    return PROVIDER_ID;
+  }
+
+  // FormAction
+
+  @Override
+  public void buildPage(FormContext formContext, LoginFormsProvider loginFormsProvider) {
+    loginFormsProvider.setAttribute("registrationPhoneAsUsername", true);
+  }
+
+  @Override
+  public void validate(ValidationContext context) {
+
+    MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
+    List<FormMessage> errors = new ArrayList<>();
+    context.getEvent().detail(Details.REGISTER_METHOD, "form");
+
+    String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
+    context.getEvent().detail(Details.USERNAME, phoneNumber);
+
+    if (Validation.isBlank(phoneNumber)) {
+      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message()));
+      context.error(Errors.INVALID_REGISTRATION);
+      context.validationError(formData, errors);
+      return;
     }
 
-    @Override
-    public String getHelpText() {
-        return "This action must always be first And Do not use Email as username! registration phone number as username. In success phase, this will create the user in the database.";
+    if (Utils.isDuplicatePhoneAllowed(context.getSession(), context.getRealm()) &&
+        Utils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber).isPresent()) {
+      context.error(Errors.INVALID_REGISTRATION);
+      formData.remove(FIELD_PHONE_NUMBER);
+      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.EXISTS.message()));
+      context.validationError(formData, errors);
+      return;
     }
 
-    @Override
-    public String getReferenceCategory() {
-        return null;
+    if (context.getSession().users().getUserByUsername(context.getRealm(), phoneNumber) != null) {
+      context.error(Errors.USERNAME_IN_USE);
+      errors.add(new FormMessage(FIELD_PHONE_NUMBER, Messages.USERNAME_EXISTS));
+      formData.remove(FIELD_PHONE_NUMBER);
+      context.validationError(formData, errors);
+      return;
     }
 
-    @Override
-    public boolean isConfigurable() {
-        return false;
+    context.success();
+  }
+
+  @Override
+  public void success(FormContext context) {
+
+    MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
+
+    String username = formData.getFirst(FIELD_PHONE_NUMBER);
+
+    context.getEvent().detail(Details.USERNAME, username)
+        .detail(Details.REGISTER_METHOD, "form");
+    UserModel user = context.getSession().users().addUser(context.getRealm(), username);
+    user.setEnabled(true);
+
+    context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, username);
+    //AttributeFormDataProcessor.process(formData);
+    context.setUser(user);
+    context.getEvent().user(user);
+    context.getEvent().success();
+    context.newEvent().event(EventType.LOGIN);
+    context.getEvent().client(context.getAuthenticationSession().getClient().getClientId())
+        .detail(Details.REDIRECT_URI, context.getAuthenticationSession().getRedirectUri())
+        .detail(Details.AUTH_METHOD, context.getAuthenticationSession().getProtocol());
+    String authType = context.getAuthenticationSession().getAuthNote(Details.AUTH_TYPE);
+    if (authType != null) {
+      context.getEvent().detail(Details.AUTH_TYPE, authType);
     }
 
+    logger.info(String.format("user: %s is created, user name is %s ", user.getId(), user.getUsername()));
+  }
 
-    @Override
-    public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
-        return REQUIREMENT_CHOICES;
-    }
+  @Override
+  public boolean requiresUser() {
+    return false;
+  }
 
-    @Override
-    public boolean isUserSetupAllowed() {
-        return false;
-    }
+  @Override
+  public boolean configuredFor(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
+    return !realmModel.isRegistrationEmailAsUsername();
+  }
 
+  @Override
+  public void setRequiredActions(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
 
-
-    @Override
-    public List<ProviderConfigProperty> getConfigProperties() {
-        return null;
-    }
-
-    @Override
-    public FormAction create(KeycloakSession session) {
-        return this;
-    }
-
-    @Override
-    public void init(Config.Scope config) {
-
-    }
-
-    @Override
-    public void postInit(KeycloakSessionFactory factory) {
-
-    }
-
-    @Override
-    public void close() {
-
-    }
-
-    @Override
-    public String getId() {
-        return PROVIDER_ID;
-    }
-
-    // FormAction
-
-    @Override
-    public void buildPage(FormContext formContext, LoginFormsProvider loginFormsProvider) {
-        loginFormsProvider.setAttribute("registrationPhoneAsUsername", true);
-    }
-
-    @Override
-    public void validate(ValidationContext context) {
-
-        MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
-        List<FormMessage> errors = new ArrayList<>();
-        context.getEvent().detail(Details.REGISTER_METHOD, "form");
-
-        String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
-        context.getEvent().detail(Details.USERNAME, phoneNumber);
-
-        if (Validation.isBlank(phoneNumber)){
-            errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message()));
-            context.error(Errors.INVALID_REGISTRATION);
-            context.validationError(formData, errors);
-            return;
-        }
-
-        if (!UserUtils.isDuplicatePhoneAllowed() && UserUtils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber).isPresent()) {
-            context.error(Errors.INVALID_REGISTRATION);
-            formData.remove(FIELD_PHONE_NUMBER);
-            errors.add(new FormMessage(FIELD_PHONE_NUMBER,SupportPhonePages.Errors.EXISTS.message()));
-            context.validationError(formData, errors);
-            return;
-        }
-
-        if (context.getSession().users().getUserByUsername(context.getRealm(),phoneNumber) != null) {
-            context.error(Errors.USERNAME_IN_USE);
-            errors.add(new FormMessage(FIELD_PHONE_NUMBER, Messages.USERNAME_EXISTS));
-            formData.remove(FIELD_PHONE_NUMBER);
-            context.validationError(formData, errors);
-            return;
-        }
-
-        context.success();
-    }
-
-    @Override
-    public void success(FormContext context) {
-
-        MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
-
-        String username = formData.getFirst(FIELD_PHONE_NUMBER);
-
-        context.getEvent().detail(Details.USERNAME, username)
-                .detail(Details.REGISTER_METHOD, "form");
-        UserModel user = context.getSession().users().addUser(context.getRealm(), username);
-        user.setEnabled(true);
-
-        context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, username);
-        //AttributeFormDataProcessor.process(formData);
-        context.setUser(user);
-        context.getEvent().user(user);
-        context.getEvent().success();
-        context.newEvent().event(EventType.LOGIN);
-        context.getEvent().client(context.getAuthenticationSession().getClient().getClientId())
-                .detail(Details.REDIRECT_URI, context.getAuthenticationSession().getRedirectUri())
-                .detail(Details.AUTH_METHOD, context.getAuthenticationSession().getProtocol());
-        String authType = context.getAuthenticationSession().getAuthNote(Details.AUTH_TYPE);
-        if (authType != null) {
-            context.getEvent().detail(Details.AUTH_TYPE, authType);
-        }
-
-        logger.info(String.format("user: %s is created, user name is %s ",user.getId(), user.getUsername()));
-    }
-
-    @Override
-    public boolean requiresUser() {
-        return false;
-    }
-
-    @Override
-    public boolean configuredFor(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
-        return !realmModel.isRegistrationEmailAsUsername();
-    }
-
-    @Override
-    public void setRequiredActions(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
-
-    }
+  }
 }

@@ -1,6 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant;
 
-import cc.coopersoft.keycloak.phone.utils.OptionalStringUtils;
+import cc.coopersoft.common.OptionalStringUtils;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;

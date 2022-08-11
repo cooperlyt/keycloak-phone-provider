@@ -7,7 +7,7 @@ import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.jpa.TokenCode;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
-import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import org.jboss.logging.Logger;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.credential.CredentialModel;
@@ -26,12 +26,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class TokenCodeServiceImpl implements TokenCodeService {
+public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCodeProvider {
 
-    private static final Logger logger = Logger.getLogger(TokenCodeServiceImpl.class);
+    private static final Logger logger = Logger.getLogger(DefaultPhoneVerificationCodeProvider.class);
     private final KeycloakSession session;
 
-    TokenCodeServiceImpl(KeycloakSession session) {
+    DefaultPhoneVerificationCodeProvider(KeycloakSession session) {
         this.session = session;
         if (getRealm() == null) {
             throw new IllegalStateException("The service cannot accept a session without a realm in its context.");

@@ -33,5 +33,9 @@ public class SmsResource {
         return new TokenCodeResource(session, TokenCodeType.RESET);
     }
 
+    @Path("otp-code")
+    public TokenCodeResource getOTPCodeResource() {
+        return new TokenCodeResource(session, TokenCodeType.OTP);
+    }
 
 }

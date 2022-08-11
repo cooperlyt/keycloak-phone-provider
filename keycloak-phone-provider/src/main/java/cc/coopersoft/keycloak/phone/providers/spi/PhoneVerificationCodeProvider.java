@@ -5,7 +5,7 @@ import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresent
 import org.keycloak.models.UserModel;
 import org.keycloak.provider.Provider;
 
-public interface TokenCodeService extends Provider {
+public interface PhoneVerificationCodeProvider extends Provider {
 
     TokenCodeRepresentation ongoingProcess(String phoneNumber, TokenCodeType tokenCodeType);
 

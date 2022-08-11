@@ -43,13 +43,11 @@
                                             <li role="presentation" v-bind:class="{ active: !phoneActivated }"
                                                 v-on:click="phoneActivated = false">
                                                 <a href="#">
-                                                        <#if !realm.loginWithEmailAllowed>${msg("username")}
-                                                        <#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmail")}
-                                                        <#else>${msg("email")}
-                                                        </#if></a>
+                                                      ${msg("loginByPassword")}
+                                                </a>
                                             </li>
                                             <li role="presentation" v-bind:class="{ active: phoneActivated }"
-                                                v-on:click="phoneActivated = true"><a href="#">${msg("phoneNumber")}</a>
+                                                v-on:click="phoneActivated = true"><a href="#">${msg("loginByPhone")}</a>
                                             </li>
                                         </ul>
                                     </div>

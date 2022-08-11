@@ -1,11 +1,11 @@
 package cc.coopersoft.keycloak.phone.providers.spi.impl;
 
-import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneSupportProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.MessageSenderService;
-import cc.coopersoft.keycloak.phone.providers.spi.PhoneMessageService;
 import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
 import org.keycloak.models.KeycloakSession;
@@ -14,17 +14,19 @@ import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.ServiceUnavailableException;
 import java.time.Instant;
 
-public class PhoneMessageServiceImpl implements PhoneMessageService {
+public class DefaultPhoneSupportProvider implements PhoneSupportProvider {
 
-    private static final Logger logger = Logger.getLogger(PhoneMessageServiceImpl.class);
+    private static final Logger logger = Logger.getLogger(DefaultPhoneSupportProvider.class);
     private final KeycloakSession session;
     private final String service;
     private final int tokenExpiresIn;
     private final int hourMaximum;
 
-    PhoneMessageServiceImpl(KeycloakSession session, Scope config) {
-        this.session = session;
+    private final Scope config;
 
+    DefaultPhoneSupportProvider(KeycloakSession session, Scope config) {
+        this.session = session;
+        this.config = config;
         logger.info("phone message service implement server name:" + config.get("service"));
 
         this.service = session.listProviderIds(MessageSenderService.class)
@@ -37,13 +39,20 @@ public class PhoneMessageServiceImpl implements PhoneMessageService {
         this.hourMaximum = config.getInt("hourMaximum",3);
     }
 
+
+
     @Override
     public void close() {
     }
 
 
-    private TokenCodeService getTokenCodeService() {
-        return session.getProvider(TokenCodeService.class);
+    private PhoneVerificationCodeProvider getTokenCodeService() {
+        return session.getProvider(PhoneVerificationCodeProvider.class);
+    }
+
+    @Override
+    public boolean isDuplicatePhoneAllowed(String realm) {
+        return config.getBoolean(realm + "-duplicate-phone-allowed",false);
     }
 
     @Override

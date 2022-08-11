@@ -1,4 +1,4 @@
-package cc.coopersoft.keycloak.phone.utils;
+package cc.coopersoft.common;
 
 import org.apache.commons.lang.StringUtils;
 
