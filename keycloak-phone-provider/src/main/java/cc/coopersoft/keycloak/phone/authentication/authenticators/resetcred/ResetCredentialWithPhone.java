@@ -19,6 +19,7 @@ import org.keycloak.events.Errors;
 import org.keycloak.models.*;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.provider.ProviderConfigProperty;
+import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.services.validation.Validation;
 
@@ -93,7 +94,7 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
     context.clearUser();
 
     String phoneNumber = inputData.getFirst(FIELD_PHONE_NUMBER);
-    String username = inputData.getFirst("username");
+    String username = inputData.getFirst(AuthenticationManager.FORM_USERNAME);
 
     UserModel user;
     if (!byPhone){

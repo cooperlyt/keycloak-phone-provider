@@ -39,7 +39,7 @@
                                     <ul class="nav nav-pills nav-justified">
                                         <li role="presentation" v-bind:class="{ active: !phoneActivated }"
                                             v-on:click="phoneActivated = false"><a
-                                                    href="#"><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmail")}<#else>${msg("email")}</#if></a>
+                                                    href="#">${msg("usernameOrEmail")}</a>
                                         </li>
                                         <li role="presentation" v-bind:class="{ active: phoneActivated }"
                                             v-on:click="phoneActivated = true"><a href="#">${msg("phoneNumber")}</a>
@@ -56,7 +56,7 @@
                         <div class="${properties.kcFormGroupClass!}">
                             <div class="${properties.kcLabelWrapperClass!}">
                                 <label for="username"
-                                       class="${properties.kcLabelClass!}"><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmail")}<#else>${msg("email")}</#if></label>
+                                       class="${properties.kcLabelClass!}">${msg("usernameOrEmail")}</label>
                             </div>
                             <div class="${properties.kcInputWrapperClass!}">
                                 <input type="text" id="username" name="username" class="${properties.kcInputClass!}"

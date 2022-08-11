@@ -21,6 +21,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.services.managers.AuthenticationManager;
+import org.keycloak.services.messages.Messages;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -28,6 +29,8 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 
+import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages.*;
+import static org.keycloak.authentication.authenticators.util.AuthenticatorUtils.getDisabledByBruteForceEventError;
 import static org.keycloak.services.validation.Validation.FIELD_USERNAME;
 
 public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements Authenticator, AuthenticatorFactory {
@@ -35,18 +38,10 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
   private static final Logger logger = Logger.getLogger(PhoneUsernamePasswordForm.class);
 
   public static final String PROVIDER_ID = "auth-phone-username-password-form";
-  private final String FORM_PHONE_VERIFICATION_CODE = "code";
-
-  private final String FORM_PHONE_NUMBER = "phoneNumber";
-  private final String FORM_ATTRIBUTE = "loginByPhone";
-
-  private final String FORM_ATTRIBUTE_INIT_PHONE_NUMBER = "initPhoneNumber";
-
-  private final String FORM_ATTRIBUTE_ACTIVE_PHONE = "activePhone";
 
   @Override
   protected Response createLoginForm(LoginFormsProvider form) {
-    form.setAttribute(FORM_ATTRIBUTE, true);
+    form.setAttribute(ATTRIBUTE_SUPPORT_PHONE, true);
     return form.createLoginUsernamePassword();
   }
 
@@ -54,51 +49,59 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
   protected Response challenge(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
     LoginFormsProvider forms = context.form();
     if (formData.size() > 0) forms.setFormData(formData);
-    forms.setAttribute(FORM_ATTRIBUTE, true);
+    forms.setAttribute(ATTRIBUTE_SUPPORT_PHONE, true);
     return forms.createLoginUsernamePassword();
   }
 
   @Override
   protected boolean validateForm(AuthenticationFlowContext context, MultivaluedMap<String, String> inputData) {
 
-    Optional<String> phoneNumber = OptionalStringUtils.ofBlank(inputData.getFirst(FORM_PHONE_NUMBER));
-    Optional<String> username = OptionalStringUtils.ofBlank(inputData.getFirst(AuthenticationManager.FORM_USERNAME));
+    boolean byPhone = OptionalStringUtils
+        .ofBlank(inputData.getFirst(FIELD_PATH_PHONE_ACTIVATED))
+        .map(s -> "true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s))
+        .orElse(false);
 
-    if (phoneNumber.isEmpty() && (username.isPresent() || isUserAlreadySetBeforeUsernamePasswordAuth(context))) {
+    if (!byPhone) {
       return validateUserAndPassword(context, inputData);
     }
+    String phoneNumber = inputData.getFirst(FIELD_PHONE_NUMBER);
 
-    Optional<String> code = OptionalStringUtils.ofBlank(inputData.getFirst(FORM_PHONE_VERIFICATION_CODE));
 
-    return phoneNumber.map(number -> code.map(c -> validatePhone(context, number, c))
-            .orElseGet(() -> invalidVerificationCode(context, number)))
-        .orElseGet(() -> {
-          context.getEvent().error(Errors.USERNAME_MISSING);
-          context.form().setAttribute(FORM_ATTRIBUTE_ACTIVE_PHONE, true);
-          Response challengeResponse = challenge(context, getDefaultChallengeMessage(context), FORM_PHONE_NUMBER);
-          context.forceChallenge(challengeResponse);
-          return false;
-        });
+    if (StringUtils.isBlank(phoneNumber)){
+      context.getEvent().error(Errors.USERNAME_MISSING);
+      context.form().setAttribute(ATTEMPTED_PHONE_ACTIVATED, true);
+      Response challengeResponse = challenge(context, MESSAGE_MISSING_PHONE_NUMBER, FIELD_PHONE_NUMBER);
+      context.forceChallenge(challengeResponse);
+      return false;
+    }
+    phoneNumber = phoneNumber.trim();
+
+    String code = inputData.getFirst(FIELD_VERIFICATION_CODE);
+    if (StringUtils.isBlank(code)){
+      invalidVerificationCode(context,phoneNumber);
+      return false;
+    }
+
+    return validatePhone(context,phoneNumber,code.trim());
   }
 
-  private boolean invalidVerificationCode(AuthenticationFlowContext context, String number) {
+  private void invalidVerificationCode(AuthenticationFlowContext context, String number) {
     context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
-    context.form().setAttribute(FORM_ATTRIBUTE_ACTIVE_PHONE, true);
-    context.form().setAttribute(FORM_ATTRIBUTE_INIT_PHONE_NUMBER, number);
-    Response challengeResponse = challenge(context, "verificationCodeDoesNotMatch", FORM_PHONE_VERIFICATION_CODE);
+    context.form().setAttribute(ATTEMPTED_PHONE_ACTIVATED, true)
+        .setAttribute(ATTEMPTED_PHONE_NUMBER, number);
+    Response challengeResponse = challenge(context, MESSAGE_VERIFICATION_CODE_NOT_MATCH, FIELD_VERIFICATION_CODE);
     context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challengeResponse);
-    return false;
   }
 
   private boolean validatePhone(AuthenticationFlowContext context, String phoneNumber, String code) {
     context.clearUser();
     return UserUtils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber)
-        .map(user -> validateVerificationCode(context, user, phoneNumber, code) && validateUser(context, user))
+        .map(user -> validateVerificationCode(context, user, phoneNumber, code) && validateUser(context, user,phoneNumber))
         .orElseGet(() -> {
           context.getEvent().error(Errors.USER_NOT_FOUND);
-          context.form().setAttribute(FORM_ATTRIBUTE_ACTIVE_PHONE, true);
-          context.form().setAttribute(FORM_ATTRIBUTE_INIT_PHONE_NUMBER, phoneNumber);
-          Response challengeResponse = challenge(context, "phoneUserNotFound", FORM_PHONE_NUMBER);
+          context.form().setAttribute(ATTEMPTED_PHONE_ACTIVATED, true)
+            .setAttribute(ATTEMPTED_PHONE_NUMBER, phoneNumber);
+          Response challengeResponse = challenge(context, MESSAGE_PHONE_USER_NOT_FOUND, FIELD_PHONE_NUMBER);
           context.failureChallenge(AuthenticationFlowError.INVALID_USER, challengeResponse);
           return false;
         });
@@ -111,12 +114,40 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
       return true;
     } catch (Exception e) {
       context.getEvent().user(user);
-      return invalidVerificationCode(context, phoneNumber);
+      invalidVerificationCode(context, phoneNumber);
+      return false;
     }
   }
 
-  private boolean validateUser(AuthenticationFlowContext context, UserModel user) {
-    if (!enabledUser(context, user)) {
+  private boolean isDisabledByBruteForce(AuthenticationFlowContext context, UserModel user, String phoneNumber) {
+    String bruteForceError = getDisabledByBruteForceEventError(context, user);
+    if (bruteForceError != null) {
+      context.getEvent().user(user);
+      context.getEvent().error(bruteForceError);
+      context.form().setAttribute(ATTEMPTED_PHONE_ACTIVATED,true)
+          .setAttribute(ATTEMPTED_PHONE_NUMBER, phoneNumber);
+      Response challengeResponse = challenge(context, disabledByBruteForceError(), disabledByBruteForceFieldError());
+      context.forceChallenge(challengeResponse);
+      return true;
+    }
+    return false;
+  }
+
+  private boolean enabledUser(AuthenticationFlowContext context, UserModel user, String phoneNumber) {
+    if (isDisabledByBruteForce(context, user,phoneNumber)) return false;
+    if (!user.isEnabled()) {
+      context.getEvent().user(user);
+      context.getEvent().error(Errors.USER_DISABLED);
+      context.form().setAttribute(ATTEMPTED_PHONE_ACTIVATED,true)
+          .setAttribute(ATTEMPTED_PHONE_NUMBER, phoneNumber);
+      Response challengeResponse = challenge(context, Messages.ACCOUNT_DISABLED);
+      context.forceChallenge(challengeResponse);
+      return false;
+    }
+    return true;
+  }
+  private boolean validateUser(AuthenticationFlowContext context, UserModel user, String phoneNumber) {
+    if (!enabledUser(context, user,phoneNumber)) {
       return false;
     }
     context.setUser(user);
