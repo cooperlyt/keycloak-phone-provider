@@ -1,7 +1,7 @@
 package cc.coopersoft.keycloak.phone.providers.rest;
 
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
-import cc.coopersoft.keycloak.phone.providers.spi.PhoneSupportProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.keycloak.models.KeycloakSession;
@@ -34,7 +34,7 @@ public class TokenCodeResource {
         if (phoneNumber == null) throw new BadRequestException("Must inform a phone number");
 
         logger.info(String.format("Requested %s code to %s",tokenCodeType.getLabel(), phoneNumber));
-        int tokenExpiresIn = session.getProvider(PhoneSupportProvider.class)
+        int tokenExpiresIn = session.getProvider(PhoneProvider.class)
             .sendTokenCode(phoneNumber,tokenCodeType,kind);
 
         String response = String.format("{\"expires_in\":%s}", tokenExpiresIn);

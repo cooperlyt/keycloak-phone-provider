@@ -1,12 +1,12 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.browser;
 
-import cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant.AuthenticationCodeAuthenticator;
+import cc.coopersoft.common.OptionalStringUtils;
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.authentication.requiredactions.ConfigSmsOtpRequiredAction;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
-import cc.coopersoft.keycloak.phone.providers.spi.PhoneSupportProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.spi.HttpResponse;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -24,6 +24,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 
+import static cc.coopersoft.keycloak.phone.authentication.authenticators.browser.PhoneUsernamePasswordForm.VERIFIED_PHONE_NUMBER;
 import static cc.coopersoft.keycloak.phone.authentication.authenticators.browser.SmsOtpMfaAuthenticatorFactory.COOKIE_MAX_AGE;
 import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages.FIELD_PHONE_NUMBER;
 
@@ -93,11 +94,20 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
             context.success();
             return;
         }
-        PhoneSupportProvider phoneSupportProvider = context.getSession().getProvider(PhoneSupportProvider.class);
+
         String phoneNumber = context.getUser().getFirstAttribute(FIELD_PHONE_NUMBER);
+        boolean verified = OptionalStringUtils.ofBlank(context.getAuthenticationSession().getAuthNote(VERIFIED_PHONE_NUMBER))
+            .map(number -> number.equalsIgnoreCase(phoneNumber))
+            .orElse(false);
+        if (verified){
+            context.success();
+            return;
+        }
+
+        PhoneProvider phoneProvider = context.getSession().getProvider(PhoneProvider.class);
         Response challenge;
         try {
-            int expires = phoneSupportProvider.sendTokenCode(phoneNumber, TokenCodeType.OTP,null);
+            int expires = phoneProvider.sendTokenCode(phoneNumber, TokenCodeType.OTP,null);
             challenge = context.form()
                 .setInfo("codeSent",phoneNumber)
                 .setAttribute("expires",expires)
@@ -133,7 +143,6 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
         return true;
     }
 
-    //TODO login by phone jump
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
         return getCredentialProvider(session).isConfiguredFor(realm, user, getType(session));

@@ -1,6 +1,6 @@
 package cc.coopersoft.keycloak.phone;
 
-import cc.coopersoft.keycloak.phone.providers.spi.PhoneSupportProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
@@ -40,7 +40,7 @@ public class Utils {
     }
 
     public static boolean isDuplicatePhoneAllowed(KeycloakSession session,RealmModel realm){
-        return session.getProvider(PhoneSupportProvider.class).isDuplicatePhoneAllowed(realm.getName());
+        return session.getProvider(PhoneProvider.class).isDuplicatePhoneAllowed(realm.getName());
     }
 
 

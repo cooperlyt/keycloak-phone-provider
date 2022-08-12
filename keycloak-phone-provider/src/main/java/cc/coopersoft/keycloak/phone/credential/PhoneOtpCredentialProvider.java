@@ -11,6 +11,9 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 
+/**
+ *  证书使用 CredentialValidator 来认证，例如 password 证书 使用登录认证，本例中使用 phone OTP 认证
+ */
 public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCredentialModel>, CredentialInputValidator {
 
     private final static Logger logger = Logger.getLogger(PhoneOtpCredentialProvider.class);
@@ -33,7 +36,6 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
     public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
         if (!supportsCredentialType(credentialType)) return false;
         return user.credentialManager().getStoredCredentialsByTypeStream(credentialType).findAny().isPresent();
-//        return !getCredentialStore().getStoredCredentialsByType(realm, user, credentialType).isEmpty();
     }
 
     @Override

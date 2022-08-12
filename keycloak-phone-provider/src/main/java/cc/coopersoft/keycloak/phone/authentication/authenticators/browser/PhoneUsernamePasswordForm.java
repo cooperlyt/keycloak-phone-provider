@@ -32,19 +32,13 @@ import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePage
 import static org.keycloak.authentication.authenticators.util.AuthenticatorUtils.getDisabledByBruteForceEventError;
 
 //TODO use phone number and password login
-//TODO if allow Duplicate Phone can`t use this
-//TODO add otp cred , skip otp
 public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements Authenticator, AuthenticatorFactory {
 
   private static final Logger logger = Logger.getLogger(PhoneUsernamePasswordForm.class);
 
   public static final String PROVIDER_ID = "auth-phone-username-password-form";
 
-  @Override
-  protected Response createLoginForm(LoginFormsProvider form) {
-    form.setAttribute(ATTRIBUTE_SUPPORT_PHONE, true);
-    return form.createLoginUsernamePassword();
-  }
+  public static final String VERIFIED_PHONE_NUMBER = "LOGIN_BY_PHONE_VERIFY";
 
   @Override
   protected Response challenge(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
@@ -52,6 +46,7 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
     if (formData.size() > 0) forms.setFormData(formData);
     if (Utils.isDuplicatePhoneAllowed(context.getSession(), context.getRealm())) {
       forms.setError("duplicatePhoneAllowedCantLogin");
+      logger.warn("duplicate phone allowed! phone login is disabled!");
     } else
       forms.setAttribute(ATTRIBUTE_SUPPORT_PHONE, true);
     return forms.createLoginUsernamePassword();
@@ -113,7 +108,8 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
 
   private boolean validateVerificationCode(AuthenticationFlowContext context, UserModel user, String phoneNumber, String code) {
     try {
-      context.getSession().getProvider(PhoneVerificationCodeProvider.class).validateCode(user, phoneNumber, code, TokenCodeType.AUTH);
+      context.getSession().getProvider(PhoneVerificationCodeProvider.class)
+          .validateCode(user, phoneNumber, code, TokenCodeType.AUTH);
       logger.debug("verification code success!");
       return true;
     } catch (Exception e) {
@@ -155,6 +151,7 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
     if (!enabledUser(context, user, phoneNumber)) {
       return false;
     }
+    context.getAuthenticationSession().setAuthNote(VERIFIED_PHONE_NUMBER, phoneNumber);
     context.setUser(user);
     return true;
   }

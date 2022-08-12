@@ -1,18 +1,18 @@
 package cc.coopersoft.keycloak.phone.providers.spi.impl;
 
-import cc.coopersoft.keycloak.phone.providers.spi.PhoneSupportProvider;
-import cc.coopersoft.keycloak.phone.providers.spi.PhoneSupportProviderFactory;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProviderFactory;
 import org.keycloak.Config.Scope;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 
-public class DefaultPhoneSupportProviderFactory implements PhoneSupportProviderFactory {
+public class DefaultPhoneProviderFactory implements PhoneProviderFactory {
 
     private Scope config;
 
     @Override
-    public PhoneSupportProvider create(KeycloakSession session) {
-        return new DefaultPhoneSupportProvider(session, config);
+    public PhoneProvider create(KeycloakSession session) {
+        return new DefaultPhoneProvider(session, config);
     }
 
     @Override

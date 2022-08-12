@@ -56,10 +56,12 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
 + Cli params
 ```shell
   kc.[sh|bat] start \
-    --spi-phone-support-default-service=[dummy|aws|aliyun|cloopen| ...]  # Which sms provider 
-    --spi-phone-support-default-token-expires-in=60  # sms expires ,default 60 second
-    --spi-phone-support-default-hour-maximum=3 # How many send sms count in one hour. 
-    --spi-phone-support-default-<$realm>-duplicate-phone-allowed=false # allow one phone register multi user
+    --spi-phone-default-service=[dummy|aws|aliyun|cloopen| ...]  # Which sms provider 
+    --spi-phone-default-token-expires-in=60  # sms expires ,default 60 second
+    --spi-phone-default-hour-maximum=3 # How many send sms count in one hour. 
+    --spi-phone-default-<$realm>-duplicate-phone=false # allow one phone register multi user
+    
+    
     ...  # provider param refer provider`s readme.md
 ```
 

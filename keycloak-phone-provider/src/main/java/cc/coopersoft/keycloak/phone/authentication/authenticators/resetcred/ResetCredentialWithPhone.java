@@ -38,7 +38,7 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
 
   public static final String PROVIDER_ID = "reset-credentials-with-phone";
 
-  public static final String NOT_SEND_EMAIL = "should-send-email";
+  public static final String SHOULD_SEND_EMAIL = "should-send-email";
 
   @Override
   public void authenticate(AuthenticationFlowContext context) {
@@ -121,19 +121,15 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
         invalidVerificationCode(context, phoneNumber);
         return false;
       }
-      user = getUserByPhone(context,phoneNumber,verificationCode.trim());
+      user = Utils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber)
+          .orElse(null);
 
-      if (user != null && !validateVerificationCode(context, user, phoneNumber, verificationCode)){
+      if (user != null && !validateVerificationCode(context, user, phoneNumber, verificationCode.trim())){
         return false;
       }
     }
 
     return validateUser(context,user,byPhone,byPhone ? phoneNumber : username);
-  }
-
-  protected UserModel getUserByPhone(AuthenticationFlowContext context, String phoneNumber, String verificationCode) {
-    return Utils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber)
-        .orElse(null);
   }
 
   protected UserModel getUserByUsername(AuthenticationFlowContext context, String username) {
@@ -196,7 +192,7 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
     }
 
     if (byPhone){
-      context.getAuthenticationSession().setAuthNote(NOT_SEND_EMAIL, "false");
+      context.getAuthenticationSession().setAuthNote(SHOULD_SEND_EMAIL, "false");
     }
     context.setUser(user);
     return true;

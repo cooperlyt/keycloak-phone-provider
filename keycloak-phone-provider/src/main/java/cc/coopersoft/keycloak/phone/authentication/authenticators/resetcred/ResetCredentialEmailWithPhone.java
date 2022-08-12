@@ -36,8 +36,9 @@ public class ResetCredentialEmailWithPhone extends ResetCredentialEmail {
         }
     }
 
+
     protected boolean configuredFor(AuthenticationFlowContext context) {
-        String sendNote = context.getAuthenticationSession().getAuthNote(ResetCredentialWithPhone.NOT_SEND_EMAIL);
+        String sendNote = context.getAuthenticationSession().getAuthNote(ResetCredentialWithPhone.SHOULD_SEND_EMAIL);
         logger.info("call if no phone email configuredFor:" + sendNote);
         return !"false".equalsIgnoreCase(sendNote);
     }

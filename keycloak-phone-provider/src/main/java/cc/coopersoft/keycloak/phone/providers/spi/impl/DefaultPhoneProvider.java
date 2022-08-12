@@ -1,6 +1,6 @@
 package cc.coopersoft.keycloak.phone.providers.spi.impl;
 
-import cc.coopersoft.keycloak.phone.providers.spi.PhoneSupportProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
@@ -14,9 +14,9 @@ import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.ServiceUnavailableException;
 import java.time.Instant;
 
-public class DefaultPhoneSupportProvider implements PhoneSupportProvider {
+public class DefaultPhoneProvider implements PhoneProvider {
 
-    private static final Logger logger = Logger.getLogger(DefaultPhoneSupportProvider.class);
+    private static final Logger logger = Logger.getLogger(DefaultPhoneProvider.class);
     private final KeycloakSession session;
     private final String service;
     private final int tokenExpiresIn;
@@ -24,7 +24,7 @@ public class DefaultPhoneSupportProvider implements PhoneSupportProvider {
 
     private final Scope config;
 
-    DefaultPhoneSupportProvider(KeycloakSession session, Scope config) {
+    DefaultPhoneProvider(KeycloakSession session, Scope config) {
         this.session = session;
         this.config = config;
         logger.info("phone message service implement server name:" + config.get("service"));
@@ -52,7 +52,7 @@ public class DefaultPhoneSupportProvider implements PhoneSupportProvider {
 
     @Override
     public boolean isDuplicatePhoneAllowed(String realm) {
-        return config.getBoolean(realm + "-duplicate-phone-allowed",false);
+        return config.getBoolean(realm + "-duplicate-phone",false);
     }
 
     @Override
