@@ -61,7 +61,15 @@
                         <div  <#if !usernameHidden?? && supportPhone??> v-if="!phoneActivated" </#if> >
                             <#if !usernameHidden??>
                                 <div class="${properties.kcFormGroupClass!}">
-                                    <label for="username" class="${properties.kcLabelClass!}"><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmail")}<#else>${msg("email")}</#if></label>
+                                    <label for="username" class="${properties.kcLabelClass!}">
+                                        <#if !realm.loginWithEmailAllowed>${msg("username")}
+                                            <#if loginWithPhoneNumber??> ${msg("usernameOrPhoneNumber")} <#else>${msg("username")}</#if>
+                                        <#elseif !realm.registrationEmailAsUsername>
+                                            <#if loginWithPhoneNumber??> ${msg("usernameOrEmailOrPhoneNumber")} <#else>${msg("usernameOrEmail")}</#if>
+                                        <#else>
+                                            <#if loginWithPhoneNumber??> ${msg("emailOrPhoneNumber")} <#else>${msg("email")}</#if>
+                                        </#if>
+                                    </label>
 
                                     <input tabindex="1" id="username" class="${properties.kcInputClass!}" name="username" value="${(login.username!'')}"  type="text" autofocus autocomplete="off"
                                            aria-invalid="<#if messagesPerField.existsError('username','password')>true</#if>"

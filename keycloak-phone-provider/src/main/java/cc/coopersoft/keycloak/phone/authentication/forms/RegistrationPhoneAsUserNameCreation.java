@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO phone number is username check input , if username is exists then show username input
+//TODO if email as username then show email input
 import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages.*;
 
 /**
