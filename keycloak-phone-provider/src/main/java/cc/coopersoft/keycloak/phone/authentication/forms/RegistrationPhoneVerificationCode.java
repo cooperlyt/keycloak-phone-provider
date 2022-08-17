@@ -5,7 +5,6 @@
  */
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
-import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
@@ -29,9 +28,9 @@ import java.util.List;
 
 import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages.*;
 
-public class RegistrationPhoneNumber implements FormAction, FormActionFactory {
+public class RegistrationPhoneVerificationCode implements FormAction, FormActionFactory {
 
-  private static final Logger logger = Logger.getLogger(RegistrationPhoneNumber.class);
+  private static final Logger logger = Logger.getLogger(RegistrationPhoneVerificationCode.class);
 
   public static final String PROVIDER_ID = "registration-phone";
 
@@ -119,23 +118,6 @@ public class RegistrationPhoneNumber implements FormAction, FormActionFactory {
     String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
     context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
 
-    if (Validation.isBlank(phoneNumber)) {
-      context.error(Errors.INVALID_REGISTRATION);
-      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message()));
-      context.validationError(formData, errors);
-      return;
-    }
-
-
-    if (Utils.isDuplicatePhoneAllowed(context.getSession(), context.getRealm())
-        && Utils.findUserByPhone(session.users(), context.getRealm(), phoneNumber).isPresent()) {
-      formData.remove(FIELD_PHONE_NUMBER);
-      context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
-      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.EXISTS.message()));
-      context.error(Errors.INVALID_REGISTRATION);
-      context.validationError(formData, errors);
-      return;
-    }
 
     String verificationCode = formData.getFirst(FIELD_VERIFICATION_CODE);
     TokenCodeRepresentation tokenCode = getTokenCodeService(session).ongoingProcess(phoneNumber, TokenCodeType.REGISTRATION);
@@ -166,7 +148,7 @@ public class RegistrationPhoneNumber implements FormAction, FormActionFactory {
 
   @Override
   public void buildPage(FormContext context, LoginFormsProvider form) {
-    form.setAttribute("phoneNumberRequired", true);
+    form.setAttribute("verifyPhone", true);
   }
 
   @Override

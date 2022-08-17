@@ -36,7 +36,6 @@ import static org.keycloak.authentication.authenticators.util.AuthenticatorUtils
 import static org.keycloak.provider.ProviderConfigProperty.BOOLEAN_TYPE;
 import static org.keycloak.services.validation.Validation.FIELD_USERNAME;
 
-//TODO use phone number and password login
 public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements Authenticator, AuthenticatorFactory {
 
   private static final Logger logger = Logger.getLogger(PhoneUsernamePasswordForm.class);

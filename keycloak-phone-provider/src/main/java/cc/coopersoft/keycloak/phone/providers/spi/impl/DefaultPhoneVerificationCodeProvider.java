@@ -133,6 +133,7 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
     @Override
     public void tokenValidated(UserModel user, String phoneNumber, String tokenCodeId) {
 
+
         session.users()
                 .searchForUserByUserAttributeStream(session.getContext().getRealm(),"phoneNumber", phoneNumber)
                 .filter(u -> !u.getId().equals(user.getId()))
