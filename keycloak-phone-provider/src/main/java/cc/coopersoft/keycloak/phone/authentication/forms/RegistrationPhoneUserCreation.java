@@ -26,10 +26,7 @@ import org.keycloak.userprofile.ValidationException;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-//TODO phone number is username check input , if username is exists then show username input
-//TODO if email as username then show email input
 import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages.*;
 import static org.keycloak.provider.ProviderConfigProperty.BOOLEAN_TYPE;
 
@@ -146,7 +143,7 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
         logger.warn("Realm set email as username, can`t use phone number.");
         return false;
       }
-      if (Utils.isDuplicatePhoneAllowed(context.getSession(),context.getRealm())){
+      if (Utils.isDuplicatePhoneAllowed(context.getSession())){
         logger.warn("Duplicate phone allowed! phone number can`t as username.");
         return false;
       }
@@ -239,7 +236,7 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       context.error(Errors.INVALID_REGISTRATION);
       context.validationError(formData, errors);
       success = false;
-    } else if (!Utils.isDuplicatePhoneAllowed(context.getSession(), context.getRealm()) &&
+    } else if (!Utils.isDuplicatePhoneAllowed(context.getSession()) &&
         Utils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber).isPresent()) {
       context.error(Errors.INVALID_REGISTRATION);
       errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.EXISTS.message()));

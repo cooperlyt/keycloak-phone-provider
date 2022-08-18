@@ -55,7 +55,7 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
   protected Response challenge(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
     LoginFormsProvider forms = context.form();
     if (formData.size() > 0) forms.setFormData(formData);
-    if (Utils.isDuplicatePhoneAllowed(context.getSession(), context.getRealm())) {
+    if (Utils.isDuplicatePhoneAllowed(context.getSession())) {
       forms.setError("duplicatePhoneAllowedCantLogin");
       logger.warn("duplicate phone allowed! phone login is disabled!");
     } else {
@@ -230,7 +230,7 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
       user = KeycloakModelUtils.findUserByNameOrEmail(context.getSession(), context.getRealm(), username);
       if (user == null &&
           isLoginWithPhoneNumber(context) &&
-          !Utils.isDuplicatePhoneAllowed(context.getSession(), context.getRealm())){
+          !Utils.isDuplicatePhoneAllowed(context.getSession())){
         user = Utils.findUserByPhone(context.getSession().users(), context.getRealm(), username).orElse(null);
       }
     } catch (ModelDuplicateException mde) {

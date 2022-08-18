@@ -26,8 +26,6 @@ public class AuthenticationCodeAuthenticator extends BaseDirectGrantAuthenticato
 
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
-        //TODO is`s is invalid? remove it.
-        //user.addRequiredAction("VERIFICATION_CODE_GRANT_CONFIG");
     }
 
     @Override

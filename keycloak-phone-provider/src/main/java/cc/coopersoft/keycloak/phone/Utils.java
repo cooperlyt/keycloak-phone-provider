@@ -39,8 +39,8 @@ public class Utils {
                 u2.getAttributeStream("phoneNumberVerified").anyMatch("true"::equals));
     }
 
-    public static boolean isDuplicatePhoneAllowed(KeycloakSession session,RealmModel realm){
-        return session.getProvider(PhoneProvider.class).isDuplicatePhoneAllowed(realm.getName());
+    public static boolean isDuplicatePhoneAllowed(KeycloakSession session){
+        return session.getProvider(PhoneProvider.class).isDuplicatePhoneAllowed(session.getContext().getRealm().getName());
     }
 
 

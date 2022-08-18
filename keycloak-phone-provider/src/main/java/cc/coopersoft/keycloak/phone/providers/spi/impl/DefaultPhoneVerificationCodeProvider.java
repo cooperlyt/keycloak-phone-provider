@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.phone.providers.spi.impl;
 
+import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.authentication.requiredactions.UpdatePhoneNumberRequiredAction;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
@@ -134,13 +135,17 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
     public void tokenValidated(UserModel user, String phoneNumber, String tokenCodeId) {
 
 
-        session.users()
+        if (!Utils.isDuplicatePhoneAllowed(session)){
+            session.users()
                 .searchForUserByUserAttributeStream(session.getContext().getRealm(),"phoneNumber", phoneNumber)
                 .filter(u -> !u.getId().equals(user.getId()))
                 .forEach(u -> {
                     logger.info(String.format("User %s also has phone number %s. Un-verifying.", u.getId(), phoneNumber));
                     u.setSingleAttribute("phoneNumberVerified", "false");
+                    u.addRequiredAction(UpdatePhoneNumberRequiredAction.PROVIDER_ID);
                 });
+        }
+
 
         user.setSingleAttribute("phoneNumberVerified", "true");
         user.setSingleAttribute("phoneNumber", phoneNumber);
