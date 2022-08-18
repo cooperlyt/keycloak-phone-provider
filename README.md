@@ -99,12 +99,13 @@ Tip:
   if Realm set 'Email as username', then config 'Phone number as username' and 'hide email' is invalid!
   if set param 'duplicate-phone' is true then 'Phone number as username' is invalid!
 
-![Registration with phone](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a0.jpg)
+![Registration with phone](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a0.png)
 
 
 Registration URL:
+```
 http://<domain>/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
-
+```
 ### **Login by phone**
 Under Authentication > Flows:
 + Copy the 'Browser' flow to 'Browser with phone' flow
