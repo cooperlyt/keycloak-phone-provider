@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.phone.providers.spi.impl;
 
+import cc.coopersoft.common.OptionalStringUtils;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
@@ -14,6 +15,7 @@ import org.keycloak.models.KeycloakSession;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.ServiceUnavailableException;
 import java.time.Instant;
+import java.util.Optional;
 
 public class DefaultPhoneProvider implements PhoneProvider {
 
@@ -62,7 +64,17 @@ public class DefaultPhoneProvider implements PhoneProvider {
 
     @Override
     public boolean isDuplicatePhoneAllowed(String realm) {
-        return config.getBoolean(realm + "-duplicate-phone",false);
+        Boolean result = config.getBoolean(realm + "-duplicate-phone",null);
+        if (result == null){
+            result = config.getBoolean("duplicate-phone",false);
+        }
+        return result;
+    }
+
+    @Override
+    public Optional<String> phoneNumberRegx(String realm) {
+        return OptionalStringUtils.ofBlank(OptionalStringUtils.ofBlank(config.get(realm + "-number-regx"))
+            .orElse(config.get("number-regx")));
     }
 
     @Override

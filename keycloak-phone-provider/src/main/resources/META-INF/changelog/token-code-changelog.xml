@@ -2,7 +2,7 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
-  <changeSet author="cooper" id="token-code-6.0">
+  <changeSet author="cooper" id="token-code-6.1">
 
     <createTable tableName="PHONE_MESSAGE_TOKEN_CODE">
       <column name="ID" type="VARCHAR(36)">
@@ -28,6 +28,9 @@
       </column>
       <column name="CONFIRMED" type="BOOLEAN" defaultValueBoolean="false"/>
       <column name="BY_WHOM" type="VARCHAR(36)"/>
+      <column name="IP" type="VARCHAR(21)"/>
+      <column name="PORT" type="int"/>
+      <column name="HOST" type="VARCHAR(21)"/>
     </createTable>
 
     <addPrimaryKey constraintName="PK_PHONE_MESSAGE_TOKEN_CODE"

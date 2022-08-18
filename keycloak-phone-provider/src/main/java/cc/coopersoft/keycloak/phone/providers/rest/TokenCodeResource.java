@@ -1,7 +1,9 @@
 package cc.coopersoft.keycloak.phone.providers.rest;
 
+import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
+import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.keycloak.models.KeycloakSession;
@@ -15,30 +17,42 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
 public class TokenCodeResource {
 
-    private static final Logger logger = Logger.getLogger(TokenCodeResource.class);
-    protected final KeycloakSession session;
-    protected final TokenCodeType tokenCodeType;
+  private static final Logger logger = Logger.getLogger(TokenCodeResource.class);
+  protected final KeycloakSession session;
+  protected final TokenCodeType tokenCodeType;
 
-    TokenCodeResource(KeycloakSession session, TokenCodeType tokenCodeType) {
-        this.session = session;
-        this.tokenCodeType = tokenCodeType;
+  TokenCodeResource(KeycloakSession session, TokenCodeType tokenCodeType) {
+    this.session = session;
+    this.tokenCodeType = tokenCodeType;
+  }
+
+
+  @GET
+  @NoCache
+  @Path("")
+  @Produces(APPLICATION_JSON)
+  public Response getTokenCode(@NotBlank @QueryParam("phoneNumber") String phoneNumber,
+                               @QueryParam("kind") String kind) {
+
+    if (StringUtils.isBlank(phoneNumber)) throw new BadRequestException("Must inform a phone number");
+
+    if (!Utils.getPhoneNumberRegx(session).map(phoneNumber::matches).orElse(true)){
+      throw new BadRequestException("Phone number is invalid");
     }
 
-    @GET
-    @NoCache
-    @Path("")
-    @Produces(APPLICATION_JSON)
-    public Response getTokenCode(@NotBlank @QueryParam("phoneNumber") String phoneNumber,
-                                 @QueryParam("kind") String kind) {
-
-        if (phoneNumber == null) throw new BadRequestException("Must inform a phone number");
-
-        logger.info(String.format("Requested %s code to %s",tokenCodeType.getLabel(), phoneNumber));
-        int tokenExpiresIn = session.getProvider(PhoneProvider.class)
-            .sendTokenCode(phoneNumber,tokenCodeType,kind);
-
-        String response = String.format("{\"expires_in\":%s}", tokenExpiresIn);
-
-        return Response.ok(response, APPLICATION_JSON_TYPE).build();
+    // everybody phones authenticator send AUTH code
+    if( !TokenCodeType.REGISTRATION.equals(tokenCodeType) &&
+        !TokenCodeType.AUTH.equals(tokenCodeType) &&
+        Utils.findUserByPhone(session.users(), session.getContext().getRealm(), phoneNumber).isEmpty()) {
+      throw new ForbiddenException("Phone number not found");
     }
+
+    logger.info(String.format("Requested %s code to %s", tokenCodeType.getLabel(), phoneNumber));
+    int tokenExpiresIn = session.getProvider(PhoneProvider.class)
+        .sendTokenCode(phoneNumber, tokenCodeType, kind);
+
+    String response = String.format("{\"expires_in\":%s}", tokenExpiresIn);
+
+    return Response.ok(response, APPLICATION_JSON_TYPE).build();
+  }
 }

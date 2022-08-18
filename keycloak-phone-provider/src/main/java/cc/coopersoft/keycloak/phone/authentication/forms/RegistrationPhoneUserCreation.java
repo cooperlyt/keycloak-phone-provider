@@ -136,7 +136,7 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
   // FormAction
 
   private boolean isPhoneNumberAsUsername(FormContext context){
-    if ("true".equals(context.getAuthenticatorConfig().getConfig()
+    if (context.getAuthenticatorConfig() == null || "true".equals(context.getAuthenticatorConfig().getConfig()
         .getOrDefault(CONFIG_PHONE_NUMBER_AS_USERNAME,"true"))){
 
       if (context.getRealm().isRegistrationEmailAsUsername()){
@@ -153,12 +153,14 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
   }
 
   private boolean isHideName(FormContext context){
-    return !"true".equals(context.getAuthenticatorConfig().getConfig()
+    return context.getAuthenticatorConfig() == null ||
+        !"true".equals(context.getAuthenticatorConfig().getConfig()
         .getOrDefault(CONFIG_INPUT_NAME,"true"));
   }
 
   private boolean isHideEmail(FormContext context){
-    if ("true".equals(context.getAuthenticatorConfig().getConfig()
+    if (context.getAuthenticatorConfig() == null ||
+        "true".equals(context.getAuthenticatorConfig().getConfig()
         .getOrDefault(CONFIG_INPUT_EMAIL,"true"))){
       return false;
     }

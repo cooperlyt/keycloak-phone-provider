@@ -136,7 +136,7 @@ public class RegistrationRedirectParametersReader implements FormActionFactory, 
       return;
     }
 
-    String params = context.getAuthenticatorConfig().getConfig().get(PARAM_NAMES);
+    String params = authenticatorConfig.getConfig().get(PARAM_NAMES);
 
     if (StringUtils.isBlank(params)) {
       logger.warn("accept params is not configure.");

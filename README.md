@@ -42,7 +42,7 @@ the default like Kerberos or LDAP. I may try to help you but I cannot guarantee.
 ### **Installing:**
 
 + Docker
-  1. docker image is [coopersoft/keycloak:x86_64-19.0.1_phone-2.1.1 OR coopersoft/keycloak:arm64-19.0.1_phone-2.1.1](https://hub.docker.com/repository/docker/coopersoft/keycloak)
+  1. docker image is [coopersoft/keycloak:x86_64-19.0.1_phone-2.1.2 OR coopersoft/keycloak:arm64-19.0.1_phone-2.1.2](https://hub.docker.com/repository/docker/coopersoft/keycloak)
   2. for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/keycloak-phone-provider/master/examples/docker-compose.yml)
   3. run as `docker-compose up` , docker-compose is required!
 
@@ -59,8 +59,8 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
     --spi-phone-default-service=[dummy|aws|aliyun|cloopen| ...]  # Which sms provider 
     --spi-phone-default-token-expires-in=60  # sms expires ,default 60 second
     --spi-phone-default-hour-maximum=3 # How many send sms count in one hour. 
-    --spi-phone-default-<$realm>-duplicate-phone=false # allow one phone register multi user
-    
+    --spi-phone-default-[$realm-]duplicate-phone=false # allow one phone register multi user
+    --spi-phone-default-[$realm-]number-regx=^\+?\d+$
     
     ...  # provider param refer provider`s readme.md
 ```

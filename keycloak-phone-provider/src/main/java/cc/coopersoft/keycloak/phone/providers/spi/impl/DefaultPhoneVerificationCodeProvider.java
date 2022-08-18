@@ -110,6 +110,11 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
         entity.setCreatedAt(Date.from(now));
         entity.setExpiresAt(Date.from(now.plusSeconds(tokenExpiresIn)));
         entity.setConfirmed(tokenCode.getConfirmed());
+        if (session.getContext().getConnection() != null) {
+            entity.setIp(session.getContext().getConnection().getRemoteAddr());
+            entity.setPort(session.getContext().getConnection().getRemotePort());
+            entity.setHost(session.getContext().getConnection().getRemoteHost());
+        }
 
         getEntityManager().persist(entity);
     }

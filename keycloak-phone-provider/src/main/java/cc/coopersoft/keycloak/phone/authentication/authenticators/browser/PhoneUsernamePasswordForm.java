@@ -49,7 +49,8 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
   private static final String CONFIG_IS_LOGIN_WITH_PHONE_NUMBER = "loginWithPhoneNumber";
 
   private boolean isLoginWithPhoneNumber(AuthenticationFlowContext context){
-    return context.getAuthenticatorConfig().getConfig().getOrDefault(CONFIG_IS_LOGIN_WITH_PHONE_NUMBER, "true").equals("true");
+    return context.getAuthenticatorConfig() == null ||
+        context.getAuthenticatorConfig().getConfig().getOrDefault(CONFIG_IS_LOGIN_WITH_PHONE_NUMBER, "true").equals("true");
   }
   @Override
   protected Response challenge(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
@@ -59,7 +60,8 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
       forms.setError("duplicatePhoneAllowedCantLogin");
       logger.warn("duplicate phone allowed! phone login is disabled!");
     } else {
-      if (context.getAuthenticatorConfig().getConfig().getOrDefault(CONFIG_IS_LOGIN_WITH_PHONE_VERIFY, "true").equals("true"))
+      if (context.getAuthenticatorConfig() == null ||
+          context.getAuthenticatorConfig().getConfig().getOrDefault(CONFIG_IS_LOGIN_WITH_PHONE_VERIFY, "true").equals("true"))
         forms.setAttribute(ATTRIBUTE_SUPPORT_PHONE, true);
       if (isLoginWithPhoneNumber(context)){
         forms.setAttribute("loginWithPhoneNumber",true);
