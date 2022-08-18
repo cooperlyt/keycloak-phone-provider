@@ -26,6 +26,7 @@ import java.net.URI;
 
 import static cc.coopersoft.keycloak.phone.authentication.authenticators.browser.PhoneUsernamePasswordForm.VERIFIED_PHONE_NUMBER;
 import static cc.coopersoft.keycloak.phone.authentication.authenticators.browser.SmsOtpMfaAuthenticatorFactory.COOKIE_MAX_AGE;
+import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages.ATTRIBUTE_SUPPORT_PHONE;
 import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages.FIELD_PHONE_NUMBER;
 
 public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidator<PhoneOtpCredentialProvider> {
@@ -106,26 +107,20 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
     }
 
     PhoneProvider phoneProvider = context.getSession().getProvider(PhoneProvider.class);
-    Response challenge;
     try {
       int expires = phoneProvider.sendTokenCode(phoneNumber, TokenCodeType.OTP, null);
-      challenge = context.form()
+      context.form()
           .setInfo("codeSent", phoneNumber)
           .setAttribute("expires", expires)
-          .setAttribute("initSend",true)
-          .setAttribute(SupportPhonePages.ATTEMPTED_PHONE_NUMBER,phoneNumber)
-          .createForm(PAGE);
+          .setAttribute("initSend",true);
     } catch (ForbiddenException e) {
       logger.warn("otp send code Forbidden Exception!", e);
-      challenge = context.form().setError(SupportPhonePages.Errors.ABUSED.message())
-          .setAttribute(SupportPhonePages.ATTEMPTED_PHONE_NUMBER,phoneNumber)
-          .createForm(PAGE);
+      context.form().setError(SupportPhonePages.Errors.ABUSED.message());
     } catch (Exception e) {
       logger.warn("otp send code Exception!", e);
-      challenge = context.form().setError(SupportPhonePages.Errors.FAIL.message())
-          .setAttribute(SupportPhonePages.ATTEMPTED_PHONE_NUMBER,phoneNumber)
-          .createForm(PAGE);
+      context.form().setError(SupportPhonePages.Errors.FAIL.message());
     }
+    Response challenge = challenge(context,phoneNumber);
     context.challenge(challenge);
   }
 
@@ -133,15 +128,21 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
   public void action(AuthenticationFlowContext context) {
     boolean validated = validateAnswer(context);
     if (!validated) {
-      Response challenge = context.form()
-          .setAttribute(SupportPhonePages.ATTEMPTED_PHONE_NUMBER, context.getUser().getFirstAttribute(FIELD_PHONE_NUMBER))
-          .setError(SupportPhonePages.Errors.NOT_MATCH.message())
-          .createForm(PAGE);
+      context.form()
+          .setError(SupportPhonePages.Errors.NOT_MATCH.message());
+      Response challenge = challenge(context,context.getUser().getFirstAttribute(FIELD_PHONE_NUMBER));
       context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
       return;
     }
     setCookie(context);
     context.success();
+  }
+
+  protected Response challenge(AuthenticationFlowContext context,String phoneNumber) {
+    return context.form()
+        .setAttribute(ATTRIBUTE_SUPPORT_PHONE, true)
+        .setAttribute(SupportPhonePages.ATTEMPTED_PHONE_NUMBER,phoneNumber)
+        .createForm(PAGE);
   }
 
   @Override
