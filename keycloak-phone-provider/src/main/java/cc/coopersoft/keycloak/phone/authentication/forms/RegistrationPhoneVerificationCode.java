@@ -22,6 +22,7 @@ import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.*;
+import org.keycloak.models.AuthenticationExecutionModel.Requirement;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.services.validation.Validation;
@@ -74,11 +75,11 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
     return false;
   }
 
-  private static AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
-      AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED};
+  private final static Requirement[] REQUIREMENT_CHOICES = {
+      Requirement.REQUIRED, Requirement.DISABLED};
 
   @Override
-  public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
+  public Requirement[] getRequirementChoices() {
     return REQUIREMENT_CHOICES;
   }
 
@@ -149,9 +150,6 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
     logger.info(String.format("registration user %s phone success, tokenId is: %s", user.getId(), tokenId));
     getTokenCodeService(context.getSession()).tokenValidated(user, phoneNumber, tokenId);
 
-    PhoneOtpCredentialProvider ocp = (PhoneOtpCredentialProvider) context.getSession()
-        .getProvider(CredentialProvider.class, PhoneOtpCredentialProviderFactory.PROVIDER_ID);
-    ocp.createCredential(context.getRealm(), context.getUser(), PhoneOtpCredentialModel.create(phoneNumber));
   }
 
   @Override

@@ -1,6 +1,7 @@
 package cc.coopersoft.keycloak.phone.providers.spi.impl;
 
 import cc.coopersoft.keycloak.phone.Utils;
+import cc.coopersoft.keycloak.phone.authentication.requiredactions.ConfigSmsOtpRequiredAction;
 import cc.coopersoft.keycloak.phone.authentication.requiredactions.UpdatePhoneNumberRequiredAction;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
@@ -175,6 +176,8 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
         user.setSingleAttribute("phoneNumberVerified", "true");
         user.setSingleAttribute("phoneNumber", phoneNumber);
 
+
+
         validateProcess(tokenCodeId, user);
 
         cleanUpAction(user);
@@ -191,16 +194,20 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
     @Override
     public void cleanUpAction(UserModel user) {
         user.removeRequiredAction(UpdatePhoneNumberRequiredAction.PROVIDER_ID);
+        user.removeRequiredAction(ConfigSmsOtpRequiredAction.PROVIDER_ID);
         PhoneOtpCredentialProvider ocp = (PhoneOtpCredentialProvider)
                 session.getProvider(CredentialProvider.class, PhoneOtpCredentialProviderFactory.PROVIDER_ID);
+        String phoneNumber = user.getFirstAttribute("phoneNumber");
         if (ocp.isConfiguredFor(getRealm(), user, PhoneOtpCredentialModel.TYPE)) {
             CredentialModel credential = user.credentialManager()
                 .getStoredCredentialsByTypeStream(PhoneOtpCredentialModel.TYPE)
                 .findFirst().orElseThrow();
-            credential.setCredentialData("{\"phoneNumber\":\"" + user.getFirstAttribute("phoneNumber") + "\"}");
+            credential.setCredentialData("{\"phoneNumber\":\"" + phoneNumber + "\"}");
             PhoneOtpCredentialModel credentialModel = PhoneOtpCredentialModel.createFromCredentialModel(credential);
             user.credentialManager().updateStoredCredential(credentialModel);
 //            session.userCredentialManager().updateCredential(getRealm(), user, credentialModel);
+        }else {
+            ocp.createCredential(getRealm(), user, PhoneOtpCredentialModel.create(phoneNumber));
         }
     }
 

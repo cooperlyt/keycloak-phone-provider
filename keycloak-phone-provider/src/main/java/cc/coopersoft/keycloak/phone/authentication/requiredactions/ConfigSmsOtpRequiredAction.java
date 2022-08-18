@@ -22,6 +22,7 @@ public class ConfigSmsOtpRequiredAction implements RequiredActionProvider {
 
     @Override
     public void requiredActionChallenge(RequiredActionContext context) {
+
         Response challenge = context.form()
                 .createForm("login-sms-otp-config.ftl");
         context.challenge(challenge);

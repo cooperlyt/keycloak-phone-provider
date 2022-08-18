@@ -53,11 +53,12 @@ public class EverybodyPhoneAuthenticator extends BaseDirectGrantAuthenticator {
 
     UserModel user = Utils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber)
         .orElseGet(() -> {
-          if (context.getSession().users().getUserByUsername(phoneNumber, context.getRealm()) != null) {
+          if (context.getSession().users().getUserByUsername(context.getRealm(),phoneNumber) != null) {
             invalidCredentials(context, AuthenticationFlowError.USER_CONFLICT);
             return null;
           }
           UserModel newUser = context.getSession().users().addUser(context.getRealm(), phoneNumber);
+
           newUser.setEnabled(true);
           context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, phoneNumber);
           return newUser;
