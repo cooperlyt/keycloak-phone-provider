@@ -43,5 +43,8 @@ public class Utils {
         return session.getProvider(PhoneProvider.class).isDuplicatePhoneAllowed(session.getContext().getRealm().getName());
     }
 
+    public static Optional<String> getPhoneNumberRegx(KeycloakSession session){
+        return session.getProvider(PhoneProvider.class).phoneNumberRegx(session.getContext().getRealm().getName());
+    }
 
 }
