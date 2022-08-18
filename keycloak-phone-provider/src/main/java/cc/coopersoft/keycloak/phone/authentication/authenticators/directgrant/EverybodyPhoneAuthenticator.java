@@ -8,21 +8,29 @@ import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 
 
-public class EverybodyPhoneAuthenticator extends AuthenticationCodeAuthenticator {
+public class EverybodyPhoneAuthenticator extends BaseDirectGrantAuthenticator {
 
   private static final Logger logger = Logger.getLogger(EverybodyPhoneAuthenticator.class);
 
   public EverybodyPhoneAuthenticator(KeycloakSession session) {
-    super(session);
+    if (session.getContext().getRealm() == null) {
+      throw new IllegalStateException("The service cannot accept a session without a realm in its context.");
+    }
   }
 
   @Override
   public boolean requiresUser() {
     return false;
+  }
+
+  @Override
+  public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
+
   }
 
   @Override

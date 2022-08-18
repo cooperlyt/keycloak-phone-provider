@@ -58,10 +58,8 @@ public class PhoneNumberAuthenticatorFactory implements AuthenticatorFactory, Co
 
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
-        return configProperties;
+        return null;
     }
-
-    private static final List<ProviderConfigProperty> configProperties = new ArrayList<ProviderConfigProperty>();
 
     @Override
     public String getDisplayType() {
@@ -80,7 +78,7 @@ public class PhoneNumberAuthenticatorFactory implements AuthenticatorFactory, Co
 
     @Override
     public boolean isConfigurable() {
-        return true;
+        return false;
     }
 }
 

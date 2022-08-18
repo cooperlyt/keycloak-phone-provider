@@ -19,7 +19,7 @@ public class PhoneNumberAuthenticator extends BaseDirectGrantAuthenticator {
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
         //TODO is`s is invalid? remove it.
-        user.addRequiredAction("PHONE_NUMBER_GRANT_CONFIG");
+        //user.addRequiredAction("PHONE_NUMBER_GRANT_CONFIG");
     }
 
     @Override
