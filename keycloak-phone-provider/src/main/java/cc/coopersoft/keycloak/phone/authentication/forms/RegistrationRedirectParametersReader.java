@@ -1,6 +1,7 @@
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
 import okhttp3.HttpUrl;
+import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -13,157 +14,169 @@ import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.services.validation.Validation;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.keycloak.provider.ProviderConfigProperty.MULTIVALUED_STRING_TYPE;
 import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
 
-//TODO test in 19.0.1
-public class RegistrationRedirectParametersReader implements  FormActionFactory, FormAction {
+public class RegistrationRedirectParametersReader implements FormActionFactory, FormAction {
 
-    private static final Logger logger = Logger.getLogger(RegistrationRedirectParametersReader.class);
+  private static final Logger logger = Logger.getLogger(RegistrationRedirectParametersReader.class);
 
-    public static final String PROVIDER_ID = "registration-redirect-parameter";
-    public static final String PARAM_NAMES = "registrationParameterAccept";
+  public static final String PROVIDER_ID = "registration-redirect-parameter";
+  public static final String PARAM_NAMES = "acceptParameter";
 
 
-    private static AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
-            AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED };
+  private static AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
+      AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED};
 
-    private static String[] QUERY_PARAM_BLACKLIST = {
-            "execution",
-            "session_code",
-            "client_id",
-            "tab_id",
-            "nonce",
-            "response_type",
-            "response_mode",
-            "scope",
-            "redirect_uri",
-            "state",
-            "phoneNumber",
-            "phoneNumberVerified"
-    };
 
-    @Override
-    public String getDisplayType() {
-        return "Redirect parameter reader";
+  @Override
+  public String getDisplayType() {
+    return "Redirect parameter reader";
+  }
+
+  @Override
+  public String getReferenceCategory() {
+    return null;
+  }
+
+  @Override
+  public boolean isConfigurable() {
+    return true;
+  }
+
+  //TODO Should set type is 'MULTIVALUED_STRING_TYPE' but a bug in keycloak 19.0.1
+  // https://github.com/keycloak/keycloak/issues/13708
+  // 'STRING_TYPE' is temporary
+  @Override
+  public List<ProviderConfigProperty> getConfigProperties() {
+    ProviderConfigProperty rep =
+        new ProviderConfigProperty(PARAM_NAMES,
+            "Accept query param",
+            "Registration query param accept names.",
+            STRING_TYPE, null);
+    return Collections.singletonList(rep);
+  }
+
+  @Override
+  public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
+    return REQUIREMENT_CHOICES;
+  }
+
+  @Override
+  public boolean isUserSetupAllowed() {
+    return false;
+  }
+
+  @Override
+  public String getHelpText() {
+    return "Read query parameter add to user attribute";
+  }
+
+  @Override
+  public FormAction create(KeycloakSession session) {
+    return this;
+  }
+
+  @Override
+  public void init(Config.Scope config) {
+
+  }
+
+  @Override
+  public void postInit(KeycloakSessionFactory factory) {
+
+  }
+
+  @Override
+  public void close() {
+
+  }
+
+  @Override
+  public String getId() {
+    return PROVIDER_ID;
+  }
+
+  // FormAction
+
+  @Override
+  public void buildPage(FormContext formContext, LoginFormsProvider loginFormsProvider) {
+  }
+
+  @Override
+  public void validate(ValidationContext validationContext) {
+    validationContext.success();
+  }
+
+  @Override
+  public void success(FormContext context) {
+
+
+    String redirectUri = context.getAuthenticationSession().getRedirectUri();
+    logger.info("add user attribute form redirectUri:" + redirectUri);
+    if (Validation.isBlank(redirectUri)) {
+      logger.error("no referer. cant get param in keycloak version");
+      return;
     }
 
-    @Override
-    public String getReferenceCategory() {
-        return null;
+    HttpUrl url = HttpUrl.parse(redirectUri);
+    if (url == null) {
+      logger.error("redirectUri is null");
+      return;
+    }
+    //url.queryParameterNames().forEach(s -> logger.info("redirect param name ->" + s));
+    UserModel user = context.getUser();
+    AuthenticatorConfigModel authenticatorConfig = context.getAuthenticatorConfig();
+
+    if (authenticatorConfig == null || authenticatorConfig.getConfig() == null) {
+      logger.error("can`t get config!");
+      return;
     }
 
-    @Override
-    public boolean isConfigurable() {
-        return true;
+    String params = context.getAuthenticatorConfig().getConfig().get(PARAM_NAMES);
+
+    if (StringUtils.isBlank(params)) {
+      logger.warn("accept params is not configure.");
+      return;
     }
 
-    @Override
-    public List<ProviderConfigProperty> getConfigProperties() {
-        ProviderConfigProperty rep =
-            new ProviderConfigProperty(PARAM_NAMES,
-                "Accept query param",
-                "Registration query param accept names.",
-                MULTIVALUED_STRING_TYPE, null);
-        return Collections.singletonList(rep);
+    logger.info("allow query param names:" + params);
+
+    List<String> finalParamNames = new ArrayList<>();
+
+    Pattern p = Pattern.compile("[A-Za-z_]\\w*");
+    Matcher m = p.matcher(params);
+    while (m.find()) {
+      finalParamNames.add(m.group());
     }
 
-    @Override
-    public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
-        return REQUIREMENT_CHOICES;
+    if (finalParamNames.isEmpty()) {
+      logger.warn("accept params is not configure.");
+      return;
     }
 
-    @Override
-    public boolean isUserSetupAllowed() {
-        return false;
-    }
+    url.queryParameterNames()
+        .stream()
+        .filter(finalParamNames::contains)
+        .forEach(v -> user.setAttribute(v, url.queryParameterValues(v)));
 
-    @Override
-    public String getHelpText() {
-        return "Read query parameter add to user attribute";
-    }
+  }
 
-    @Override
-    public FormAction create(KeycloakSession session) {
-        return this;
-    }
+  @Override
+  public boolean requiresUser() {
+    return false;
+  }
 
-    @Override
-    public void init(Config.Scope config) {
+  @Override
+  public boolean configuredFor(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
+    return true;
+  }
 
-    }
+  @Override
+  public void setRequiredActions(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
 
-    @Override
-    public void postInit(KeycloakSessionFactory factory) {
-
-    }
-
-    @Override
-    public void close() {
-
-    }
-
-    @Override
-    public String getId() {
-        return PROVIDER_ID;
-    }
-
-    // FormAction
-
-    @Override
-    public void buildPage(FormContext formContext, LoginFormsProvider loginFormsProvider) {
-    }
-
-    @Override
-    public void validate(ValidationContext validationContext) {
-        validationContext.success();
-    }
-
-    @Override
-    public void success(FormContext context) {
-
-
-
-
-        String redirectUri = context.getAuthenticationSession().getRedirectUri();
-        logger.info("add user attribute form redirectUri:" + redirectUri);
-        if (Validation.isBlank(redirectUri)){
-            logger.error("no referer. cant get param in keycloak version");
-            return;
-        }
-
-        HttpUrl url = HttpUrl.parse(redirectUri);
-        if (url != null) {
-            UserModel user = context.getUser();
-            String[] paramNames = null;
-            AuthenticatorConfigModel authenticatorConfig = context.getAuthenticatorConfig();
-            if (authenticatorConfig != null && authenticatorConfig.getConfig() != null) {
-                paramNames = Optional.ofNullable(context.getAuthenticatorConfig().getConfig().get(PARAM_NAMES)).orElse("").split("##");
-            }
-            String[] finalParamNames = paramNames;
-            logger.info("allow query param names:" + finalParamNames);
-            url.queryParameterNames()
-                    .stream()
-                    .filter(v -> (finalParamNames != null && finalParamNames.length > 0) ? Arrays.asList(finalParamNames).contains(v) : !Validation.isBlank(v) && v.length() < 32 && Arrays.stream(QUERY_PARAM_BLACKLIST).noneMatch(item -> item.equals(v)) )
-
-                    .forEach(v -> user.setAttribute(v, url.queryParameterValues(v)));
-
-        }
-    }
-
-    @Override
-    public boolean requiresUser() {
-        return false;
-    }
-
-    @Override
-    public boolean configuredFor(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
-        return true;
-    }
-
-    @Override
-    public void setRequiredActions(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
-
-    }
+  }
 }

@@ -2,7 +2,7 @@ package cc.coopersoft.keycloak.phone.credential;
 
 import cc.coopersoft.keycloak.phone.authentication.authenticators.browser.SmsOtpMfaAuthenticatorFactory;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
-import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import org.jboss.logging.Logger;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.*;
@@ -11,8 +11,9 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 
-import java.util.stream.Collectors;
-
+/**
+ *  证书使用 CredentialValidator 来认证，例如 password 证书 使用登录认证，本例中使用 phone OTP 认证
+ */
 public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCredentialModel>, CredentialInputValidator {
 
     private final static Logger logger = Logger.getLogger(PhoneOtpCredentialProvider.class);
@@ -22,8 +23,8 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
         this.session = session;
     }
 
-    private TokenCodeService getTokenCodeService() {
-        return session.getProvider(TokenCodeService.class);
+    private PhoneVerificationCodeProvider getTokenCodeService() {
+        return session.getProvider(PhoneVerificationCodeProvider.class);
     }
 
     @Override
@@ -35,14 +36,14 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
     public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
         if (!supportsCredentialType(credentialType)) return false;
         return user.credentialManager().getStoredCredentialsByTypeStream(credentialType).findAny().isPresent();
-//        return !getCredentialStore().getStoredCredentialsByType(realm, user, credentialType).isEmpty();
     }
 
     @Override
     public boolean isValid(RealmModel realm, UserModel user, CredentialInput input) {
-        logger.info("---------------begnin valid otp sms");
+        logger.info("---------------begin valid otp sms");
 
         String phoneNumber = user.getFirstAttribute("phoneNumber");
+
         String code = input.getChallengeResponse();
 
         if (!(input instanceof UserCredentialModel)) return false;

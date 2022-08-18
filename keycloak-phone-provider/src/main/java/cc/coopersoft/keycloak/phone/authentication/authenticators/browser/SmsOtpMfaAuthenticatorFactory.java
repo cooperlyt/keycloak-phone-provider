@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.browser;
 
+import cc.coopersoft.keycloak.phone.authentication.authenticators.resetcred.ResetCredentialWithPhone;
 import org.keycloak.Config.Scope;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.AuthenticatorFactory;

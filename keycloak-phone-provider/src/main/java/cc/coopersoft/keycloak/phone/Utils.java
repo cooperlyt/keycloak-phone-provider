@@ -1,14 +1,14 @@
-package cc.coopersoft.keycloak.phone.utils;
+package cc.coopersoft.keycloak.phone;
 
-import org.apache.commons.collections4.comparators.BooleanComparator;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
+import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserProvider;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+
 
 /**
  *
@@ -17,20 +17,20 @@ import java.util.stream.Collectors;
  */
 
 
-public class UserUtils {
+public class Utils {
 
 
-    public static UserModel findUserByPhone(UserProvider userProvider, RealmModel realm, String phoneNumber){
+    public static Optional<UserModel> findUserByPhone(UserProvider userProvider, RealmModel realm, String phoneNumber){
         return userProvider
             .searchForUserByUserAttributeStream(realm,"phoneNumber", phoneNumber)
-            .max(comparatorUser()).orElse(null);
+            .max(comparatorUser());
     }
 
-    public static UserModel findUserByPhone(UserProvider userProvider, RealmModel realm, String phoneNumber, String notIs){
+    public static Optional<UserModel> findUserByPhone(UserProvider userProvider, RealmModel realm, String phoneNumber, String notIs){
         return userProvider
             .searchForUserByUserAttributeStream(realm, "phoneNumber", phoneNumber)
             .filter(u -> !u.getId().equals(notIs))
-            .max(comparatorUser()).orElse(null);
+            .max(comparatorUser());
     }
 
     private static Comparator<UserModel> comparatorUser() {
@@ -39,8 +39,9 @@ public class UserUtils {
                 u2.getAttributeStream("phoneNumberVerified").anyMatch("true"::equals));
     }
 
-    public static boolean isDuplicatePhoneAllowed(){
-        //TODO isDuplicatePhoneAllowed
-        return true;
+    public static boolean isDuplicatePhoneAllowed(KeycloakSession session){
+        return session.getProvider(PhoneProvider.class).isDuplicatePhoneAllowed(session.getContext().getRealm().getName());
     }
+
+
 }

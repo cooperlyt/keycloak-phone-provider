@@ -42,7 +42,7 @@ the default like Kerberos or LDAP. I may try to help you but I cannot guarantee.
 ### **Installing:**
 
 + Docker
-  1. docker image is [coopersoft/keycloak:x86_64-19.0.1_phone-2.0.1 OR coopersoft/keycloak:arm64-19.0.1_phone-2.0.1](https://hub.docker.com/repository/docker/coopersoft/keycloak)
+  1. docker image is [coopersoft/keycloak:x86_64-19.0.1_phone-2.1.1 OR coopersoft/keycloak:arm64-19.0.1_phone-2.1.1](https://hub.docker.com/repository/docker/coopersoft/keycloak)
   2. for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/keycloak-phone-provider/master/examples/docker-compose.yml)
   3. run as `docker-compose up` , docker-compose is required!
 
@@ -56,9 +56,12 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
 + Cli params
 ```shell
   kc.[sh|bat] start \
-    --spi-phone-message-service-default-service=[dummy|aws|aliyun|cloopen| ...]  # Which sms provider 
-    --spi-phone-message-service-default-token-expires-in=60  # sms expires ,default 60 second
-    --spi-phone-message-service-default-hour-maximum=3 # How many send sms count in one hour. 
+    --spi-phone-default-service=[dummy|aws|aliyun|cloopen| ...]  # Which sms provider 
+    --spi-phone-default-token-expires-in=60  # sms expires ,default 60 second
+    --spi-phone-default-hour-maximum=3 # How many send sms count in one hour. 
+    --spi-phone-default-<$realm>-duplicate-phone=false # allow one phone register multi user
+    
+    
     ...  # provider param refer provider`s readme.md
 ```
 
@@ -66,41 +69,41 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
 
 Under Authentication > Flows:
 + Create flows from registration:
-  Copy the 'Registration' flow to 'Registration fast by phone' flow.
+  Copy the 'Registration' flow to 'Registration with phone' flow.
 
-+ (Optional) Phone number used as username for new user:  
-  Delete or disable 'Registration User Creation'.
-  Click on 'Registration Fast By Phone Registration Form > Add > Add step' on the 'Registration Phone As Username Creation' line.
-  Move this item to first.
++ Replace 'Registration User Creation' to 'Registration Phone User Creation'
 
-+ (Optional)Hidden all other field phone except :   
-  Click on 'Registration Fast By Phone Registration Form > Add > Add step' on the 'Registration Least' line
++ (Optional) Click Settings on 'Registration Phone User Creation', config it;
 
-+ Add phone number to profile
-  Click on 'Registration Fast By Phone Registration Form > Add > Add step' on the 'Phone Validation' line
++ (Optional) Verify Phone
+  Click on 'Registration with phone registration Form >Add 'Phone validation' if you want to verify phone.
 
 + (Optional)Read query parameter add to user attribute:
-  Click on 'Registration Fast By Phone Registration Form > Actions > Add execution' on the 'Query Parameter Reader' line
-  Click on 'Registration Fast By Phone Registration Form > Actions > configure' add accept param name in to
+  Click on 'Registration with phone registration Form > Actions > Add execution' on the 'Query Parameter Reader' line
+  Click on 'Registration with phone registration Form > Actions > configure' add accept param name in to
 
 + (Optional)Hidden password field:
   Delete or disable 'Password Validation'.
 
++ (Optional) if not any user profile: 
+  Delete or disable 'Profile Validation'
+
 Set All add item as Required.
 
-Set Bind 'Registration fast by phone' to 'Registration flow'
+Set Bind 'Registration with phone' to 'Registration flow'
 
 Under Realm Settings > Themes
 Set Login Theme as 'phone'
 
-![Authentication setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a0.jpg)
-![full user profile](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a1.jpg)
-![Phone number is username](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a2.jpg)
-![No password](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a3.jpg)
-![Only phone registration](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a4.jpg)
+Tip:
+  if Realm set 'Email as username', then config 'Phone number as username' and 'hide email' is invalid!
+  if set param 'duplicate-phone' is true then 'Phone number as username' is invalid!
 
-test:
-http://<addr>/auth/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
+![Registration with phone](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a0.jpg)
+
+
+Registration URL:
+http://<domain>/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
 
 ### **Login by phone**
 Under Authentication > Flows:

@@ -3,17 +3,15 @@ package cc.coopersoft.keycloak.phone.providers.sender;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import cc.coopersoft.keycloak.phone.providers.spi.MessageSenderService;
+import cc.coopersoft.common.OptionalStringUtils;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
-import com.tencentcloudapi.common.profile.ClientProfile;
-import com.tencentcloudapi.common.profile.HttpProfile;
 import com.tencentcloudapi.sms.v20190711.SmsClient;
 import com.tencentcloudapi.sms.v20190711.models.SendSmsRequest;
 import com.tencentcloudapi.sms.v20190711.models.SendSmsResponse;
 import org.keycloak.Config;
 import org.keycloak.models.RealmModel;
 
-import java.util.Locale;
 import java.util.Optional;
 
 public class TencentSmsSenderServiceProvider implements MessageSenderService {
@@ -68,7 +66,7 @@ public class TencentSmsSenderServiceProvider implements MessageSenderService {
 
 
   @Override
-  public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code, int expires) throws MessageSendException {
+  public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code, int expires,String kind) throws MessageSendException {
     try {
 
       /* 实例化一个请求对象，根据调用的接口和实际情况，可以进一步设置请求参数
@@ -106,8 +104,9 @@ public class TencentSmsSenderServiceProvider implements MessageSenderService {
 //      req.setExtendCode(extendcode);
 
       /* 模板 ID: 必须填写已审核通过的模板 ID，可登录 [短信控制台] 查看模板 ID */
-      String templateId= Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + type.name().toLowerCase() + "-" + TEMPLATE_PARAM_NAME))
-              .orElse(type.name().toLowerCase() + "-" + config.get(TEMPLATE_PARAM_NAME));
+      String kindName = OptionalStringUtils.ofBlank(kind).orElse(type.name().toLowerCase());
+      String templateId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + kindName + "-template"))
+          .orElse(config.get(kindName + "-template"));
       req.setTemplateID(templateId);
 
       /* 下发手机号码，采用 e.164 标准，+[国家或地区码][手机号]

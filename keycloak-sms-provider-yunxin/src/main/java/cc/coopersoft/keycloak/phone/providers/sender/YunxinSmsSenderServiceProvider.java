@@ -3,12 +3,12 @@ package cc.coopersoft.keycloak.phone.providers.sender;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import cc.coopersoft.keycloak.phone.providers.spi.MessageSenderService;
+import cc.coopersoft.common.OptionalStringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
@@ -17,7 +17,6 @@ import org.keycloak.Config;
 import org.keycloak.models.RealmModel;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,7 +41,7 @@ public class YunxinSmsSenderServiceProvider implements MessageSenderService {
   }
 
   @Override
-  public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code, int expires) throws MessageSendException {
+  public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code, int expires, String kind) throws MessageSendException {
 
     HttpPost httpPost = new HttpPost(SERVER_URL);
     String curTime = String.valueOf((new Date()).getTime() / 1000L);
@@ -58,8 +57,9 @@ public class YunxinSmsSenderServiceProvider implements MessageSenderService {
      * 2.参数格式是jsonArray的格式，例如 "['13888888888','13666666666']"
      * 3.params是根据你模板里面有几个参数，那里面的参数也是jsonArray格式
      */
-    String templateId= Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + type.name().toLowerCase() + "-template"))
-        .orElse(config.get(type.name().toLowerCase() + "-template"));
+    String kindName = OptionalStringUtils.ofBlank(kind).orElse(type.name().toLowerCase());
+    String templateId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + kindName + "-template"))
+        .orElse(config.get(kindName + "-template"));
     nvps.add(new BasicNameValuePair("templateid", templateId));
     nvps.add(new BasicNameValuePair("mobile", phoneNumber));
     nvps.add(new BasicNameValuePair("codeLen", String.valueOf(code.length())));

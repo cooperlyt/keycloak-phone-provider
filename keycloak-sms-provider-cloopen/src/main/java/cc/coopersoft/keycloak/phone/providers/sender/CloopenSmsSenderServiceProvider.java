@@ -1,6 +1,7 @@
 package cc.coopersoft.keycloak.phone.providers.sender;
 
 import cc.coopersoft.keycloak.phone.providers.spi.MessageSenderService;
+import cc.coopersoft.common.OptionalStringUtils;
 import com.cloopen.rest.sdk.BodyType;
 import com.cloopen.rest.sdk.CCPRestSmsSDK;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
@@ -54,13 +55,16 @@ public class CloopenSmsSenderServiceProvider implements MessageSenderService {
     }
 
     @Override
-    public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code, int expires) throws MessageSendException {
+    public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code, int expires, String kind) throws MessageSendException {
         //请使用管理控制台中已创建应用的APPID
         String appId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + APP_ID_PARAM_NAME))
                 .orElse(config.get(APP_ID_PARAM_NAME));
         client.setAppId(appId);
-        String templateId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + type.name().toLowerCase() + TEMPLATE_PARAM_NAME))
-            .orElse(config.get(type.name().toLowerCase() + TEMPLATE_PARAM_NAME));
+
+        String kindName = OptionalStringUtils.ofBlank(kind).orElse(type.name().toLowerCase());
+        String templateId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + kindName + "-template"))
+            .orElse(config.get(kindName + "-template"));
+
         logger.info(String.format("cloopen appId: %s ; templateId: %s", appId, templateId));
 
         String[] datas = {code, String.valueOf(expires / 60) };

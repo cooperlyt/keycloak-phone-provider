@@ -3,6 +3,7 @@ package cc.coopersoft.keycloak.phone.providers.sender;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import cc.coopersoft.keycloak.phone.providers.spi.MessageSenderService;
+import cc.coopersoft.common.OptionalStringUtils;
 import com.aliyuncs.CommonRequest;
 import com.aliyuncs.CommonResponse;
 import com.aliyuncs.DefaultAcsClient;
@@ -33,10 +34,12 @@ public class AliyunSmsSenderServiceProvider implements MessageSenderService {
   }
 
   @Override
-  public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code, int expires) throws MessageSendException {
+  public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code, int expires, String kind) throws MessageSendException {
 
-    String templateId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + type.name().toLowerCase() + "-template"))
-        .orElse(config.get(type.name().toLowerCase() + "-template"));
+    String kindName = OptionalStringUtils.ofBlank(kind).orElse(type.name().toLowerCase());
+    String templateId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + kindName + "-template"))
+        .orElse(config.get(kindName + "-template"));
+
     CommonRequest request = new CommonRequest();
     request.setSysMethod(MethodType.POST);
     request.setSysDomain("dysmsapi.aliyuncs.com");

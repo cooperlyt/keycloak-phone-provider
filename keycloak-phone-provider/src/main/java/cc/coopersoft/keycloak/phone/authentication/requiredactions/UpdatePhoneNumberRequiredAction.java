@@ -1,6 +1,7 @@
 package cc.coopersoft.keycloak.phone.authentication.requiredactions;
 
-import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
+import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 
@@ -25,11 +26,11 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
     @Override
     public void processAction(RequiredActionContext context) {
-        TokenCodeService tokenCodeService = context.getSession().getProvider(TokenCodeService.class);
-        String phoneNumber = context.getHttpRequest().getDecodedFormParameters().getFirst("phoneNumber");
-        String code = context.getHttpRequest().getDecodedFormParameters().getFirst("code");
+        PhoneVerificationCodeProvider phoneVerificationCodeProvider = context.getSession().getProvider(PhoneVerificationCodeProvider.class);
+        String phoneNumber = context.getHttpRequest().getDecodedFormParameters().getFirst(SupportPhonePages.FIELD_PHONE_NUMBER);
+        String code = context.getHttpRequest().getDecodedFormParameters().getFirst(SupportPhonePages.FIELD_VERIFICATION_CODE);
         try {
-            tokenCodeService.validateCode(context.getUser(), phoneNumber, code);
+            phoneVerificationCodeProvider.validateCode(context.getUser(), phoneNumber, code);
             context.success();
         } catch (BadRequestException e) {
 

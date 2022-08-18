@@ -1,7 +1,7 @@
 package cc.coopersoft.keycloak.phone.providers.rest;
 
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
-import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.keycloak.models.KeycloakSession;
@@ -25,8 +25,8 @@ public class VerificationCodeResource extends TokenCodeResource {
         this.auth = new AppAuthManager.BearerTokenAuthenticator(session).authenticate();
     }
 
-    private TokenCodeService getTokenCodeService() {
-        return session.getProvider(TokenCodeService.class);
+    private PhoneVerificationCodeProvider getTokenCodeService() {
+        return session.getProvider(PhoneVerificationCodeProvider.class);
     }
 
     @POST

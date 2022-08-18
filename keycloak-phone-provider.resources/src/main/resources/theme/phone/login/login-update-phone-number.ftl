@@ -8,10 +8,14 @@
       <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
       <div id="vue-app">
-        <div class="alert alert-error" v-show="errorMessage">
-          <span class="${properties.kcFeedbackErrorIcon!}"></span>
-          <span class="kc-feedback-text">{{ errorMessage }}</span>
-        </div>
+          <div class="alert-error ${properties.kcAlertClass!} pf-m-danger" v-show="errorMessage">
+              <div class="pf-c-alert__icon">
+                  <span class="${properties.kcFeedbackErrorIcon!}"></span>
+              </div>
+
+              <span class="${properties.kcAlertTitleClass!}">{{ errorMessage }}</span>
+          </div>
+
         <div id="kc-form">
           <div id="kc-form-wrapper">
             <form id="kc-form-login" action="${url.loginAction}" method="post">
@@ -45,7 +49,6 @@
                        <#if auth.selectedCredential?has_content>value="${auth.selectedCredential}"</#if>/>
                 <input tabindex="4"
                        class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
-                       :disabled='sendButtonText === initSendButtonText'
                        name="save" id="kc-login" type="submit" value="${msg("doSubmit")}"/>
               </div>
             </form>

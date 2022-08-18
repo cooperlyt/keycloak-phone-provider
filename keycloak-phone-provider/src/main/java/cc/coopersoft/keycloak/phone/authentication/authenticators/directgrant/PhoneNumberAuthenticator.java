@@ -1,16 +1,11 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant;
 
-import cc.coopersoft.keycloak.phone.utils.UserUtils;
+import cc.coopersoft.keycloak.phone.Utils;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
-import org.keycloak.authentication.AuthenticationFlowError;
-import org.keycloak.events.Errors;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.services.validation.Validation;
-
-import javax.ws.rs.core.Response;
 
 public class PhoneNumberAuthenticator extends BaseDirectGrantAuthenticator {
 
@@ -23,27 +18,16 @@ public class PhoneNumberAuthenticator extends BaseDirectGrantAuthenticator {
 
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
-        //TODO is`s is invalid? remove it.
-        user.addRequiredAction("PHONE_NUMBER_GRANT_CONFIG");
     }
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
-
-        String phoneNumber = getPhoneNumber(context);
-
-        if (Validation.isBlank(phoneNumber)){
-            invalidCredentials(context);
-            return;
-        }
-        UserModel user = UserUtils.findUserByPhone(context.getSession().users(),context.getRealm(),phoneNumber);
-        if (user == null) {
-            invalidCredentials(context);
-            return;
-        }
-
-        logger.info("Grant authenticator valid phone success");
-        context.setUser(user);
-        context.success();
+        context.clearUser();
+        getPhoneNumber(context).ifPresentOrElse(phoneNumber ->
+            Utils.findUserByPhone(context.getSession().users(),context.getRealm(),phoneNumber)
+                .ifPresentOrElse(user -> {
+                    context.setUser(user);
+                    context.success();
+                },()->invalidCredentials(context)),() -> invalidCredentials(context));
     }
 }

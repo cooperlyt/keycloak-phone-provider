@@ -4,45 +4,72 @@
         ${msg("loginAccountTitle")}
     <#elseif section = "form">
 
-        <#if !usernameHidden?? && loginByPhone??>
+        <#if !usernameHidden?? && supportPhone??>
 
             <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+            <style>
+                [v-cloak] > * {
+                    display: none;
+                }
 
+                [v-cloak]::before {
+                    content: "loading...";
+                }
+            </style>
         </#if>
+
+
         <div id="vue-app">
             <div v-cloak>
 
                     <#if realm.password>
                     <form id="kc-form-login" onsubmit="login.disabled = true; return true;" action="${url.loginAction}" method="post">
 
-                        <#if !usernameHidden?? && loginByPhone??>
-                        <div class="${properties.kcFormClass!}">
-                            <div class="alert-error ${properties.kcAlertClass!} pf-m-danger" v-show="errorMessage">
-                                <div class="pf-c-alert__icon">
-                                    <span class="${properties.kcFeedbackErrorIcon!}"></span>
+                        <#if !usernameHidden?? && supportPhone??>
+                            <div class="${properties.kcFormClass!}">
+                                <div class="alert-error ${properties.kcAlertClass!} pf-m-danger" v-show="errorMessage">
+                                    <div class="pf-c-alert__icon">
+                                        <span class="${properties.kcFeedbackErrorIcon!}"></span>
+                                    </div>
+
+                                    <span class="${properties.kcAlertTitleClass!}">{{ errorMessage }}</span>
                                 </div>
 
-                                <span class="${properties.kcAlertTitleClass!}">{{ errorMessage }}</span>
-                            </div>
 
-
-                            <div class="${properties.kcFormGroupClass!}">
-                                <div class="${properties.kcLabelWrapperClass!}">
-                                    <ul class="nav nav-pills nav-justified">
-                                        <li role="presentation" v-bind:class="{ active: usernameOrPhone }" v-on:click="usernameOrPhone = true"><a href="#"><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmail")}<#else>${msg("email")}</#if></a></li>
-                                        <li role="presentation" v-bind:class="{ active: !usernameOrPhone }" v-on:click="usernameOrPhone = false"><a href="#">${msg("phoneNumber")}</a></li>
-                                    </ul>
+                                <div class="${properties.kcFormGroupClass!}">
+                                    <div class="${properties.kcLabelWrapperClass!}">
+                                        <ul class="nav nav-pills nav-justified">
+                                            <li role="presentation" v-bind:class="{ active: !phoneActivated }"
+                                                v-on:click="phoneActivated = false">
+                                                <a href="#">
+                                                      ${msg("loginByPassword")}
+                                                </a>
+                                            </li>
+                                            <li role="presentation" v-bind:class="{ active: phoneActivated }"
+                                                v-on:click="phoneActivated = true"><a href="#">${msg("loginByPhone")}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                       </div>
+
+                            <input type="hidden" id="phoneActivated" name="phoneActivated" v-model="phoneActivated">
                        </#if>
 
 
-                        <div  <#if !usernameHidden?? && loginByPhone??> v-if="usernameOrPhone" </#if> >
+                        <div  <#if !usernameHidden?? && supportPhone??> v-if="!phoneActivated" </#if> >
                             <#if !usernameHidden??>
                                 <div class="${properties.kcFormGroupClass!}">
-                                    <label for="username" class="${properties.kcLabelClass!}"><#if !realm.loginWithEmailAllowed>${msg("username")}<#elseif !realm.registrationEmailAsUsername>${msg("usernameOrEmail")}<#else>${msg("email")}</#if></label>
+                                    <label for="username" class="${properties.kcLabelClass!}">
+                                        <#if !realm.loginWithEmailAllowed>${msg("username")}
+                                            <#if loginWithPhoneNumber??> ${msg("usernameOrPhoneNumber")} <#else>${msg("username")}</#if>
+                                        <#elseif !realm.registrationEmailAsUsername>
+                                            <#if loginWithPhoneNumber??> ${msg("usernameOrEmailOrPhoneNumber")} <#else>${msg("usernameOrEmail")}</#if>
+                                        <#else>
+                                            <#if loginWithPhoneNumber??> ${msg("emailOrPhoneNumber")} <#else>${msg("email")}</#if>
+                                        </#if>
+                                    </label>
 
                                     <input tabindex="1" id="username" class="${properties.kcInputClass!}" name="username" value="${(login.username!'')}"  type="text" autofocus autocomplete="off"
                                            aria-invalid="<#if messagesPerField.existsError('username','password')>true</#if>"
@@ -97,8 +124,8 @@
 
                         </div>
 
-                        <#if !usernameHidden?? && loginByPhone??>
-                            <div v-if="!usernameOrPhone">
+                        <#if !usernameHidden?? && supportPhone??>
+                            <div v-if="phoneActivated">
                                 <div class="${properties.kcFormGroupClass!}">
                                     <label for="phoneNumber" class="${properties.kcLabelClass!}">${msg("phoneNumber")}</label>
                                     <input tabindex="1" type="text" id="phoneNumber" name="phoneNumber" v-model="phoneNumber"
@@ -138,11 +165,10 @@
 
                     </form>
                     </#if>
-
             </div>
         </div>
 
-        <#if !usernameHidden?? && loginByPhone??>
+        <#if !usernameHidden?? && supportPhone??>
             <script type="text/javascript">
 
                 function req(phoneNumber) {
@@ -157,8 +183,8 @@
                     data: {
                         errorMessage: '',
                         freezeSendCodeSeconds: 0,
-                        usernameOrPhone: <#if !activePhone??>true<#else>false</#if>,
-                        phoneNumber: '${initPhoneNumber!}',
+                        phoneActivated: <#if attemptedPhoneActivated??>true<#else>false</#if>,
+                        phoneNumber: '${attemptedPhoneNumber!}',
                         sendButtonText: '${msg("sendVerificationCode")}',
                         initsendButtonText: '${msg("sendVerificationCode")}',
                         disableSend: function(seconds) {

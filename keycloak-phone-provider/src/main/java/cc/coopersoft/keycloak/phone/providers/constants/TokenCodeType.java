@@ -2,7 +2,9 @@ package cc.coopersoft.keycloak.phone.providers.constants;
 
 public enum TokenCodeType {
     VERIFY("verification"),
-    OTP("authentication"),
+    AUTH("authentication"),
+
+    OTP("OTP"),
     RESET("reset credential"),
     REGISTRATION("registration");
 

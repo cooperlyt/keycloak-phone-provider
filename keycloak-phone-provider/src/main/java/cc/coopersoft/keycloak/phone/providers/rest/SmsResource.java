@@ -20,7 +20,7 @@ public class SmsResource {
 
     @Path("authentication-code")
     public TokenCodeResource getAuthenticationCodeResource() {
-        return new TokenCodeResource(session, TokenCodeType.OTP);
+        return new TokenCodeResource(session, TokenCodeType.AUTH);
     }
 
     @Path("registration-code")
@@ -33,5 +33,9 @@ public class SmsResource {
         return new TokenCodeResource(session, TokenCodeType.RESET);
     }
 
+    @Path("otp-code")
+    public TokenCodeResource getOTPCodeResource() {
+        return new TokenCodeResource(session, TokenCodeType.OTP);
+    }
 
 }

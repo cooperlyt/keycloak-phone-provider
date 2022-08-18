@@ -3,7 +3,7 @@ package cc.coopersoft.keycloak.phone.authentication.requiredactions;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
-import cc.coopersoft.keycloak.phone.providers.spi.TokenCodeService;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.credential.CredentialProvider;
@@ -22,6 +22,7 @@ public class ConfigSmsOtpRequiredAction implements RequiredActionProvider {
 
     @Override
     public void requiredActionChallenge(RequiredActionContext context) {
+
         Response challenge = context.form()
                 .createForm("login-sms-otp-config.ftl");
         context.challenge(challenge);
@@ -29,11 +30,11 @@ public class ConfigSmsOtpRequiredAction implements RequiredActionProvider {
 
     @Override
     public void processAction(RequiredActionContext context) {
-        TokenCodeService tokenCodeService = context.getSession().getProvider(TokenCodeService.class);
+        PhoneVerificationCodeProvider phoneVerificationCodeProvider = context.getSession().getProvider(PhoneVerificationCodeProvider.class);
         String phoneNumber = context.getHttpRequest().getDecodedFormParameters().getFirst("phoneNumber");
         String code = context.getHttpRequest().getDecodedFormParameters().getFirst("code");
         try {
-            tokenCodeService.validateCode(context.getUser(), phoneNumber, code);
+            phoneVerificationCodeProvider.validateCode(context.getUser(), phoneNumber, code);
             PhoneOtpCredentialProvider socp = (PhoneOtpCredentialProvider) context.getSession()
                     .getProvider(CredentialProvider.class, PhoneOtpCredentialProviderFactory.PROVIDER_ID);
             socp.createCredential(context.getRealm(), context.getUser(), PhoneOtpCredentialModel.create(phoneNumber));
