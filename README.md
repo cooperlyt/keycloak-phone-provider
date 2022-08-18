@@ -103,8 +103,9 @@ Tip:
 
 
 Registration URL:
+```
 http://<domain>/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
-
+```
 ### **Login by phone**
 Under Authentication > Flows:
 + Copy the 'Browser' flow to 'Browser with phone' flow
