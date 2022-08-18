@@ -99,7 +99,7 @@ Tip:
   if Realm set 'Email as username', then config 'Phone number as username' and 'hide email' is invalid!
   if set param 'duplicate-phone' is true then 'Phone number as username' is invalid!
 
-![Registration with phone](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a0.jpg)
+![Registration with phone](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a0.png)
 
 
 Registration URL:
