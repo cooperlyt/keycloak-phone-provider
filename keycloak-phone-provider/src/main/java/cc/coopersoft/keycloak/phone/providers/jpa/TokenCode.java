@@ -53,4 +53,13 @@ public class TokenCode {
 
     @Column(name = "BY_WHOM", nullable = true)
     private String byWhom;
+
+    @Column(name = "IP")
+    private String ip;
+
+    @Column(name = "PORT")
+    private Integer port;
+
+    @Column(name = "HOST")
+    private String host;
 }
