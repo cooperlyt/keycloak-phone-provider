@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 import static org.keycloak.provider.ProviderConfigProperty.MULTIVALUED_STRING_TYPE;
 import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
 
-//TODO test in 19.0.1
 public class RegistrationRedirectParametersReader implements FormActionFactory, FormAction {
 
   private static final Logger logger = Logger.getLogger(RegistrationRedirectParametersReader.class);
