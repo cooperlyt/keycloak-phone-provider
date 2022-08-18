@@ -9,6 +9,7 @@ import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.jpa.TokenCode;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.credential.CredentialModel;
@@ -16,16 +17,19 @@ import org.keycloak.credential.CredentialProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.util.JsonSerialization;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TemporalType;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCodeProvider {
 
@@ -142,7 +146,28 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
                 .forEach(u -> {
                     logger.info(String.format("User %s also has phone number %s. Un-verifying.", u.getId(), phoneNumber));
                     u.setSingleAttribute("phoneNumberVerified", "false");
+
                     u.addRequiredAction(UpdatePhoneNumberRequiredAction.PROVIDER_ID);
+
+                    //remove otp Credentials
+                    u.credentialManager()
+                        .getStoredCredentialsByTypeStream(PhoneOtpCredentialModel.TYPE)
+                        .filter(c -> {
+                            try {
+                                PhoneOtpCredentialModel.SmsOtpCredentialData credentialData =
+                                    JsonSerialization.readValue(c.getCredentialData(), PhoneOtpCredentialModel.SmsOtpCredentialData.class);
+                                if (StringUtils.isBlank(credentialData.getPhoneNumber())){
+                                    return true;
+                                }
+                                return credentialData.getPhoneNumber().equals(user.getFirstAttribute("phoneNumber"));
+                            } catch (IOException e) {
+                                logger.warn("Unknown format Otp Credential", e);
+                                return true;
+                            }
+                        })
+                        .map(CredentialModel::getId)
+                        .collect(Collectors.toList())
+                        .forEach(id -> u.credentialManager().removeStoredCredentialById(id));
                 });
         }
 
@@ -150,7 +175,6 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
         user.setSingleAttribute("phoneNumberVerified", "true");
         user.setSingleAttribute("phoneNumber", phoneNumber);
 
-        //add other phoneNumber user add update phone number action
         validateProcess(tokenCodeId, user);
 
         cleanUpAction(user);
@@ -179,6 +203,8 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
 //            session.userCredentialManager().updateCredential(getRealm(), user, credentialModel);
         }
     }
+
+
 
 
 

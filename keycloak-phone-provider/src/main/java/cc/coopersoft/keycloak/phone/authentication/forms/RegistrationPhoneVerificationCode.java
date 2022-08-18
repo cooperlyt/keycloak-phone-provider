@@ -5,6 +5,9 @@
  */
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
+import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
+import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
+import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
@@ -14,6 +17,7 @@ import org.keycloak.authentication.FormAction;
 import org.keycloak.authentication.FormActionFactory;
 import org.keycloak.authentication.FormContext;
 import org.keycloak.authentication.ValidationContext;
+import org.keycloak.credential.CredentialProvider;
 import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.forms.login.LoginFormsProvider;
@@ -144,6 +148,10 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
 
     logger.info(String.format("registration user %s phone success, tokenId is: %s", user.getId(), tokenId));
     getTokenCodeService(context.getSession()).tokenValidated(user, phoneNumber, tokenId);
+
+    PhoneOtpCredentialProvider ocp = (PhoneOtpCredentialProvider) context.getSession()
+        .getProvider(CredentialProvider.class, PhoneOtpCredentialProviderFactory.PROVIDER_ID);
+    ocp.createCredential(context.getRealm(), context.getUser(), PhoneOtpCredentialModel.create(phoneNumber));
   }
 
   @Override

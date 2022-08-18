@@ -40,9 +40,10 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
 
     @Override
     public boolean isValid(RealmModel realm, UserModel user, CredentialInput input) {
-        logger.info("---------------begnin valid otp sms");
+        logger.info("---------------begin valid otp sms");
 
         String phoneNumber = user.getFirstAttribute("phoneNumber");
+
         String code = input.getChallengeResponse();
 
         if (!(input instanceof UserCredentialModel)) return false;

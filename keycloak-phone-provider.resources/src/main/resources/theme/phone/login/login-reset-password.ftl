@@ -109,7 +109,7 @@
                                     <input tabindex="2" style="height: 36px"
                                            class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
                                            type="button" v-model="sendButtonText"
-                                           :disabled='sendButtonText !== initsendButtonText'
+                                           :disabled='sendButtonText !== initSendButtonText'
                                            v-on:click="sendVerificationCode()"/>
                                 </div>
                             </div>
@@ -153,7 +153,7 @@
                         phoneActivated: <#if attemptedPhoneActivated??>true<#else>false</#if>,
                         phoneNumber: '${attemptedPhoneNumber!}',
                         sendButtonText: '${msg("sendVerificationCode")}',
-                        initsendButtonText: '${msg("sendVerificationCode")}',
+                        initSendButtonText: '${msg("sendVerificationCode")}',
                         disableSend: function (seconds) {
                             if (seconds <= 0) {
                                 app.sendButtonText = app.initSendButtonText;
@@ -174,7 +174,7 @@
                                 document.getElementById('phoneNumber').focus();
                                 return;
                             }
-                            if (this.sendButtonText !== this.initsendButtonText) {
+                            if (this.sendButtonText !== this.initSendButtonText) {
                                 return;
                             }
                             req(phoneNumber);
