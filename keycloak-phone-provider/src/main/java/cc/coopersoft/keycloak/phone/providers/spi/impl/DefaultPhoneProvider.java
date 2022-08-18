@@ -6,6 +6,7 @@ import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.MessageSenderService;
+import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
 import org.keycloak.models.KeycloakSession;
@@ -27,14 +28,23 @@ public class DefaultPhoneProvider implements PhoneProvider {
     DefaultPhoneProvider(KeycloakSession session, Scope config) {
         this.session = session;
         this.config = config;
-        logger.info("phone message service implement server name:" + config.get("service"));
+
 
         this.service = session.listProviderIds(MessageSenderService.class)
                 .stream().filter(s -> s.equals(config.get("service")))
                 .findFirst().orElse(
                         session.listProviderIds(MessageSenderService.class)
-                                .stream().findFirst().orElse("")
+                                .stream().findFirst().orElse(null)
                 );
+
+        if (StringUtils.isBlank(this.service)){
+            logger.error("Message sender service provider not found!");
+        }
+
+        if (StringUtils.isBlank(config.get("service")))
+            logger.warn("not specify a message sender service provider! Default provider'" +
+                this.service + "' will be used. you can use keycloak start param '--spi-phone-default-service' specify other one. ");
+
         this.tokenExpiresIn = config.getInt("tokenExpiresIn", 60);
         this.hourMaximum = config.getInt("hourMaximum",3);
     }

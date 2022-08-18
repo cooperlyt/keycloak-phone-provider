@@ -85,6 +85,9 @@ Under Authentication > Flows:
 + (Optional)Hidden password field:
   Delete or disable 'Password Validation'.
 
++ (Optional) if not any user profile: 
+  Delete or disable 'Profile Validation'
+
 Set All add item as Required.
 
 Set Bind 'Registration with phone' to 'Registration flow'
@@ -99,8 +102,8 @@ Tip:
 ![Registration with phone](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a0.jpg)
 
 
-test:
-http://<addr>/auth/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
+Registration URL:
+http://<domain>/realms/<realm name>/protocol/openid-connect/registrations?client_id=<client id>&response_type=code&scope=openid%20email&redirect_uri=<redirect_uri>
 
 ### **Login by phone**
 Under Authentication > Flows:
