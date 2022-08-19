@@ -211,8 +211,6 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
             PhoneOtpCredentialModel credentialModel = PhoneOtpCredentialModel.createFromCredentialModel(credential);
             user.credentialManager().updateStoredCredential(credentialModel);
 //            session.userCredentialManager().updateCredential(getRealm(), user, credentialModel);
-        }else {
-            ocp.createCredential(getRealm(), user, PhoneOtpCredentialModel.create(phoneNumber));
         }
     }
 

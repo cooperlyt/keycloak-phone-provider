@@ -25,6 +25,7 @@ import org.keycloak.models.*;
 import org.keycloak.models.AuthenticationExecutionModel.Requirement;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.provider.ProviderConfigProperty;
+import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.services.validation.Validation;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages.*;
+import static org.keycloak.provider.ProviderConfigProperty.BOOLEAN_TYPE;
 
 public class RegistrationPhoneVerificationCode implements FormAction, FormActionFactory {
 
@@ -39,15 +41,11 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
 
   public static final String PROVIDER_ID = "registration-phone";
 
+  public static final String CONFIG_OPT_CREDENTIAL="createOPTCredential";
 
   @Override
   public String getHelpText() {
     return "valid phone number and verification code";
-  }
-
-  @Override
-  public List<ProviderConfigProperty> getConfigProperties() {
-    return null;
   }
 
   @Override
@@ -72,7 +70,25 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
 
   @Override
   public boolean isConfigurable() {
-    return false;
+    return true;
+  }
+
+  protected static final List<ProviderConfigProperty> CONFIG_PROPERTIES;
+
+  static {
+    CONFIG_PROPERTIES = ProviderConfigurationBuilder.create()
+        .property().name(CONFIG_OPT_CREDENTIAL)
+        .type(BOOLEAN_TYPE)
+        .defaultValue(false)
+        .label("Create a phone OPT credential")
+        .helpText("Create a phone OPT credential.")
+        .add()
+        .build();
+  }
+
+  @Override
+  public List<ProviderConfigProperty> getConfigProperties() {
+    return CONFIG_PROPERTIES;
   }
 
   private final static Requirement[] REQUIREMENT_CHOICES = {
@@ -149,6 +165,14 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
 
     logger.info(String.format("registration user %s phone success, tokenId is: %s", user.getId(), tokenId));
     getTokenCodeService(context.getSession()).tokenValidated(user, phoneNumber, tokenId);
+
+    AuthenticatorConfigModel config = context.getAuthenticatorConfig();
+    if (config != null &&
+        "true".equalsIgnoreCase(config.getConfig().getOrDefault(CONFIG_OPT_CREDENTIAL,"false"))){
+      PhoneOtpCredentialProvider ocp = (PhoneOtpCredentialProvider) context.getSession()
+          .getProvider(CredentialProvider.class, PhoneOtpCredentialProviderFactory.PROVIDER_ID);
+      ocp.createCredential(context.getRealm(), context.getUser(), PhoneOtpCredentialModel.create(phoneNumber));
+    }
 
   }
 
