@@ -65,6 +65,16 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
     ...  # provider param refer provider`s readme.md
 ```
 
+### **Theme**
+
+Need change realm login theme to 'phone'.
+
+you can create a customized theme base on 'phone'.
+
+```
+  parent=phone
+```
+
 ### **Phone registration support**
 
 Under Authentication > Flows:
