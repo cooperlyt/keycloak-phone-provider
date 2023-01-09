@@ -43,6 +43,7 @@ public class TokenCodeResource {
     // everybody phones authenticator send AUTH code
     if( !TokenCodeType.REGISTRATION.equals(tokenCodeType) &&
         !TokenCodeType.AUTH.equals(tokenCodeType) &&
+        !TokenCodeType.VERIFY.equals(tokenCodeType) &&
         Utils.findUserByPhone(session.users(), session.getContext().getRealm(), phoneNumber).isEmpty()) {
       throw new ForbiddenException("Phone number not found");
     }
