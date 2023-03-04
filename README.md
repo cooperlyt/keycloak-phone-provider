@@ -1,4 +1,4 @@
-# Keycloak (Quarkus 19.0.1)  Phone Provider
+# Keycloak (Quarkus 21.0.1)  Phone Provider
 
  + Phone support like e-mail 
  + OTP by phone
@@ -27,10 +27,6 @@ This is what you can do for now:
   + Register only phone (username is phone number)
   + Register add user attribute with redirect_uri params
 
-  
-
-## Client:
-see my project [KeycloakClient](https://github.com/cooper-lyt/KeycloakClient) ,is android client, nothing stop you from implementing other java program.
 
 ## Compatibility
 
@@ -42,12 +38,27 @@ the default like Kerberos or LDAP. I may try to help you but I cannot guarantee.
 ### **Installing:**
 
 + Docker
-  1. docker image is [coopersoft/keycloak:x86_64-19.0.1_phone-2.1.2 OR coopersoft/keycloak:arm64-19.0.1_phone-2.1.2](https://hub.docker.com/repository/docker/coopersoft/keycloak)
+  1. docker image is [coopersoft/keycloak:21.0.1_phone-2.2.1](https://hub.docker.com/repository/docker/coopersoft/keycloak)
   2. for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/keycloak-phone-provider/master/examples/docker-compose.yml)
   3. run as `docker-compose up` , docker-compose is required!
 
 If you want to build the project, simply run  `examples/docker-build.sh` after cloning the repository.
+ 2.2.1 is build on JAVA 17, Maven 3.8.6
+  + `keycloak-phone-provide`
+    main 
+  + `keycloak-phone-provide.resources`
+    theme
+  + `keycloak-sms-provider-dummy`
+    test message will print to console.
 
+  sms service provider, choose one.
+  `keycloak-sms-provider-aws-sns`
+  `keycloak-sms-provider-totalvoice`
+  `keycloak-sms-provider-twilio`
+  `keycloak-sms-provider-cloopen`
+  `keycloak-sms-provider-yunxin`
+  `keycloak-sms-provider-aliyun`
+  `keycloak-sms-provider-tencent`
 + Local
   1. local keycloak installed: copy the `target\providers` to keycloak home directory
   2. kc.[sh|bat] build

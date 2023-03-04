@@ -7,16 +7,45 @@
     <groupId>cc.coopersoft</groupId>
     <artifactId>keycloak-phone-provider-parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.1.2</version>
+    <version>2.2.1</version>
+
+    <name>keycloak-phone-provider</name>
+    <description>keycloak phone support.</description>
+    <url>https://github.com/cooperlyt/keycloak-phone-provider</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <tag>${project.version}</tag>
+        <connection>scm:git@github.com:cooperlyt/keycloak-phone-provider.git</connection>
+        <developerConnection>scm:git@github.com:cooperlyt/keycloak-phone-provider.git</developerConnection>
+        <url>https://github.com/cooperlyt/keycloak-phone-provider</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>cooperlyt</id>
+            <name>cooper lee</name>
+            <email>lyt3131@163.com</email>
+            <organization>https://cooperlyt.github.io</organization>
+            <timezone>+8</timezone>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <version.keycloak>19.0.1</version.keycloak>
-        <docker.image.name>coopersoft/keycloak</docker.image.name>
-
-        <version.project.parent>2.1.2</version.project.parent>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <version.keycloak>21.0.1</version.keycloak>
     </properties>
 
     <modules>
@@ -69,6 +98,14 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.10.0</version>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
+            </plugin>
             <plugin>
                 <inherited>false</inherited>
                 <artifactId>maven-resources-plugin</artifactId>

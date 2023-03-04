@@ -7,8 +7,6 @@ import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import cc.coopersoft.keycloak.phone.providers.spi.FullSmsSenderAbstractService;
 import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
 
 public class TwilioSmsSenderServiceProvider extends FullSmsSenderAbstractService {
 
@@ -31,6 +29,7 @@ public class TwilioSmsSenderServiceProvider extends FullSmsSenderAbstractService
                 message).create();
 
         if (msg.getStatus() == Message.Status.FAILED) {
+            logger.error("message send failed!");
             throw new MessageSendException(msg.getStatus().ordinal(),
                     String.valueOf(msg.getErrorCode()),
                     msg.getErrorMessage());
