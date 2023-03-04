@@ -30,7 +30,7 @@ This is what you can do for now:
 
 ## Compatibility
 
-This was initially developed using 19.0.1 version of Quarkus Keycloak as baseline,Wildfily keycloak is not support again, and I did not test another user storage beyond
+This was initially developed using 20.0.1 version of Quarkus Keycloak as baseline,Wildfily keycloak is not support again, and I did not test another user storage beyond
 the default like Kerberos or LDAP. I may try to help you but I cannot guarantee.
 
 ## Usage
