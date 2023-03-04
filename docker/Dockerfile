@@ -47,7 +47,7 @@ COPY providers/keycloak-sms-provider-aliyun.jar /opt/keycloak/providers/
 #aws provider
 COPY providers/keycloak-sms-provider-aws-sns.jar /opt/keycloak/providers/
 
-RUN mkdir /opt/certs
+RUN mkdir /opt/keycloak/certs
 
 RUN /opt/keycloak/bin/kc.sh build
 
