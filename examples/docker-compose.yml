@@ -39,4 +39,6 @@ services:
 #      - database:database
 #    depends_on:
 #      - database
+    volumes:
+      - /home/docker/certs:/opt/keycloak/certs
 
