@@ -1,4 +1,5 @@
 # Keycloak (Quarkus 21.0.1)  Phone Provider
+![Build Status](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/compile-and-liveness-check.yml/badge.svg)
 
  + Phone support like e-mail 
  + OTP by phone
@@ -12,8 +13,8 @@ voice
 phone one key login
 
 With this provider you can **enforce authentication policies based on a verification token sent to users' mobile phones**.
-Currently, there are implementations of Twilio and TotalVoice and YunTongXun SMS sender services. That said, is nice to note that more
-services can be used with ease thankfully for the adopted modularity and in fact, nothing stop you from implementing a 
+Currently, there are implementations of Twilio, TotalVoice, and YunTongXun SMS sender services. That said, more
+services can be added with ease due to the modularity.  In fact, nothing would stop you from implementing a 
 sender of TTS calls or WhatsApp messages. 
 
 This is what you can do for now:
@@ -30,8 +31,8 @@ This is what you can do for now:
 
 ## Compatibility
 
-This was initially developed using 20.0.1 version of Quarkus Keycloak as baseline,Wildfily keycloak is not support again, and I did not test another user storage beyond
-the default like Kerberos or LDAP. I may try to help you but I cannot guarantee.
+This was initially developed using 20.0.1 version of Quarkus Keycloak as baseline.  Wildfily keycloak is not support 
+anymore, and I did not test user storage beyond Kerberos or LDAP. I may try to help you but I cannot guarantee.
 
 ## Usage
 
@@ -78,9 +79,9 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
 
 ### **Theme**
 
-Need change realm login theme to 'phone'.
+You will need to change the realm login theme to 'phone'.
 
-you can create a customized theme base on 'phone'.
+You can create a customized theme base on 'phone'.
 
 ```
   parent=phone
@@ -117,8 +118,8 @@ Under Realm Settings > Themes
 Set Login Theme as 'phone'
 
 Tip:
-  if Realm set 'Email as username', then config 'Phone number as username' and 'hide email' is invalid!
-  if set param 'duplicate-phone' is true then 'Phone number as username' is invalid!
+  if Realm parameter 'Email as username' is true, then config 'Phone number as username' and 'hide email' is invalid!
+  if parameter 'duplicate-phone' is true then 'Phone number as username' is invalid!
 
 ![Registration with phone](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/a0.png)
 
@@ -143,7 +144,7 @@ Set Bind 'Browser with phone' to 'Browser flow'
 ### **OTP by Phone**
 
 Two user attributes are going to be used by this provider: _phoneNumberVerified_ (bool) and _phoneNumber_ (str). Many
-users can have the same _phoneNumber_, but only one of them is getting _phoneNumberVerified_ = true at the end of a
+users can have the same _phoneNumber_, but only one of them will have _phoneNumberVerified_ = true at the end of a
 verification process. This accommodates the use case of pre-paid numbers that get recycled if inactive for too much time.
 
 
