@@ -19,12 +19,19 @@ services:
 
 
   keycloak:
-    image: coopersoft/keycloak:21.0.1_phone-2.2.1
+    image: coopersoft/keycloak:${ARCH:-arm64}-21.0.1_phone-2.1.2
 #    restart: always
     ports:
       - 8901:8080
     command:
       - start-dev --spi-phone-message-service-default-service=dummy
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8901/auth/health"]
+      interval: 10s
+      timeout: 60s
+      retries: 2
+
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
