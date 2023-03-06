@@ -12,5 +12,5 @@ jobs:
           distribution: 'temurin' 
           java-version: '17'
       - shell: bash
-        run: cd examples && ./docker-build.sh test
+        run: cd examples && bash docker-build.sh test
       - run: cd examples && docker compose --verbose up --build --wait
