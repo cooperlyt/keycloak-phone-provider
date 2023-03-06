@@ -45,6 +45,13 @@ services:
 
   healthcheck:
     image: curlimages/curl:latest
+    command:
+      - "sh"
+      - "-c"
+      - >
+          while true; do
+            sleep 60;
+          done
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://keycloak:8080/health" ]
       interval: 10s
