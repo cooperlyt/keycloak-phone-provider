@@ -1,5 +1,6 @@
-#!/bin/sh
-if [[ @project.version@ == *"snapshot" ]] || [[ @project.version@ == *"SNAPSHOT" ]]
+#!/bin/bash
+
+if [ "$1" == "test" ] || [[ @project.version@ == *"snapshot" ]] || [[ @project.version@ == *"SNAPSHOT" ]]
 then
   docker build -t coopersoft/keycloak:@version.keycloak@_phone-@project.version@ .
 else

@@ -19,7 +19,7 @@ services:
 
 
   keycloak:
-    image: coopersoft/keycloak:${ARCH:-arm64}-21.0.1_phone-2.1.2
+    image: coopersoft/keycloak:21.0.1_phone-2.2.1
 #    restart: always
     ports:
       - 8901:8080
