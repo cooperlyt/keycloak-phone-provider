@@ -50,13 +50,13 @@ services:
       - "-c"
       - >
           while true; do
-            sleep 360;
+            sleep 3600;
           done
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://keycloak:8080/health" ]
       interval: 10s
       timeout: 60s
-      retries: 3
+      retries: 5
     depends_on:
       - keycloak
     links:
