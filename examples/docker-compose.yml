@@ -18,6 +18,8 @@ services:
 
 
 
+
+
   keycloak:
     image: coopersoft/keycloak:21.0.1_phone-2.2.1
 #    restart: always
@@ -25,13 +27,6 @@ services:
       - 8080:8080
     command:
       - start-dev --spi-phone-message-service-default-service=dummy
-
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 10s
-      timeout: 60s
-      retries: 5
-
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
@@ -47,6 +42,15 @@ services:
 #      - database:database
 #    depends_on:
 #      - database
-    volumes:
-      - /home/docker/certs:/opt/keycloak/certs
 
+  healthcheck:
+    image: curlimages/curl:latest
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://keycloak:8080/health" ]
+      interval: 10s
+      timeout: 60s
+      retries: 2
+    depends_on:
+      - keycloak
+    links:
+      - keycloak:keycloak
