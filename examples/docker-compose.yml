@@ -27,7 +27,7 @@ services:
       - start-dev --spi-phone-message-service-default-service=dummy
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8901/auth/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8901/health"]
       interval: 10s
       timeout: 60s
       retries: 2
@@ -35,6 +35,7 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: true
 #      KC_PROXY: edge
 #      DB_VENDOR: mariadb
 #      DB_ADDR: database
