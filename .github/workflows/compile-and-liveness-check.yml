@@ -1,0 +1,11 @@
+name: 'build-test'
+on:
+  push
+
+jobs:
+  build-and-liveness-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: cd examples && ./docker-build.sh
+      - run: cd examples && ARCH=$(arch) docker compose --verbose up --build --wait
