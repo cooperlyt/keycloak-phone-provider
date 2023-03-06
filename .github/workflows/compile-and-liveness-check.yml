@@ -5,12 +5,11 @@ on:
 jobs:
   build-and-liveness-check:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-java@v2
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: maven
+    steps: 
       - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin' 
+          java-version: '17'
       - run: cd examples && ./docker-build.sh
       - run: cd examples && ARCH=$(arch) docker compose --verbose up --build --wait
