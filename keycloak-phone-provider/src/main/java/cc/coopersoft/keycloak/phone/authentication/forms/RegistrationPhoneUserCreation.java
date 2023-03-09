@@ -75,19 +75,19 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
         .property().name(CONFIG_PHONE_NUMBER_AS_USERNAME)
         .type(BOOLEAN_TYPE)
         .label("Phone number as username")
-        .helpText("Allow users to set phone number as username. if Realm set email as username, this is invalid!")
+        .helpText("Allow users to set phone number as username. If Realm has `email as username` set to true, this is invalid!")
         .defaultValue(true)
         .add()
         .property().name(CONFIG_INPUT_NAME)
         .type(BOOLEAN_TYPE)
         .label("Input name")
-        .helpText("Allow users input first name and last name.")
+        .helpText("Allow users to input first and last name.")
         .defaultValue(true)
         .add()
         .property().name(CONFIG_INPUT_EMAIL)
         .type(BOOLEAN_TYPE)
         .label("Input Email")
-        .helpText("Allow users input e-mail, if Realm set email as username, this is invalid!")
+        .helpText("Allow users to input e-mail. If Realm has `email as username` set to true, this is invalid!")
         .defaultValue(true)
         .add()
         .build();
@@ -165,7 +165,7 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       return false;
     }
     if (context.getRealm().isRegistrationEmailAsUsername()){
-      logger.warn("email as username can`t hide email input.");
+      logger.warn("`email as username` is set, so can't hide email input.");
       return false;
     }
 
