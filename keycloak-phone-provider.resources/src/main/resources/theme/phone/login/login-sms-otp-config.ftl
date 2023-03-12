@@ -26,13 +26,13 @@
                          class="${properties.kcLabelClass!}">${msg("phoneNumber")}</label>
                 </div>
                 <div class="col-xs-8" style="padding: 0 5px 0 0">
-                  <input tabindex="1" id="phoneNumber" class="${properties.kcInputClass!}"
+                  <input tabindex="0" id="phoneNumber" class="${properties.kcInputClass!}"
                          name="phoneNumber" type="tel" <#if !phoneNumber??>autofocus</#if>
                          value="${phoneNumber!''}"
                          autocomplete="mobile tel"/>
                 </div>
                 <div class="col-xs-4" style="padding: 0 0 0 5px">
-                  <input tabindex="2" style="height: 36px"
+                  <input tabindex="0" style="height: 36px"
                          class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
                          v-model="sendButtonText" :disabled='sendButtonText !== initSendButtonText'
                          v-on:click="sendVerificationCode()"
@@ -41,14 +41,14 @@
               </div>
               <div class="${properties.kcFormGroupClass!} row">
                 <label for="code" class="${properties.kcLabelClass!}">${msg("verificationCode")}</label>
-                <input tabindex="3" id="code" class="${properties.kcInputClass!}" name="code"
+                <input tabindex="0" id="code" class="${properties.kcInputClass!}" name="code"
                        type="text" <#if phoneNumber??>autofocus</#if>
                        autocomplete="off"/>
               </div>
               <div id="kc-form-buttons" class="${properties.kcFormGroupClass!}">
                 <input type="hidden" id="id-hidden-input" name="credentialId"
                        <#if auth.selectedCredential?has_content>value="${auth.selectedCredential}"</#if>/>
-                <input tabindex="4"
+                <input tabindex="0"
                        class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
                        :disabled='sendButtonText === initSendButtonText'
                        name="save" id="kc-login" type="submit" value="${msg("doSubmit")}"/>

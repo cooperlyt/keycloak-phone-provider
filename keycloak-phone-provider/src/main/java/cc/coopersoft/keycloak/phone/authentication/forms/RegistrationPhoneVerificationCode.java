@@ -80,8 +80,8 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
         .property().name(CONFIG_OPT_CREDENTIAL)
         .type(BOOLEAN_TYPE)
         .defaultValue(false)
-        .label("Create a phone OPT credential")
-        .helpText("Create a phone OPT credential.")
+        .label("Create a phone OTP credential")
+        .helpText("Create a phone OTP credential.")
         .add()
         .build();
   }

@@ -142,7 +142,7 @@
                         <label for="phoneNumber" class="${properties.kcLabelClass!}">${msg("phoneNumber")}</label>
                     </div>
                     <div class="${properties.kcInputWrapperClass!}">
-                        <input tabindex="1" id="phoneNumber" class="${properties.kcInputClass!}"
+                        <input tabindex="0" id="phoneNumber" class="${properties.kcInputClass!}"
                                name="phoneNumber" id="phoneNumber" type="tel"
                                aria-invalid="<#if messagesPerField.existsError('phoneNumber')>true</#if>"
                                autofocus
@@ -164,7 +164,7 @@
                         <label for="registerCode" class="${properties.kcLabelClass!}">${msg("verificationCode")}</label>
                     </div>
                     <div class="col-xs-8" style="padding: 0 5px 0 0">
-                        <input tabindex="3" id="code" name="code"
+                        <input tabindex="0" id="code" name="code"
                                aria-invalid="<#if messagesPerField.existsError('registerCode')>true</#if>"
                                type="text" class="${properties.kcInputClass!}"
                                autocomplete="off"/>
@@ -175,7 +175,7 @@
                         </#if>
                     </div>
                     <div class="col-xs-4" style="padding: 0 0 0 5px">
-                        <input tabindex="2" style="height: 36px"
+                        <input tabindex="0" style="height: 36px"
                                class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
                                v-model="sendButtonText" :disabled='sendButtonText !== initSendButtonText'
                                v-on:click="sendVerificationCode()"
