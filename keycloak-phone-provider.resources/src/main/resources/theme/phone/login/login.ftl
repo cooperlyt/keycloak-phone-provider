@@ -71,7 +71,7 @@
                                         </#if>
                                     </label>
 
-                                    <input tabindex="1" id="username" class="${properties.kcInputClass!}" name="username" value="${(login.username!'')}"  type="text" autofocus autocomplete="off"
+                                    <input tabindex="0" id="username" class="${properties.kcInputClass!}" name="username" value="${(login.username!'')}"  type="text" autofocus autocomplete="off"
                                            aria-invalid="<#if messagesPerField.existsError('username','password')>true</#if>"
                                     />
 
@@ -87,7 +87,7 @@
                             <div class="${properties.kcFormGroupClass!}">
                                 <label for="password" class="${properties.kcLabelClass!}">${msg("password")}</label>
 
-                                <input tabindex="2" id="password" class="${properties.kcInputClass!}" name="password" type="password" autocomplete="off"
+                                <input tabindex="0" id="password" class="${properties.kcInputClass!}" name="password" type="password" autocomplete="off"
                                        aria-invalid="<#if messagesPerField.existsError('username','password')>true</#if>"
                                 />
 
@@ -106,9 +106,9 @@
                                         <div class="checkbox">
                                             <label>
                                                 <#if login.rememberMe??>
-                                                    <input tabindex="3" id="rememberMe" name="rememberMe" type="checkbox" checked> ${msg("rememberMe")}
+                                                    <input tabindex="0" id="rememberMe" name="rememberMe" type="checkbox" checked> ${msg("rememberMe")}
                                                 <#else>
-                                                    <input tabindex="3" id="rememberMe" name="rememberMe" type="checkbox"> ${msg("rememberMe")}
+                                                    <input tabindex="0" id="rememberMe" name="rememberMe" type="checkbox"> ${msg("rememberMe")}
                                                 </#if>
                                             </label>
                                         </div>
@@ -116,7 +116,7 @@
                                 </div>
                                 <div class="${properties.kcFormOptionsWrapperClass!}">
                                     <#if realm.resetPasswordAllowed>
-                                        <span><a tabindex="5" href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a></span>
+                                        <span><a tabindex="0" href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a></span>
                                     </#if>
                                 </div>
                             </div>
@@ -128,7 +128,7 @@
                             <div v-if="phoneActivated">
                                 <div class="${properties.kcFormGroupClass!}">
                                     <label for="phoneNumber" class="${properties.kcLabelClass!}">${msg("phoneNumber")}</label>
-                                    <input tabindex="1" type="text" id="phoneNumber" name="phoneNumber" v-model="phoneNumber"
+                                    <input tabindex="0" type="text" id="phoneNumber" name="phoneNumber" v-model="phoneNumber"
                                            aria-invalid="<#if messagesPerField.existsError('code','phoneNumber')>true</#if>"
                                            class="${properties.kcInputClass!}" autofocus/>
                                     <#if messagesPerField.existsError('code','phoneNumber')>
@@ -143,13 +143,13 @@
                                         <label for="code" class="${properties.kcLabelClass!}">${msg("verificationCode")}</label>
                                     </div>
                                     <div class="col-xs-8" style="padding: 0 5px 0 0">
-                                        <input tabindex="2" type="text" id="code" name="code"
+                                        <input tabindex="0" type="text" id="code" name="code"
                                                aria-invalid="<#if messagesPerField.existsError('code','phoneNumber')>true</#if>"
                                                class="${properties.kcInputClass!}" autocomplete="off"/>
 
                                     </div>
                                     <div class="col-xs-4" style="padding: 0 0 0 5px">
-                                        <input tabindex="2" style="height: 36px"
+                                        <input tabindex="0" style="height: 36px"
                                                class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
                                                type="button" v-model="sendButtonText" :disabled='sendButtonText !== initSendButtonText' v-on:click="sendVerificationCode()"/>
                                     </div>
@@ -160,7 +160,7 @@
 
                         <div id="kc-form-buttons" class="${properties.kcFormGroupClass!}">
                             <input type="hidden" id="id-hidden-input" name="credentialId" <#if auth.selectedCredential?has_content>value="${auth.selectedCredential}"</#if>/>
-                            <input tabindex="4" class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}" name="login" id="kc-login" type="submit" value="${msg("doLogIn")}"/>
+                            <input tabindex="0" class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}" name="login" id="kc-login" type="submit" value="${msg("doLogIn")}"/>
                         </div>
 
                     </form>
@@ -222,7 +222,7 @@
         <#if realm.password && realm.registrationAllowed && !registrationDisabled??>
             <div id="kc-registration-container">
                 <div id="kc-registration">
-                    <span>${msg("noAccount")} <a tabindex="6"
+                    <span>${msg("noAccount")} <a tabindex="0"
                                                  href="${url.registrationUrl}">${msg("doRegister")}</a></span>
                 </div>
             </div>

@@ -26,12 +26,12 @@
                                        class="${properties.kcLabelClass!}">${msg("authenticationCode")}</label>
                             </div>
                             <div class="col-xs-8" style="padding: 0 5px 0 0">
-                                <input tabindex="1" id="code" class="${properties.kcInputClass!}" name="code"
+                                <input tabindex="0" id="code" class="${properties.kcInputClass!}" name="code"
                                        type="text" autofocus
                                        autocomplete="off"/>
                             </div>
                             <div class="col-xs-4" style="padding: 0 0 0 5px">
-                                <input tabindex="2" style="height: 36px"
+                                <input tabindex="0" style="height: 36px"
                                        class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
                                        type="button" v-model="sendButtonText"
                                        :disabled='sendButtonText !== initSendButtonText'
@@ -42,7 +42,7 @@
                         <div id="kc-form-buttons" class="${properties.kcFormGroupClass!}">
                             <input type="hidden" id="id-hidden-input" name="credentialId"
                                    <#if auth.selectedCredential?has_content>value="${auth.selectedCredential}"</#if>/>
-                            <input tabindex="2"
+                            <input tabindex="0"
                                    class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
                                    name="save" id="kc-login" type="submit" value="${msg("doSubmit")}"/>
                         </div>
