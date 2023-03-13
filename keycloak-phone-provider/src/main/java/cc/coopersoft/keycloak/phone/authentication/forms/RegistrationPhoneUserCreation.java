@@ -194,17 +194,21 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
   public void validate(ValidationContext context) {
 
     MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
-
     context.getEvent().detail(Details.REGISTER_METHOD, "form");
 
+    String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
+    context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
+
+    if (isPhoneNumberAsUsername(context)){
+      context.getEvent().detail(Details.USERNAME, phoneNumber);
+      formData.putSingle(UserModel.USERNAME,phoneNumber);
+    }
 
     KeycloakSession session = context.getSession();
     UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
     UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION_USER_CREATION, formData);
 
     String username = profile.getAttributes().getFirstValue(UserModel.USERNAME);
-    String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
-
     context.getEvent().detail(Details.USERNAME, username);
 
     boolean hideName = isHideName(context);
@@ -223,12 +227,6 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       if (context.getRealm().isRegistrationEmailAsUsername()){
         context.getEvent().detail(Details.USERNAME, email);
       }
-    }
-
-    context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
-
-    if (isPhoneNumberAsUsername(context)){
-      context.getEvent().detail(Details.USERNAME, phoneNumber);
     }
 
     boolean success = true;

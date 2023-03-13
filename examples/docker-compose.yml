@@ -21,8 +21,8 @@ services:
 
 
   keycloak:
-    image: coopersoft/keycloak:21.0.1_phone-2.2.1
-#    restart: always
+    image: coopersoft/keycloak:21.0.1_phone-2.2.2
+    #    restart: always
     ports:
       - 8080:8080
     command:
