@@ -132,7 +132,7 @@ public class RegistrationRedirectParametersReader implements FormActionFactory, 
     AuthenticatorConfigModel authenticatorConfig = context.getAuthenticatorConfig();
 
     if (authenticatorConfig == null || authenticatorConfig.getConfig() == null) {
-      logger.error("can`t get config!");
+      logger.error("can't get config!");
       return;
     }
 

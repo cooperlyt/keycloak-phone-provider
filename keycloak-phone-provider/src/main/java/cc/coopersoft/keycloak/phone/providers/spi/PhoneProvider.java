@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface PhoneProvider extends Provider {
 
-    //TODO on key longin support
+    //TODO on key login support
     //boolean Verification(String phoneNumber, String token);
 
     boolean isDuplicatePhoneAllowed(String realm);
