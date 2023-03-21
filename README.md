@@ -1,4 +1,4 @@
-# Keycloak (Quarkus 21.0.1)  Phone Provider
+# Keycloak (Quarkus)  Phone Provider
 ![Build Status](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/compile-and-liveness-check.yml/badge.svg)
 
  + Phone support like e-mail
