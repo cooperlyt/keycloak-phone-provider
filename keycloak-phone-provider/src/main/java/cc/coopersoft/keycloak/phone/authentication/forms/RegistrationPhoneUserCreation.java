@@ -140,11 +140,11 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
         .getOrDefault(CONFIG_PHONE_NUMBER_AS_USERNAME,"true"))){
 
       if (context.getRealm().isRegistrationEmailAsUsername()){
-        logger.warn("Realm set email as username, can`t use phone number.");
+        logger.warn("Realm set email as username, can't use phone number.");
         return false;
       }
       if (Utils.isDuplicatePhoneAllowed(context.getSession())){
-        logger.warn("Duplicate phone allowed! phone number can`t as username.");
+        logger.warn("Duplicate phone allowed! phone number can't as username.");
         return false;
       }
       return true;
