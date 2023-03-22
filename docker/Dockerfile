@@ -1,5 +1,5 @@
 
-FROM quay.io/keycloak/keycloak:21.0.1
+FROM quay.io/keycloak/keycloak:@version.keycloak@
 
 
   # yuntongxin sdk
