@@ -2,7 +2,7 @@
 
 www.aliyun.com
 
-**Not verify in Quarkus 19.0.1**
+**verify on Quarkus 21.0.1 #35 **
 
 ```sh
 cp target/providers/keycloak-phone-provider.jar ${KEYCLOAK_HOME}/providers/
