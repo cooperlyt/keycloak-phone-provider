@@ -11,6 +11,7 @@ import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -139,6 +140,9 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
     String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
     context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
 
+    var phoneProvider = session.getProvider(PhoneProvider.class);
+    phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
+
 
     String verificationCode = formData.getFirst(FIELD_VERIFICATION_CODE);
     TokenCodeRepresentation tokenCode = getTokenCodeService(session).ongoingProcess(phoneNumber, TokenCodeType.REGISTRATION);
@@ -158,10 +162,15 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
   public void success(FormContext context) {
 
     UserModel user = context.getUser();
+    var session = context.getSession();
 
     MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
+
     String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
-    String tokenId = context.getSession().getAttribute("tokenId", String.class);
+    var phoneProvider = session.getProvider(PhoneProvider.class);
+    phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
+
+    String tokenId = session.getAttribute("tokenId", String.class);
 
     logger.info(String.format("registration user %s phone success, tokenId is: %s", user.getId(), tokenId));
     getTokenCodeService(context.getSession()).tokenValidated(user, phoneNumber, tokenId);

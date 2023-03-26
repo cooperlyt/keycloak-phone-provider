@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.keycloak.models.KeycloakSession;
+import com.google.i18n.phonenumbers.NumberParseException;
 
 import javax.validation.constraints.NotBlank;
 import javax.ws.rs.*;
@@ -34,7 +35,11 @@ public class TokenCodeResource {
   public Response getTokenCode(@NotBlank @QueryParam("phoneNumber") String phoneNumber,
                                @QueryParam("kind") String kind) {
 
-    if (StringUtils.isBlank(phoneNumber)) throw new BadRequestException("Must inform a phone number");
+    if (StringUtils.isBlank(phoneNumber)) throw new BadRequestException("Must supply a phone number");
+
+    var phoneProvider = session.getProvider(PhoneProvider.class);
+
+    phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
 
     if (!Utils.getPhoneNumberRegx(session).map(phoneNumber::matches).orElse(true)){
       throw new BadRequestException("Phone number is invalid");
@@ -49,8 +54,7 @@ public class TokenCodeResource {
     }
 
     logger.info(String.format("Requested %s code to %s", tokenCodeType.getLabel(), phoneNumber));
-    int tokenExpiresIn = session.getProvider(PhoneProvider.class)
-        .sendTokenCode(phoneNumber, tokenCodeType, kind);
+    int tokenExpiresIn = phoneProvider.sendTokenCode(phoneNumber, tokenCodeType, kind);
 
     String response = String.format("{\"expires_in\":%s}", tokenExpiresIn);
 

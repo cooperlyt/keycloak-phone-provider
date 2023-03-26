@@ -94,6 +94,11 @@
             <version>${version.keycloak}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+          <groupId>com.googlecode.libphonenumber</groupId>
+          <artifactId>libphonenumber</artifactId>
+          <version>8.13.7</version>
+        </dependency>
     </dependencies>
 
 

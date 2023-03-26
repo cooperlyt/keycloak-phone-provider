@@ -3,6 +3,7 @@ package cc.coopersoft.keycloak.phone.authentication.authenticators.browser;
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import cc.coopersoft.common.OptionalStringUtils;
 import cc.coopersoft.keycloak.phone.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -93,6 +94,8 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
       context.forceChallenge(challengeResponse);
       return false;
     }
+    var phoneProvider = context.getSession().getProvider(PhoneProvider.class);
+    phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
     phoneNumber = phoneNumber.trim();
 
     String code = inputData.getFirst(FIELD_VERIFICATION_CODE);

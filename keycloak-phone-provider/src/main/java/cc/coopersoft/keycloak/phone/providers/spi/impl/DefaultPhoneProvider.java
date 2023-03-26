@@ -7,12 +7,15 @@ import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.MessageSenderService;
+import cc.coopersoft.keycloak.phone.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
 import org.keycloak.models.KeycloakSession;
+import com.google.i18n.phonenumbers.NumberParseException;
 
 import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ServiceUnavailableException;
 import java.time.Instant;
 import java.util.Optional;
@@ -65,7 +68,7 @@ public class DefaultPhoneProvider implements PhoneProvider {
     @Override
     public boolean isDuplicatePhoneAllowed(String realm) {
         Boolean result = config.getBoolean(realm + "-duplicate-phone",null);
-        if (result == null){
+        if (result == null) {
             result = config.getBoolean("duplicate-phone",false);
         }
         return result;
@@ -75,6 +78,24 @@ public class DefaultPhoneProvider implements PhoneProvider {
     public Optional<String> phoneNumberRegx(String realm) {
         return OptionalStringUtils.ofBlank(OptionalStringUtils.ofBlank(config.get(realm + "-number-regx"))
             .orElse(config.get("number-regx")));
+    }
+
+    @Override
+    public String canonicalizePhoneNumber(String phoneNumber) {
+        if (config.getBoolean("canonicalize-phone-numbers",false)) {
+            try {
+                return Utils.canonicalizePhoneNumber(session, phoneNumber, defaultPhoneRegion());
+            } catch (NumberParseException e) {
+                throw new BadRequestException("Unable to parse phone number. " + e.toString());
+            }
+        } else {
+            return phoneNumber;
+        }
+    }
+
+    @Override
+    public Optional<String> defaultPhoneRegion() {
+        return OptionalStringUtils.ofEmpty(config.get("phone-region"));
     }
 
     @Override

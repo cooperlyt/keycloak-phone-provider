@@ -16,4 +16,9 @@ public interface PhoneProvider extends Provider {
     Optional<String> phoneNumberRegx(String realm);
 
     int sendTokenCode(String phoneNumber, TokenCodeType type, String kind);
+
+    String canonicalizePhoneNumber(String phoneNumber);
+
+    Optional<String> defaultPhoneRegion();
+
 }
