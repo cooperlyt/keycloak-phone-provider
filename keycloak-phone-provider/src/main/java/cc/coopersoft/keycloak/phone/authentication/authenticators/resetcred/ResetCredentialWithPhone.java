@@ -4,6 +4,7 @@ import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.common.OptionalStringUtils;
 import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
+import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -117,10 +118,10 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
 
       try {
         phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
-      } catch (NumberParseException e) {
+      } catch (PhoneNumberInvalidException e) {
         context.getEvent().error(Errors.USERNAME_MISSING);
         Response challenge = challenge(context, FIELD_PHONE_NUMBER,
-            SupportPhonePages.Errors.NUMBER_INVALID.message(), phoneNumber);
+            e.getErrorType().message(), phoneNumber);
         context.forceChallenge(challenge);
         return false;
       }

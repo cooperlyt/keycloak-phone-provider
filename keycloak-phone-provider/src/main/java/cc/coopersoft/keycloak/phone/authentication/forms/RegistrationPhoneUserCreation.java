@@ -1,8 +1,7 @@
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
 import cc.coopersoft.keycloak.phone.Utils;
-import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
-import com.google.i18n.phonenumbers.NumberParseException;
+import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -220,10 +219,10 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
           context.validationError(formData, errors);
           success = false;
         }
-      } catch (NumberParseException e) {
+      } catch (PhoneNumberInvalidException e) {
 
         context.error(Errors.INVALID_REGISTRATION);
-        errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.NUMBER_INVALID.message()));
+        errors.add(new FormMessage(FIELD_PHONE_NUMBER, e.getErrorType().message()));
         context.validationError(formData, errors);
         success = false;
       }
@@ -291,7 +290,7 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
     var session = context.getSession();
     try {
       phoneNumber = Utils.canonicalizePhoneNumber(session,phoneNumber);
-    } catch (NumberParseException e) {
+    } catch (PhoneNumberInvalidException e) {
       // verified in validate process
       throw new IllegalStateException();
     }

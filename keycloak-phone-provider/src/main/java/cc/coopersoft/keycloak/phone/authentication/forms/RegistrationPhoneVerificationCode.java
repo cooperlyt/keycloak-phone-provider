@@ -5,6 +5,7 @@ import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
+import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
@@ -145,9 +146,9 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
 
     try {
       phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
-    } catch (NumberParseException e) {
+    } catch (PhoneNumberInvalidException e) {
       context.error(Errors.INVALID_REGISTRATION);
-      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.NUMBER_INVALID));
+      errors.add(new FormMessage(FIELD_PHONE_NUMBER, e.getErrorType().message()));
       context.validationError(formData, errors);
       return;
     }
@@ -180,7 +181,7 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
 
     try {
       phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
-    } catch (NumberParseException e) {
+    } catch (PhoneNumberInvalidException e) {
       //verified in validate process
       throw new IllegalStateException();
     }

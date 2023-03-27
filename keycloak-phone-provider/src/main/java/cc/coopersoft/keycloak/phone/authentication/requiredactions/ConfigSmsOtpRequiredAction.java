@@ -5,6 +5,7 @@ import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
+import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -59,9 +60,9 @@ public class ConfigSmsOtpRequiredAction implements RequiredActionProvider {
                     .setError(SupportPhonePages.Errors.NOT_MATCH.message())
                     .createForm("login-update-phone-number.ftl");
             context.challenge(challenge);
-        } catch (NumberParseException e) {
+        } catch (PhoneNumberInvalidException e) {
             Response challenge = context.form()
-                .setError(SupportPhonePages.Errors.NUMBER_INVALID.message())
+                .setError(e.getErrorType().message())
                 .createForm("login-sms-otp-config.ftl");
             context.challenge(challenge);
         }

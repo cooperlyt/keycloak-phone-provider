@@ -2,6 +2,7 @@ package cc.coopersoft.keycloak.phone.authentication.authenticators.browser;
 
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
+import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import cc.coopersoft.common.OptionalStringUtils;
 import cc.coopersoft.keycloak.phone.Utils;
@@ -126,11 +127,11 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
             context.failureChallenge(AuthenticationFlowError.INVALID_USER, challengeResponse);
             return false;
           });
-    } catch (NumberParseException e) {
+    } catch (PhoneNumberInvalidException e) {
       context.getEvent().error(Errors.USERNAME_MISSING);
       context.form().setAttribute(ATTEMPTED_PHONE_ACTIVATED, true)
           .setAttribute(ATTEMPTED_PHONE_NUMBER, phoneNumber);
-      Response challengeResponse = challenge(context,SupportPhonePages.Errors.NUMBER_INVALID.message(), FIELD_PHONE_NUMBER);
+      Response challengeResponse = challenge(context,e.getErrorType().message(), FIELD_PHONE_NUMBER);
       context.failureChallenge(AuthenticationFlowError.INVALID_USER, challengeResponse);
       return false;
     }

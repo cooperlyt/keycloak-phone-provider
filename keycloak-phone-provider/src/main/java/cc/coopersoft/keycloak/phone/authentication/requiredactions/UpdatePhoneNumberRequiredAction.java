@@ -2,6 +2,7 @@ package cc.coopersoft.keycloak.phone.authentication.requiredactions;
 
 import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
+import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -50,10 +51,10 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
                     .setError(SupportPhonePages.Errors.NOT_MATCH.message())
                     .createForm("login-update-phone-number.ftl");
             context.challenge(challenge);
-        } catch (NumberParseException e) {
+        } catch (PhoneNumberInvalidException e) {
             Response challenge = context.form()
                 .setAttribute("phoneNumber", phoneNumber)
-                .setError(SupportPhonePages.Errors.NUMBER_INVALID.message())
+                .setError(e.getErrorType().message())
                 .createForm("login-update-phone-number.ftl");
             context.challenge(challenge);
         }
