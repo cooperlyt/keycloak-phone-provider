@@ -40,9 +40,9 @@ This is what you can do for now:
 Current version: `2.3.1-snapshot`
 ## Features
 ### New in Version 2.3.1
-    + Canonicalize phone numbers using Google's libphonenumbers 
-    + Valid phone number using Google's libphonenumbers 
-    + Remove cli param `number-regx`
++ Canonicalize phone numbers using Google's libphonenumbers 
++ Valid phone number using Google's libphonenumbers 
++ Remove cli param `number-regx`
 
 ### New in Version 2.2.2
 + fix phone number as username bug [#24](https://github.com/cooperlyt/keycloak-phone-provider/issues/24)
