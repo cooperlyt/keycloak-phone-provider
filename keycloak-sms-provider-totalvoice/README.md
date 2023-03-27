@@ -10,6 +10,6 @@ cp target/providers/keycloak-sms-provider-totalvoice.jar ${KEYCLOAK_HOME}/provid
 
 ${KEYCLOAK_HOME}/bin/kc.sh build
 
-${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-message-service-default-service=totalvoice \
+${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-service-default-service=totalvoice \
   --spi-message-sender-service-totalvoice-token=${token} 
 ```

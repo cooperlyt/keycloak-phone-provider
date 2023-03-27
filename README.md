@@ -86,7 +86,7 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
     --spi-phone-default-hour-maximum=3 # How many send sms count in one hour.
     --spi-phone-default-[$realm-]duplicate-phone=false # allow one phone register multi user
     --spi-phone-default-[$realm-]number-regx=^\+?\d+$
-    --spi-phone-canonicalize-phone-numbers=true # whether to parse user-supplied phone numbers and put into canonical International E.163 format.  _Required for proper duplicate phone number detection_
+    --spi-phone-default-canonicalize-phone-numbers=true # whether to parse user-supplied phone numbers and put into canonical International E.163 format.  _Required for proper duplicate phone number detection_
     --spi-phone-default-phone-region=US # a default region to be used when parsing user-supplied phone numbers. Lookup codes at https://www.unicode.org/cldr/cldr-aux/charts/30/supplemental/territory_information.html
 
 
