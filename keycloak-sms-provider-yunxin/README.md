@@ -10,7 +10,7 @@ cp target/providers/keycloak-sms-provider-yunxin.jar ${KEYCLOAK_HOME}/providers/
 
 ${KEYCLOAK_HOME}/bin/kc.sh build
 
-${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-service-default-service=yunxin \
+${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-default-service=yunxin \
   --spi-message-sender-service-yunxin-secret=${secret} \
   --spi-message-sender-service-yunxin-app=${AppId} \
   --spi-message-sender-service-yunxin-opt-template=${templateId} 

@@ -12,7 +12,7 @@ cp target/providers/keycloak-sms-provider-aliyun.jar ${KEYCLOAK_HOME}/providers/
 
 ${KEYCLOAK_HOME}/bin/kc.sh build
 
-${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-service-default-service=aliyun \
+${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-default-service=aliyun \
   --spi-message-sender-service-aliyun-region=cn-hangzhou \
   --spi-message-sender-service-aliyun-key=${accessKey} \
   --spi-message-sender-service-aliyun-secret=${accessSecret} \

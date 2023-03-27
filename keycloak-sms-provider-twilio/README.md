@@ -10,7 +10,7 @@ cp target/providers/keycloak-sms-provider-twilio.jar ${KEYCLOAK_HOME}/providers/
 
 ${KEYCLOAK_HOME}/bin/kc.sh build
 
-${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-service-default-service=twilio \
+${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-default-service=twilio \
   --spi-message-sender-service-twilio-account=${account} \
   --spi-message-sender-service-twilio-token=${token} \
   --spi-message-sender-service-twilio-number=${servicePhoneNumber} 
