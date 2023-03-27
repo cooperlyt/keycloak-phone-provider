@@ -10,7 +10,6 @@ import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.jpa.TokenCode;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
-import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.credential.CredentialModel;
@@ -18,6 +17,7 @@ import org.keycloak.credential.CredentialProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.services.validation.Validation;
 import org.keycloak.util.JsonSerialization;
 
 import javax.persistence.EntityManager;
@@ -162,7 +162,7 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
                             try {
                                 PhoneOtpCredentialModel.SmsOtpCredentialData credentialData =
                                     JsonSerialization.readValue(c.getCredentialData(), PhoneOtpCredentialModel.SmsOtpCredentialData.class);
-                                if (StringUtils.isBlank(credentialData.getPhoneNumber())){
+                                if (Validation.isBlank(credentialData.getPhoneNumber())){
                                     return true;
                                 }
                                 return credentialData.getPhoneNumber().equals(user.getFirstAttribute("phoneNumber"));
@@ -172,7 +172,7 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
                             }
                         })
                         .map(CredentialModel::getId)
-                        .collect(Collectors.toList())
+                        .toList()
                         .forEach(id -> u.credentialManager().removeStoredCredentialById(id));
                 });
         }

@@ -7,15 +7,12 @@ import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.MessageSenderService;
-import cc.coopersoft.keycloak.phone.Utils;
-import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
 import org.keycloak.models.KeycloakSession;
-import com.google.i18n.phonenumbers.NumberParseException;
+import org.keycloak.services.validation.Validation;
 
 import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ServiceUnavailableException;
 import java.time.Instant;
 import java.util.Optional;
@@ -42,19 +39,17 @@ public class DefaultPhoneProvider implements PhoneProvider {
                                 .stream().findFirst().orElse(null)
                 );
 
-        if (StringUtils.isBlank(this.service)){
+        if (Validation.isBlank(this.service)){
             logger.error("Message sender service provider not found!");
         }
 
-        if (StringUtils.isBlank(config.get("service")))
+        if (Validation.isBlank(config.get("service")))
             logger.warn("No message sender service provider specified! Default provider'" +
                 this.service + "' will be used. You can use keycloak start param '--spi-phone-default-service' to specify a different one. ");
 
         this.tokenExpiresIn = config.getInt("tokenExpiresIn", 60);
         this.hourMaximum = config.getInt("hourMaximum",3);
     }
-
-
 
     @Override
     public void close() {
@@ -65,38 +60,44 @@ public class DefaultPhoneProvider implements PhoneProvider {
         return session.getProvider(PhoneVerificationCodeProvider.class);
     }
 
-    @Override
-    public boolean isDuplicatePhoneAllowed(String realm) {
-        Boolean result = config.getBoolean(realm + "-duplicate-phone",null);
+    private String getRealmName(){
+        return session.getContext().getRealm().getName();
+    }
+
+    private Optional<String> getStringConfigValue(String configName){
+        return OptionalStringUtils.ofBlank(OptionalStringUtils.ofBlank(config.get(getRealmName() + "-" + configName))
+            .orElse(config.get(configName)));
+    }
+
+    private boolean getBooleanConfigValue(String configName, boolean defaultValue){
+        Boolean result = config.getBoolean(getRealmName() + "-" + configName,null);
         if (result == null) {
-            result = config.getBoolean("duplicate-phone",false);
+            result = config.getBoolean(configName,defaultValue);
         }
         return result;
     }
 
     @Override
-    public Optional<String> phoneNumberRegx(String realm) {
-        return OptionalStringUtils.ofBlank(OptionalStringUtils.ofBlank(config.get(realm + "-number-regx"))
-            .orElse(config.get("number-regx")));
+    public boolean isDuplicatePhoneAllowed() {
+        return getBooleanConfigValue("duplicate-phone", false);
     }
 
     @Override
-    public String canonicalizePhoneNumber(String phoneNumber) {
-        if (config.getBoolean("canonicalize-phone-numbers",false)) {
-            try {
-                return Utils.canonicalizePhoneNumber(session, phoneNumber, defaultPhoneRegion());
-            } catch (NumberParseException e) {
-                throw new BadRequestException("Unable to parse phone number. " + e.toString());
-            }
-        } else {
-            return phoneNumber;
-        }
+    public boolean validPhoneNumber() {
+        return getBooleanConfigValue("valid-phone", true);
+    }
+
+    @Override
+    public boolean canonicalizePhoneNumber() {
+        return getBooleanConfigValue("canonicalize-phone-numbers", true);
     }
 
     @Override
     public Optional<String> defaultPhoneRegion() {
-        return OptionalStringUtils.ofEmpty(config.get("phone-region"));
+        return getStringConfigValue("default-phone-region");
     }
+
+
 
     @Override
     public int sendTokenCode(String phoneNumber,TokenCodeType type, String kind){

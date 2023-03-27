@@ -4,10 +4,18 @@ public class SupportPhonePages {
 
   public enum Errors{
     MISSING("requiredPhoneNumber"),
+
+    USER_NOT_FOUND("phoneUserNotFound"),
+
+    NUMBER_INVALID("invalidPhoneNumber"),
+
+    NO_PROCESS("noOngoingVerificationProcess"),
+
     EXISTS("phoneNumberExists"),
     ABUSED("abusedMessageService") ,
     NOT_MATCH("authenticationCodeDoesNotMatch"),
     FAIL("sendVerificationCodeFail");
+
 
     private final String errorMessage;
 
@@ -32,7 +40,8 @@ public class SupportPhonePages {
   public static final String ATTEMPTED_PHONE_ACTIVATED = "attemptedPhoneActivated";
 
 
-  public static final String MESSAGE_PHONE_USER_NOT_FOUND = "phoneUserNotFound";
-  public static final String MESSAGE_VERIFICATION_CODE_NOT_MATCH = "verificationCodeDoesNotMatch";
+//  public static final String MESSAGE_PHONE_USER_NOT_FOUND = "phoneUserNotFound";
+//  public static final String MESSAGE_VERIFICATION_CODE_NOT_MATCH = "verificationCodeDoesNotMatch";
+
 
 }

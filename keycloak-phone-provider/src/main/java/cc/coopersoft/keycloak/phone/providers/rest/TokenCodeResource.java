@@ -3,11 +3,11 @@ package cc.coopersoft.keycloak.phone.providers.rest;
 import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
-import org.apache.commons.lang.StringUtils;
+import com.google.i18n.phonenumbers.NumberParseException;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.keycloak.models.KeycloakSession;
-import com.google.i18n.phonenumbers.NumberParseException;
+import org.keycloak.services.validation.Validation;
 
 import javax.validation.constraints.NotBlank;
 import javax.ws.rs.*;
@@ -35,13 +35,13 @@ public class TokenCodeResource {
   public Response getTokenCode(@NotBlank @QueryParam("phoneNumber") String phoneNumber,
                                @QueryParam("kind") String kind) {
 
-    if (StringUtils.isBlank(phoneNumber)) throw new BadRequestException("Must supply a phone number");
+    if (Validation.isBlank(phoneNumber)) throw new BadRequestException("Must supply a phone number");
 
     var phoneProvider = session.getProvider(PhoneProvider.class);
 
-    phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
-
-    if (!Utils.getPhoneNumberRegx(session).map(phoneNumber::matches).orElse(true)){
+    try {
+      phoneNumber = Utils.canonicalizePhoneNumber(session,phoneNumber);
+    } catch (NumberParseException e) {
       throw new BadRequestException("Phone number is invalid");
     }
 

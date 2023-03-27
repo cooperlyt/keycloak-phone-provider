@@ -1,10 +1,6 @@
-/**
- * add by zhangzhl
- * 2020-07-27
- * 注册页手机号码必填验证
- */
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
+import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
@@ -12,6 +8,7 @@ import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
+import com.google.i18n.phonenumbers.NumberParseException;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -138,18 +135,31 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
     KeycloakSession session = context.getSession();
 
     String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
+
+    if (Validation.isBlank(phoneNumber)){
+      context.error(Errors.INVALID_REGISTRATION);
+      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING));
+      context.validationError(formData, errors);
+      return;
+    }
+
+    try {
+      phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
+    } catch (NumberParseException e) {
+      context.error(Errors.INVALID_REGISTRATION);
+      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.NUMBER_INVALID));
+      context.validationError(formData, errors);
+      return;
+    }
+
     context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
-
-    var phoneProvider = session.getProvider(PhoneProvider.class);
-    phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
-
 
     String verificationCode = formData.getFirst(FIELD_VERIFICATION_CODE);
     TokenCodeRepresentation tokenCode = getTokenCodeService(session).ongoingProcess(phoneNumber, TokenCodeType.REGISTRATION);
     if (Validation.isBlank(verificationCode) || tokenCode == null || !tokenCode.getCode().equals(verificationCode)) {
       context.error(Errors.INVALID_REGISTRATION);
       formData.remove(FIELD_VERIFICATION_CODE);
-      errors.add(new FormMessage(FIELD_VERIFICATION_CODE, "verificationCodeDoesNotMatch"));
+      errors.add(new FormMessage(FIELD_VERIFICATION_CODE, SupportPhonePages.Errors.NOT_MATCH.message()));
       context.validationError(formData, errors);
       return;
     }
@@ -167,8 +177,13 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
     MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
 
     String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
-    var phoneProvider = session.getProvider(PhoneProvider.class);
-    phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
+
+    try {
+      phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
+    } catch (NumberParseException e) {
+      //verified in validate process
+      throw new IllegalStateException();
+    }
 
     String tokenId = session.getAttribute("tokenId", String.class);
 

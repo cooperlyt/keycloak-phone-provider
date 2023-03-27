@@ -2,6 +2,7 @@ package cc.coopersoft.keycloak.phone.authentication.forms;
 
 import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
+import com.google.i18n.phonenumbers.NumberParseException;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -194,18 +195,46 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
   @Override
   public void validate(ValidationContext context) {
 
+    KeycloakSession session = context.getSession();
+
+
     MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
     context.getEvent().detail(Details.REGISTER_METHOD, "form");
 
     String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
-    context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
 
+    boolean success = true;
+    List<FormMessage> errors = new ArrayList<>();
+    if (Validation.isBlank(phoneNumber)) {
+      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message()));
+      context.error(Errors.INVALID_REGISTRATION);
+      context.validationError(formData, errors);
+      success = false;
+    }else {
+      try {
+        phoneNumber = Utils.canonicalizePhoneNumber(session,phoneNumber);
+        if (!Utils.isDuplicatePhoneAllowed(session) &&
+            Utils.findUserByPhone(session.users(), context.getRealm(), phoneNumber).isPresent()) {
+          context.error(Errors.INVALID_REGISTRATION);
+          errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.EXISTS.message()));
+          context.validationError(formData, errors);
+          success = false;
+        }
+      } catch (NumberParseException e) {
+
+        context.error(Errors.INVALID_REGISTRATION);
+        errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.NUMBER_INVALID.message()));
+        context.validationError(formData, errors);
+        success = false;
+      }
+    }
+
+    context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
     if (isPhoneNumberAsUsername(context)){
       context.getEvent().detail(Details.USERNAME, phoneNumber);
       formData.putSingle(UserModel.USERNAME,phoneNumber);
     }
 
-    KeycloakSession session = context.getSession();
     UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
     UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION_USER_CREATION, formData);
 
@@ -230,26 +259,6 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       }
     }
 
-    if (!Validation.isBlank(phoneNumber)) {
-      var phoneProvider = session.getProvider(PhoneProvider.class);
-      phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
-    }
-
-    boolean success = true;
-    List<FormMessage> errors = new ArrayList<>();
-    if (Validation.isBlank(phoneNumber)) {
-      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message()));
-      context.error(Errors.INVALID_REGISTRATION);
-      context.validationError(formData, errors);
-      success = false;
-    } else if (!Utils.isDuplicatePhoneAllowed(session) &&
-        Utils.findUserByPhone(session.users(), context.getRealm(), phoneNumber).isPresent()) {
-      context.error(Errors.INVALID_REGISTRATION);
-      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.EXISTS.message()));
-      context.validationError(formData, errors);
-      success = false;
-    }
-
     try {
       profile.validate();
     } catch (ValidationException pve) {
@@ -263,7 +272,6 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       success = false;
       errors.addAll(Validation.getFormErrorsFromValidation(pve.getErrors()));
     }
-
 
     if (success) {
       context.success();
@@ -281,8 +289,12 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
     String username = formData.getFirst(UserModel.USERNAME);
 
     var session = context.getSession();
-    var phoneProvider = session.getProvider(PhoneProvider.class);
-    phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
+    try {
+      phoneNumber = Utils.canonicalizePhoneNumber(session,phoneNumber);
+    } catch (NumberParseException e) {
+      // verified in validate process
+      throw new IllegalStateException();
+    }
 
     if (context.getRealm().isRegistrationEmailAsUsername()){
       username = email;

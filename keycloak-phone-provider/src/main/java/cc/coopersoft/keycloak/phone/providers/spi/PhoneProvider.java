@@ -11,14 +11,16 @@ public interface PhoneProvider extends Provider {
     //TODO on key login support
     //boolean Verification(String phoneNumber, String token);
 
-    boolean isDuplicatePhoneAllowed(String realm);
+    boolean isDuplicatePhoneAllowed();
 
-    Optional<String> phoneNumberRegx(String realm);
+    boolean validPhoneNumber();
+
+    boolean canonicalizePhoneNumber();
+
+    Optional<String> defaultPhoneRegion();
 
     int sendTokenCode(String phoneNumber, TokenCodeType type, String kind);
 
-    String canonicalizePhoneNumber(String phoneNumber);
 
-    Optional<String> defaultPhoneRegion();
 
 }

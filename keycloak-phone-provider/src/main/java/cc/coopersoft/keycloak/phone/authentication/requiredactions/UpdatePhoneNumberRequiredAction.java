@@ -1,8 +1,10 @@
 package cc.coopersoft.keycloak.phone.authentication.requiredactions;
 
+import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
+import com.google.i18n.phonenumbers.NumberParseException;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 
@@ -29,16 +31,15 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
     public void processAction(RequiredActionContext context) {
         PhoneVerificationCodeProvider phoneVerificationCodeProvider = context.getSession().getProvider(PhoneVerificationCodeProvider.class);
         String phoneNumber = context.getHttpRequest().getDecodedFormParameters().getFirst(SupportPhonePages.FIELD_PHONE_NUMBER);
-        var phoneProvider = context.getSession().getProvider(PhoneProvider.class);
-        phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
         String code = context.getHttpRequest().getDecodedFormParameters().getFirst(SupportPhonePages.FIELD_VERIFICATION_CODE);
         try {
+            phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
             phoneVerificationCodeProvider.validateCode(context.getUser(), phoneNumber, code);
             context.success();
         } catch (BadRequestException e) {
 
             Response challenge = context.form()
-                    .setError("noOngoingVerificationProcess")
+                    .setError(SupportPhonePages.Errors.NO_PROCESS.message())
                     .createForm("login-update-phone-number.ftl");
             context.challenge(challenge);
 
@@ -46,8 +47,14 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
             Response challenge = context.form()
                     .setAttribute("phoneNumber", phoneNumber)
-                    .setError("verificationCodeDoesNotMatch")
+                    .setError(SupportPhonePages.Errors.NOT_MATCH.message())
                     .createForm("login-update-phone-number.ftl");
+            context.challenge(challenge);
+        } catch (NumberParseException e) {
+            Response challenge = context.form()
+                .setAttribute("phoneNumber", phoneNumber)
+                .setError(SupportPhonePages.Errors.NUMBER_INVALID.message())
+                .createForm("login-update-phone-number.ftl");
             context.challenge(challenge);
         }
     }

@@ -83,11 +83,11 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
   kc.[sh|bat] start \
     --spi-phone-default-service=[dummy|aws|aliyun|cloopen| ...]  # Which sms provider
     --spi-phone-default-token-expires-in=60  # sms expires ,default 60 second
-    --spi-phone-default-hour-maximum=3 # How many send sms count in one hour.
-    --spi-phone-default-[$realm-]duplicate-phone=false # allow one phone register multi user
-    --spi-phone-default-[$realm-]number-regx=^\+?\d+$
-    --spi-phone-default-canonicalize-phone-numbers=true # whether to parse user-supplied phone numbers and put into canonical International E.163 format.  _Required for proper duplicate phone number detection_
-    --spi-phone-default-phone-region=US # a default region to be used when parsing user-supplied phone numbers. Lookup codes at https://www.unicode.org/cldr/cldr-aux/charts/30/supplemental/territory_information.html
+    --spi-phone-default-hour-maximum=3 # How many send sms count in one hour, default 3
+    --spi-phone-default-[$realm-]duplicate-phone=false # allow one phone register multi user, default: false
+    --spi-phone-default-[$realm-]valid-phone=true # valid phone number, default: true
+    --spi-phone-default-[$realm-]canonicalize-phone-numbers=true # whether to parse user-supplied phone numbers and put into canonical International E.163 format.  _Required for proper duplicate phone number detection_
+    --spi-phone-default-[$realm-]default-phone-region=US # a default region to be used when parsing user-supplied phone numbers. Lookup codes at https://www.unicode.org/cldr/cldr-aux/charts/30/supplemental/territory_information.html
 
 
     ...  # provider param refer provider`s readme.md

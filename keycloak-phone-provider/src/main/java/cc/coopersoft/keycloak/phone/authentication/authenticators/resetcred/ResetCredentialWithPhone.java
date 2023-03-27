@@ -6,7 +6,7 @@ import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
-import org.apache.commons.lang.StringUtils;
+import com.google.i18n.phonenumbers.NumberParseException;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -99,7 +99,7 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
 
     UserModel user;
     if (!byPhone){
-      if (StringUtils.isBlank(username)) {
+      if (Validation.isBlank(username)) {
         context.getEvent().error(Errors.USERNAME_MISSING);
         Response challenge = challenge(context, Validation.FIELD_USERNAME, Messages.MISSING_USERNAME);
         context.failureChallenge(AuthenticationFlowError.INVALID_USER, challenge);
@@ -108,18 +108,26 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
       user = getUserByUsername(context, username.trim());
     }else{
 
-      if (StringUtils.isBlank(phoneNumber)) {
+      if (Validation.isBlank(phoneNumber)) {
         context.getEvent().error(Errors.USERNAME_MISSING);
         Response challenge = challenge(context, FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message(), phoneNumber);
         context.forceChallenge(challenge);
         return false;
       }
 
-      phoneNumber = phoneNumber.trim();
-      var phoneProvider = context.getSession().getProvider(PhoneProvider.class);
-      phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
+      try {
+        phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
+      } catch (NumberParseException e) {
+        context.getEvent().error(Errors.USERNAME_MISSING);
+        Response challenge = challenge(context, FIELD_PHONE_NUMBER,
+            SupportPhonePages.Errors.NUMBER_INVALID.message(), phoneNumber);
+        context.forceChallenge(challenge);
+        return false;
+      }
+
+
       String verificationCode = inputData.getFirst(FIELD_VERIFICATION_CODE);
-      if (StringUtils.isBlank(verificationCode)) {
+      if (Validation.isBlank(verificationCode)) {
         invalidVerificationCode(context, phoneNumber);
         return false;
       }
@@ -176,7 +184,7 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
       if(!byPhone){
         context.getEvent().detail(Details.USERNAME, attempted);
       }
-      Response challenge = byPhone ? challenge(context, FIELD_PHONE_NUMBER, MESSAGE_PHONE_USER_NOT_FOUND , attempted) : challenge(context, Validation.FIELD_USERNAME, Messages.INVALID_USERNAME_OR_EMAIL);
+      Response challenge = byPhone ? challenge(context, FIELD_PHONE_NUMBER, SupportPhonePages.Errors.USER_NOT_FOUND.message(), attempted) : challenge(context, Validation.FIELD_USERNAME, Messages.INVALID_USERNAME_OR_EMAIL);
       context.forceChallenge(challenge);
       return false;
     }
@@ -202,7 +210,7 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
 
   protected void invalidVerificationCode(AuthenticationFlowContext context, String phoneNumber) {
     context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
-    Response challenge = challenge(context, FIELD_VERIFICATION_CODE, MESSAGE_VERIFICATION_CODE_NOT_MATCH, phoneNumber);
+    Response challenge = challenge(context, FIELD_VERIFICATION_CODE, SupportPhonePages.Errors.NOT_MATCH.message(), phoneNumber);
     context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
   }
 

@@ -1,7 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
 import okhttp3.HttpUrl;
-import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -17,7 +16,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.keycloak.provider.ProviderConfigProperty.MULTIVALUED_STRING_TYPE;
 import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
 
 public class RegistrationRedirectParametersReader implements FormActionFactory, FormAction {
@@ -138,7 +136,7 @@ public class RegistrationRedirectParametersReader implements FormActionFactory, 
 
     String params = authenticatorConfig.getConfig().get(PARAM_NAMES);
 
-    if (StringUtils.isBlank(params)) {
+    if (Validation.isBlank(params)) {
       logger.warn("accept params is not configure.");
       return;
     }
