@@ -6,6 +6,10 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserProvider;
 
+import com.google.i18n.phonenumbers.*;
+import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
+
+
 import java.util.Comparator;
 import java.util.Optional;
 
@@ -45,6 +49,18 @@ public class Utils {
 
     public static Optional<String> getPhoneNumberRegx(KeycloakSession session){
         return session.getProvider(PhoneProvider.class).phoneNumberRegx(session.getContext().getRealm().getName());
+    }
+
+    /**
+    * Parses a phone number with google's libphonenumber and then outputs it's
+    * international canonical form
+    *
+    */
+    public static String canonicalizePhoneNumber(KeycloakSession session, String phoneNumber, Optional<String> defaultRegion) throws NumberParseException {
+        var phoneNumberUtil = PhoneNumberUtil.getInstance();
+
+        var parsedNumber = phoneNumberUtil.parse(phoneNumber, defaultRegion.isPresent() ? defaultRegion.get() : null);
+        return phoneNumberUtil.format(parsedNumber,  PhoneNumberFormat.INTERNATIONAL);
     }
 
 }

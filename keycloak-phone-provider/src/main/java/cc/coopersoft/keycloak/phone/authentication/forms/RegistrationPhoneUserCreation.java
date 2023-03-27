@@ -1,6 +1,7 @@
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
 import cc.coopersoft.keycloak.phone.Utils;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -144,7 +145,7 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
         return false;
       }
       if (Utils.isDuplicatePhoneAllowed(context.getSession())){
-        logger.warn("Duplicate phone allowed! phone number can't as username.");
+        logger.warn("Duplicate phone allowed! phone number can't be used as username.");
         return false;
       }
       return true;
@@ -229,6 +230,11 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       }
     }
 
+    if (!Validation.isBlank(phoneNumber)) {
+      var phoneProvider = session.getProvider(PhoneProvider.class);
+      phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
+    }
+
     boolean success = true;
     List<FormMessage> errors = new ArrayList<>();
     if (Validation.isBlank(phoneNumber)) {
@@ -236,8 +242,8 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       context.error(Errors.INVALID_REGISTRATION);
       context.validationError(formData, errors);
       success = false;
-    } else if (!Utils.isDuplicatePhoneAllowed(context.getSession()) &&
-        Utils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber).isPresent()) {
+    } else if (!Utils.isDuplicatePhoneAllowed(session) &&
+        Utils.findUserByPhone(session.users(), context.getRealm(), phoneNumber).isPresent()) {
       context.error(Errors.INVALID_REGISTRATION);
       errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.EXISTS.message()));
       context.validationError(formData, errors);
@@ -274,6 +280,9 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
     String email = formData.getFirst(UserModel.EMAIL);
     String username = formData.getFirst(UserModel.USERNAME);
 
+    var session = context.getSession();
+    var phoneProvider = session.getProvider(PhoneProvider.class);
+    phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
 
     if (context.getRealm().isRegistrationEmailAsUsername()){
       username = email;
@@ -290,7 +299,6 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       context.getEvent().detail(Details.EMAIL,email);
     }
 
-    KeycloakSession session = context.getSession();
     UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
     UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION_USER_CREATION, formData);
     UserModel user = profile.create();

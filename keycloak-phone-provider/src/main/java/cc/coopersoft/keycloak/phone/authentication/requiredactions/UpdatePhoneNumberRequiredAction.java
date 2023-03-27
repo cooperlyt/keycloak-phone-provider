@@ -2,6 +2,7 @@ package cc.coopersoft.keycloak.phone.authentication.requiredactions;
 
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 
@@ -28,6 +29,8 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
     public void processAction(RequiredActionContext context) {
         PhoneVerificationCodeProvider phoneVerificationCodeProvider = context.getSession().getProvider(PhoneVerificationCodeProvider.class);
         String phoneNumber = context.getHttpRequest().getDecodedFormParameters().getFirst(SupportPhonePages.FIELD_PHONE_NUMBER);
+        var phoneProvider = context.getSession().getProvider(PhoneProvider.class);
+        phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
         String code = context.getHttpRequest().getDecodedFormParameters().getFirst(SupportPhonePages.FIELD_VERIFICATION_CODE);
         try {
             phoneVerificationCodeProvider.validateCode(context.getUser(), phoneNumber, code);

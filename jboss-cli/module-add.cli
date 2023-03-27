@@ -2,7 +2,8 @@
 
 
 # main provider
-module add --name=keycloak-phone-provider --resources=keycloak-phone-provider.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-common,org.hibernate,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-services,org.keycloak.keycloak-model-jpa,org.jboss.logging,javax.api,javax.ws.rs.api,javax.transaction.api,javax.persistence.api,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,org.apache.commons.lang,javax.xml.bind.api,com.squareup.okhttp3
+module add --name=com.googlecode.libphonenumber --resources=libphonenumber-8.13.7.jar
+module add --name=keycloak-phone-provider --resources=keycloak-phone-provider.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-common,org.hibernate,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-services,org.keycloak.keycloak-model-jpa,org.jboss.logging,javax.api,javax.ws.rs.api,javax.transaction.api,javax.persistence.api,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,org.apache.commons.lang,javax.xml.bind.api,com.squareup.okhttp3,com.googlecode.libphonenumber
 
 # dummy provider
 module add --name=keycloak-sms-provider-dummy --resources=keycloak-sms-provider-dummy.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider

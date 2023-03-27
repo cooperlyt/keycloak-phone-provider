@@ -4,6 +4,7 @@ import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.credential.CredentialProvider;
@@ -30,8 +31,11 @@ public class ConfigSmsOtpRequiredAction implements RequiredActionProvider {
 
     @Override
     public void processAction(RequiredActionContext context) {
-        PhoneVerificationCodeProvider phoneVerificationCodeProvider = context.getSession().getProvider(PhoneVerificationCodeProvider.class);
+        var session = context.getSession();
+        PhoneVerificationCodeProvider phoneVerificationCodeProvider = session.getProvider(PhoneVerificationCodeProvider.class);
         String phoneNumber = context.getHttpRequest().getDecodedFormParameters().getFirst("phoneNumber");
+        var phoneProvider = session.getProvider(PhoneProvider.class);
+        phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
         String code = context.getHttpRequest().getDecodedFormParameters().getFirst("code");
         try {
             phoneVerificationCodeProvider.validateCode(context.getUser(), phoneNumber, code);

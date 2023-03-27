@@ -5,6 +5,7 @@ import cc.coopersoft.common.OptionalStringUtils;
 import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
@@ -115,6 +116,8 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
       }
 
       phoneNumber = phoneNumber.trim();
+      var phoneProvider = context.getSession().getProvider(PhoneProvider.class);
+      phoneNumber = phoneProvider.canonicalizePhoneNumber(phoneNumber);
       String verificationCode = inputData.getFirst(FIELD_VERIFICATION_CODE);
       if (StringUtils.isBlank(verificationCode)) {
         invalidVerificationCode(context, phoneNumber);
