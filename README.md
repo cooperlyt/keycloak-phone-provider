@@ -45,7 +45,7 @@ Current version: `2.3.1-snapshot`
 + Cli param `number-regx` rename to `number-regex`,  
 
 Migration: 
-+ Set cli param `canonicalize-phone-numbers` is "" or `compatible` is true , because old user data phone number is not canonicalize.
++ Set cli param `canonicalize-phone-numbers` is "" or `compatible` is true , because in old user data phone number is not canonicalize.
 + Change `number-regx` to `number-regex` and change regex match canonicalize after phone number
     
 
