@@ -46,7 +46,7 @@ Current version: `2.3.1-snapshot`
 
 Migration: 
 + Set cli param `canonicalize-phone-numbers` is "" or `compatible` is true , because in old user data phone number is not canonicalize.
-+ Change `number-regx` to `number-regex` and change regex match canonicalize after phone number
++ Change `number-regx` to `number-regex` and change regex match after canonicalize phone number
     
 
 ### New in Version 2.2.2
@@ -101,7 +101,7 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
     --spi-phone-default-token-expires-in=60  # sms expires ,default 60 second
     --spi-phone-default-hour-maximum=3 # How many send sms count in one hour, default 3
     --spi-phone-default-[$realm-]duplicate-phone=false # allow one phone register multi user, default: false
-    --spi-phone-default-[$realm-]default-number-regex=^\+?\d+$ #Notice: will match canonicalize after number. eg: INTERNATIONAL: +41 44 668 18 00 , NATIONAL: 044 668 18 00 , E164: +41446681800
+    --spi-phone-default-[$realm-]default-number-regex=^\+?\d+$ #Notice: will match after canonicalize number. eg: INTERNATIONAL: +41 44 668 18 00 , NATIONAL: 044 668 18 00 , E164: +41446681800
     --spi-phone-default-[$realm-]valid-phone=true # valid phone number, default: true
     #whether to parse user-supplied phone numbers and put into canonical International E.163 format.  _Required for proper duplicate phone number detection_
     --spi-phone-default-[$realm-]canonicalize-phone-numbers=E164 #[E164,INTERNATIONAL,NATIONAL,RFC3966], default: "" un-canonicalize;  
