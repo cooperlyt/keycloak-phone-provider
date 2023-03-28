@@ -24,7 +24,7 @@ public class PhoneNumberAuthenticator extends BaseDirectGrantAuthenticator {
     public void authenticate(AuthenticationFlowContext context) {
         context.clearUser();
         getPhoneNumber(context).ifPresentOrElse(phoneNumber ->
-            Utils.findUserByPhone(context.getSession().users(),context.getRealm(),phoneNumber)
+            Utils.findUserByPhone(context.getSession(),context.getRealm(),phoneNumber)
                 .ifPresentOrElse(user -> {
                     context.setUser(user);
                     context.success();

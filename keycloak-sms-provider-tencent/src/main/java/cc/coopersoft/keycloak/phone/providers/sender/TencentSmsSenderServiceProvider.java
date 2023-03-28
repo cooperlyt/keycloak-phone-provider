@@ -3,7 +3,7 @@ package cc.coopersoft.keycloak.phone.providers.sender;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import cc.coopersoft.keycloak.phone.providers.spi.MessageSenderService;
-import cc.coopersoft.common.OptionalStringUtils;
+import cc.coopersoft.common.OptionalUtils;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.sms.v20190711.SmsClient;
@@ -104,7 +104,7 @@ public class TencentSmsSenderServiceProvider implements MessageSenderService {
 //      req.setExtendCode(extendcode);
 
       /* 模板 ID: 必须填写已审核通过的模板 ID，可登录 [短信控制台] 查看模板 ID */
-      String kindName = OptionalStringUtils.ofBlank(kind).orElse(type.name().toLowerCase());
+      String kindName = OptionalUtils.ofBlank(kind).orElse(type.name().toLowerCase());
       String templateId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + kindName + "-template"))
           .orElse(config.get(kindName + "-template"));
       req.setTemplateID(templateId);

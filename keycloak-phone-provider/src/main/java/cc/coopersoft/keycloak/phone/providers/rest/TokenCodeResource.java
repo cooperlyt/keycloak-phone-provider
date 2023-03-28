@@ -49,7 +49,7 @@ public class TokenCodeResource {
     if( !TokenCodeType.REGISTRATION.equals(tokenCodeType) &&
         !TokenCodeType.AUTH.equals(tokenCodeType) &&
         !TokenCodeType.VERIFY.equals(tokenCodeType) &&
-        Utils.findUserByPhone(session.users(), session.getContext().getRealm(), phoneNumber).isEmpty()) {
+        Utils.findUserByPhone(session, session.getContext().getRealm(), phoneNumber).isEmpty()) {
       throw new ForbiddenException("Phone number not found");
     }
 

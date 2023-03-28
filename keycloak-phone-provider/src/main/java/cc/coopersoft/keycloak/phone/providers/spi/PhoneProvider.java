@@ -15,9 +15,13 @@ public interface PhoneProvider extends Provider {
 
     boolean validPhoneNumber();
 
-    boolean canonicalizePhoneNumber();
+    boolean compatibleMode();
+
+    Optional<String> canonicalizePhoneNumber();
 
     Optional<String> defaultPhoneRegion();
+
+    Optional<String> phoneNumberRegex();
 
     int sendTokenCode(String phoneNumber, TokenCodeType type, String kind);
 

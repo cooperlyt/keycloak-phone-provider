@@ -1,13 +1,11 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.resetcred;
 
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
-import cc.coopersoft.common.OptionalStringUtils;
+import cc.coopersoft.common.OptionalUtils;
 import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
-import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
-import com.google.i18n.phonenumbers.NumberParseException;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -88,7 +86,7 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
 
 
   protected boolean validateForm(AuthenticationFlowContext context, MultivaluedMap<String, String> inputData) {
-    boolean byPhone = OptionalStringUtils
+    boolean byPhone = OptionalUtils
         .ofBlank(inputData.getFirst(FIELD_PATH_PHONE_ACTIVATED))
         .map(s -> "true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s))
         .orElse(false);
@@ -132,7 +130,7 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
         invalidVerificationCode(context, phoneNumber);
         return false;
       }
-      user = Utils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber)
+      user = Utils.findUserByPhone(context.getSession(), context.getRealm(), phoneNumber)
           .orElse(null);
 
       if (user != null && !validateVerificationCode(context, user, phoneNumber, verificationCode.trim())){

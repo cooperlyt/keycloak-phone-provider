@@ -1,7 +1,7 @@
 package cc.coopersoft.keycloak.phone.providers.sender;
 
 import cc.coopersoft.keycloak.phone.providers.spi.MessageSenderService;
-import cc.coopersoft.common.OptionalStringUtils;
+import cc.coopersoft.common.OptionalUtils;
 import com.cloopen.rest.sdk.BodyType;
 import com.cloopen.rest.sdk.CCPRestSmsSDK;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
@@ -61,7 +61,7 @@ public class CloopenSmsSenderServiceProvider implements MessageSenderService {
                 .orElse(config.get(APP_ID_PARAM_NAME));
         client.setAppId(appId);
 
-        String kindName = OptionalStringUtils.ofBlank(kind).orElse(type.name().toLowerCase());
+        String kindName = OptionalUtils.ofBlank(kind).orElse(type.name().toLowerCase());
         String templateId = Optional.ofNullable(config.get(realm.getName().toLowerCase() + "-" + kindName + "-template"))
             .orElse(config.get(kindName + "-template"));
 

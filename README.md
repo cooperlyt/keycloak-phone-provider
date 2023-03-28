@@ -40,9 +40,14 @@ This is what you can do for now:
 Current version: `2.3.1-snapshot`
 ## Features
 ### New in Version 2.3.1
-+ Canonicalize phone numbers using Google's libphonenumbers 
-+ Valid phone number using Google's libphonenumbers 
-+ Remove cli param `number-regx`
++ Canonicalize phone numbers using [Google's libphonenumbers](https://github.com/google/libphonenumber) 
++ Valid phone number using [Google's libphonenumbers](https://github.com/google/libphonenumber)
++ Cli param `number-regx` rename to `number-regex`,  
+
+Migration: 
++ Set cli param `canonicalize-phone-numbers` is false OR `compatible` is true , because old user data phone number is not canonicalize.
++ Change `number-regx` to `number-regex` and chane regex match your canonicalize phone number format
+    
 
 ### New in Version 2.2.2
 + fix phone number as username bug [#24](https://github.com/cooperlyt/keycloak-phone-provider/issues/24)
@@ -96,10 +101,14 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
     --spi-phone-default-token-expires-in=60  # sms expires ,default 60 second
     --spi-phone-default-hour-maximum=3 # How many send sms count in one hour, default 3
     --spi-phone-default-[$realm-]duplicate-phone=false # allow one phone register multi user, default: false
+    --spi-phone-default-[$realm-]default-number-regex=^\+?\d+$ #Notice: will match canonicalize after number. eg: INTERNATIONAL: +41 44 668 18 00 , NATIONAL: 044 668 18 00 , E164: +41446681800
     --spi-phone-default-[$realm-]valid-phone=true # valid phone number, default: true
-    --spi-phone-default-[$realm-]canonicalize-phone-numbers=true # whether to parse user-supplied phone numbers and put into canonical International E.163 format.  _Required for proper duplicate phone number detection_
-    --spi-phone-default-[$realm-]default-phone-region=US # a default region to be used when parsing user-supplied phone numbers. Lookup codes at https://www.unicode.org/cldr/cldr-aux/charts/30/supplemental/territory_information.html
-
+    #whether to parse user-supplied phone numbers and put into canonical International E.163 format.  _Required for proper duplicate phone number detection_
+    --spi-phone-default-[$realm-]canonicalize-phone-numbers=E164 #[E164,INTERNATIONAL,NATIONAL,RFC3966], default: "" un-canonicalize;  
+    #a default region to be used when parsing user-supplied phone numbers. Lookup codes at https://www.unicode.org/cldr/cldr-aux/charts/30/supplemental/territory_information.html
+    --spi-phone-default-[$realm-]phone-default-region=US #default: use realm setting's default Locate; 
+    #if compatible is true then search user will be use all format phone number 
+    --spi-phone-default-[$realm-]compatible=false #default: false
 
     ...  # provider param refer provider`s readme.md
 ```

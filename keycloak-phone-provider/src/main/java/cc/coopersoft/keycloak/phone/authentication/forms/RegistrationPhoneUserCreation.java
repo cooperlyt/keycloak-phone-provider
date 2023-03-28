@@ -213,7 +213,7 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       try {
         phoneNumber = Utils.canonicalizePhoneNumber(session,phoneNumber);
         if (!Utils.isDuplicatePhoneAllowed(session) &&
-            Utils.findUserByPhone(session.users(), context.getRealm(), phoneNumber).isPresent()) {
+            Utils.findUserByPhone(session, context.getRealm(), phoneNumber).isPresent()) {
           context.error(Errors.INVALID_REGISTRATION);
           errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.EXISTS.message()));
           context.validationError(formData, errors);

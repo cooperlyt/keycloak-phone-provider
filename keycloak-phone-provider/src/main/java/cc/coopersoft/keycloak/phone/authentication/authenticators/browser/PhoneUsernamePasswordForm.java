@@ -4,9 +4,8 @@ import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
-import cc.coopersoft.common.OptionalStringUtils;
+import cc.coopersoft.common.OptionalUtils;
 import cc.coopersoft.keycloak.phone.Utils;
-import com.google.i18n.phonenumbers.NumberParseException;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -77,7 +76,7 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
   @Override
   protected boolean validateForm(AuthenticationFlowContext context, MultivaluedMap<String, String> inputData) {
 
-    boolean byPhone = OptionalStringUtils
+    boolean byPhone = OptionalUtils
         .ofBlank(inputData.getFirst(FIELD_PATH_PHONE_ACTIVATED))
         .map(s -> "true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s))
         .orElse(false);
@@ -117,7 +116,7 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
     context.clearUser();
     try {
      var validPhoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
-      return Utils.findUserByPhone(context.getSession().users(), context.getRealm(), validPhoneNumber)
+      return Utils.findUserByPhone(context.getSession(), context.getRealm(), validPhoneNumber)
           .map(user -> validateVerificationCode(context, user, validPhoneNumber, code) && validateUser(context, user, validPhoneNumber))
           .orElseGet(() -> {
             context.getEvent().error(Errors.USER_NOT_FOUND);
@@ -244,7 +243,7 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
       if (user == null &&
           isLoginWithPhoneNumber(context) &&
           !Utils.isDuplicatePhoneAllowed(context.getSession())){
-        user = Utils.findUserByPhone(context.getSession().users(), context.getRealm(), username).orElse(null);
+        user = Utils.findUserByPhone(context.getSession(), context.getRealm(), username).orElse(null);
       }
     } catch (ModelDuplicateException mde) {
       ServicesLogger.LOGGER.modelDuplicateException(mde);

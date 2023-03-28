@@ -1,6 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant;
 
-import cc.coopersoft.common.OptionalStringUtils;
+import cc.coopersoft.common.OptionalUtils;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
@@ -22,13 +22,13 @@ public abstract class BaseDirectGrantAuthenticator implements Authenticator {
     }
 
     protected Optional<String> getPhoneNumber(AuthenticationFlowContext context){
-        return OptionalStringUtils.ofBlank(OptionalStringUtils.ofBlank(
+        return OptionalUtils.ofBlank(OptionalUtils.ofBlank(
             context.getHttpRequest().getDecodedFormParameters().getFirst("phone_number"))
             .orElse(context.getHttpRequest().getDecodedFormParameters().getFirst("phoneNumber")));
     }
 
     protected Optional<String> getAuthenticationCode(AuthenticationFlowContext context){
-        return OptionalStringUtils.ofBlank(context.getHttpRequest().getDecodedFormParameters().getFirst("code"));
+        return OptionalUtils.ofBlank(context.getHttpRequest().getDecodedFormParameters().getFirst("code"));
     }
 
     protected void invalidCredentials(AuthenticationFlowContext context,AuthenticationFlowError error){

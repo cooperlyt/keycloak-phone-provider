@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.26</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -94,11 +94,7 @@
             <version>${version.keycloak}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-          <groupId>com.googlecode.libphonenumber</groupId>
-          <artifactId>libphonenumber</artifactId>
-          <version>8.13.7</version>
-        </dependency>
+
     </dependencies>
 
 

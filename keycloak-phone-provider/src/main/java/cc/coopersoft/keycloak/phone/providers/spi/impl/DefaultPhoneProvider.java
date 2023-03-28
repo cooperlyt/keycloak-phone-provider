@@ -1,6 +1,6 @@
 package cc.coopersoft.keycloak.phone.providers.spi.impl;
 
-import cc.coopersoft.common.OptionalStringUtils;
+import cc.coopersoft.common.OptionalUtils;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
@@ -65,7 +65,7 @@ public class DefaultPhoneProvider implements PhoneProvider {
     }
 
     private Optional<String> getStringConfigValue(String configName){
-        return OptionalStringUtils.ofBlank(OptionalStringUtils.ofBlank(config.get(getRealmName() + "-" + configName))
+        return OptionalUtils.ofBlank(OptionalUtils.ofBlank(config.get(getRealmName() + "-" + configName))
             .orElse(config.get(configName)));
     }
 
@@ -88,19 +88,28 @@ public class DefaultPhoneProvider implements PhoneProvider {
     }
 
     @Override
-    public boolean canonicalizePhoneNumber() {
-        return getBooleanConfigValue("canonicalize-phone-numbers", true);
+    public boolean compatibleMode() {
+        return getBooleanConfigValue("compatible", false);
+    }
+
+    @Override
+    public Optional<String> canonicalizePhoneNumber() {
+        return getStringConfigValue("canonicalize-phone-numbers");
     }
 
     @Override
     public Optional<String> defaultPhoneRegion() {
-        return getStringConfigValue("default-phone-region");
+        return getStringConfigValue("phone-default-region");
     }
 
-
+    @Override
+    public Optional<String> phoneNumberRegex() {
+        return getStringConfigValue("number-regex");
+    }
 
     @Override
     public int sendTokenCode(String phoneNumber,TokenCodeType type, String kind){
+
         logger.info("send code to:" + phoneNumber );
 
         if (getTokenCodeService().isAbusing(phoneNumber, type,hourMaximum)) {

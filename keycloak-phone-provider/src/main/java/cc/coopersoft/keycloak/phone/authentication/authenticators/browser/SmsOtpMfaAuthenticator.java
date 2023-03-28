@@ -1,6 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.browser;
 
-import cc.coopersoft.common.OptionalStringUtils;
+import cc.coopersoft.common.OptionalUtils;
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.authentication.requiredactions.ConfigSmsOtpRequiredAction;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
@@ -98,7 +98,7 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
     }
 
     String phoneNumber = context.getUser().getFirstAttribute(FIELD_PHONE_NUMBER);
-    boolean verified = OptionalStringUtils.ofBlank(context.getAuthenticationSession().getAuthNote(VERIFIED_PHONE_NUMBER))
+    boolean verified = OptionalUtils.ofBlank(context.getAuthenticationSession().getAuthNote(VERIFIED_PHONE_NUMBER))
         .map(number -> number.equalsIgnoreCase(phoneNumber))
         .orElse(false);
     if (verified) {
