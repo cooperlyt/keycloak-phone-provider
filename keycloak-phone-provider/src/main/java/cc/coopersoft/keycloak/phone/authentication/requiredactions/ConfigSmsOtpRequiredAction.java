@@ -63,7 +63,7 @@ public class ConfigSmsOtpRequiredAction implements RequiredActionProvider {
         } catch (PhoneNumberInvalidException e) {
             Response challenge = context.form()
                 .setError(e.getErrorType().message())
-                .createForm("login-sms-otp-config.ftl");
+                .createForm("login-update-phone-number.ftl");
             context.challenge(challenge);
         }
     }
