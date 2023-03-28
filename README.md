@@ -42,7 +42,7 @@ Current version: `2.3.1-snapshot`
 ### New in Version 2.3.1
 + Canonicalize phone numbers using [Google's libphonenumbers](https://github.com/google/libphonenumber) 
 + Valid phone number using [Google's libphonenumbers](https://github.com/google/libphonenumber)
-+ Cli param `number-regx` rename to `number-regex`,  
++ Cli param `number-regx` rename to `number-regex`, and match regex at after canonicalize phone number
 
 Migration: 
 + Set cli param `canonicalize-phone-numbers` is "" or `compatible` is true , because in old user data phone number is not canonicalize.
