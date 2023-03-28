@@ -10,6 +10,7 @@ import org.keycloak.models.UserModel;
 
 import com.google.i18n.phonenumbers.*;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
+import org.keycloak.services.validation.Validation;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -29,6 +30,9 @@ public class Utils {
             var phoneNumberUtil = PhoneNumberUtil.getInstance();
             try {
                 var parsedNumber = phoneNumberUtil.parse(phoneNumber, defaultRegion(session));
+                if (parsedNumber.hasNationalNumber()){
+                    numbers.add(String.valueOf(parsedNumber.getNationalNumber())) ;
+                }
                 for (PhoneNumberFormat format : PhoneNumberFormat.values()) {
                     numbers.add(phoneNumberUtil.format(parsedNumber, format));
                 }
