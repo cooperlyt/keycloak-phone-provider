@@ -69,7 +69,6 @@ anymore and I did not test user storage beyond Kerberos or LDAP. I may try to he
   3. run as `docker-compose up` , [docker-compose](https://docs.docker.com/compose/) is required!
 
 If you want to build the project, simply run  `examples/docker-build.sh` after cloning the repository.
- 2.2.1 is build on JAVA 17, Maven 3.8.6
 
   + `keycloak-phone-provide`  
     main
