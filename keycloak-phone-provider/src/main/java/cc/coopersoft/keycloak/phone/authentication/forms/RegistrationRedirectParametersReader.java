@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.keycloak.provider.ProviderConfigProperty.MULTIVALUED_STRING_TYPE;
 import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
 
 public class RegistrationRedirectParametersReader implements FormActionFactory, FormAction {
@@ -45,16 +46,13 @@ public class RegistrationRedirectParametersReader implements FormActionFactory, 
     return true;
   }
 
-  //TODO Should set type is 'MULTIVALUED_STRING_TYPE' but a bug in keycloak 19.0.1
-  // https://github.com/keycloak/keycloak/issues/13708
-  // 'STRING_TYPE' is temporary
   @Override
   public List<ProviderConfigProperty> getConfigProperties() {
     ProviderConfigProperty rep =
         new ProviderConfigProperty(PARAM_NAMES,
             "Accept query param",
             "Registration query param accept names.",
-            STRING_TYPE, null);
+            MULTIVALUED_STRING_TYPE, null);
     return Collections.singletonList(rep);
   }
 
