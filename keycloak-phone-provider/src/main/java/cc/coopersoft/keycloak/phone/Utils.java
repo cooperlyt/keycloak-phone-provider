@@ -1,18 +1,23 @@
 package cc.coopersoft.keycloak.phone;
 
 import cc.coopersoft.common.OptionalUtils;
+import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import org.jboss.logging.Logger;
+import org.keycloak.credential.CredentialModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import com.google.i18n.phonenumbers.*;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
+import org.keycloak.models.credential.dto.OTPSecretData;
 import org.keycloak.services.validation.Validation;
+import org.keycloak.util.JsonSerialization;
 
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -75,9 +80,6 @@ public class Utils {
         });
     }
 
-    public static boolean isDuplicatePhoneAllowed(KeycloakSession session){
-        return session.getProvider(PhoneProvider.class).isDuplicatePhoneAllowed();
-    }
 
     private static String defaultRegion(KeycloakSession session){
         var defaultRegion = session.getProvider(PhoneProvider.class).defaultPhoneRegion();
@@ -131,5 +133,12 @@ public class Utils {
         }
     }
 
+    public static boolean isDuplicatePhoneAllowed(KeycloakSession session){
+        return session.getProvider(PhoneProvider.class).isDuplicatePhoneAllowed();
+    }
+
+    public static int getOtpExpires(KeycloakSession session){
+        return session.getProvider(PhoneProvider.class).otpExpires();
+    }
 
 }

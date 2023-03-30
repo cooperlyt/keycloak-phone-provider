@@ -43,6 +43,10 @@ Current version: `2.3.1-snapshot`
 + Canonicalize phone numbers using [Google's libphonenumbers](https://github.com/google/libphonenumber) 
 + Valid phone number using [Google's libphonenumbers](https://github.com/google/libphonenumber)
 + Cli param `number-regx` rename to `number-regex`, and match regex at after canonicalize phone number
++ Fixed Bug [#40 OTP Cookie bypass](https://github.com/cooperlyt/keycloak-phone-provider/issues/40)
++ Remove OTP setting `Cookie Max Age` and add cli param otp-expires
++ Refactor OTP , only use Credential's phone number (The certificate's phone number comes from Required action `Configure OTP over SMS` or setting `Create OTP Credential` in user registration  ), Regardless of the user's phone number
+
 
 Migration: 
 + Set cli param `canonicalize-phone-numbers` is "" or `compatible` is true , because in old user data phone number is not canonicalize.
@@ -108,6 +112,8 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
     --spi-phone-default-[$realm-]phone-default-region=US #default: use realm setting's default Locate; 
     #if compatible is true then search user will be use all format phone number 
     --spi-phone-default-[$realm-]compatible=false #default: false
+    #Prevent 2FA from always happening for a period of time
+    --spi-phone-default-[$realm-]otp-expires=3600 #default: 60 * 60; 1 hour
 
     ...  # provider param refer provider`s readme.md
 ```
@@ -123,6 +129,10 @@ You can create a customized theme base on `phone`.
 ```
 
 ### **Phone registration support**
+
+Two user attributes are going to be used by this provider: `phoneNumberVerified` (bool) and `phoneNumber` (str). Multiple
+users can have the same `phoneNumber`, but only one of them will have `phoneNumberVerified` = `true` at the end of a
+verification process. This accommodates the use case of pre-paid numbers that get recycled if inactive for too much time.
 
 Under `Authentication` > `Flows`:
 
@@ -179,13 +189,14 @@ On the `Authentication` page, bind `Browser with phone` to `Browser flow`
 
 ### **OTP by Phone**
 
-Two user attributes are going to be used by this provider: `phoneNumberVerified` (bool) and `phoneNumber` (str). Multiple
-users can have the same `phoneNumber`, but only one of them will have `phoneNumberVerified` = `true` at the end of a
-verification process. This accommodates the use case of pre-paid numbers that get recycled if inactive for too much time.
+
+OTP Phone use OTP Credential's phone number,Different from the user's phone number, Credential's phone number come from required actions `Configure OTP over SMS`, Unless the `Create OTP Credential` is enabled on user registration flow.
 
 
   On Authentication page, copy the browser flow and replace `OTP` with  `OTP Over SMS` . Don't forget to bind this flow copy as the de facto browser flow.
-  Finally, register the required actions `Update Phone Number` and `Configure OTP over SMS` in the Required Actions tab.
+  Finally, register the required actions `Configure OTP over SMS` in the Required Actions tab.
+
+
 
 ![OTP](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/b0.jpg)
 
@@ -244,6 +255,11 @@ Under `Authentication` > `Flows`:
 Set Bind `Reset credentials with phone` to `Reset credentials flow`
 
 ![Authentication setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/d0.jpg)
+
+
+## **Required Action**
++ `Update Phone Number` update user's phone number on next login.
++ `Configure OTP over SMS` update OTP Credential's phone number on next login.
 
 **Phone one key login**
   Testing , coming soon!

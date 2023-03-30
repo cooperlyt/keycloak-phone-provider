@@ -61,7 +61,7 @@
       <script type="text/javascript">
           function req(phoneNumber) {
               const params = {params: {phoneNumber}}
-              axios.get(window.location.origin + '/realms/${realm.name}/sms/verification-code', params)
+              axios.get(window.location.origin + '/realms/${realm.name}/sms/otp-configure-code', params)
                   .then(res => app.disableSend(res.data.expires_in))
                   .catch(e => app.errorMessage = e.response.data.error);
           }

@@ -79,8 +79,8 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
         .property().name(CONFIG_OPT_CREDENTIAL)
         .type(BOOLEAN_TYPE)
         .defaultValue(false)
-        .label("Create a phone OTP credential")
-        .helpText("Create a phone OTP credential.")
+        .label("Create OTP Credential")
+        .helpText("Create OTP credential by phone number.")
         .add()
         .build();
   }
@@ -189,14 +189,14 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
     String tokenId = session.getAttribute("tokenId", String.class);
 
     logger.info(String.format("registration user %s phone success, tokenId is: %s", user.getId(), tokenId));
-    getTokenCodeService(context.getSession()).tokenValidated(user, phoneNumber, tokenId);
+    getTokenCodeService(context.getSession()).tokenValidated(user, phoneNumber, tokenId,false);
 
     AuthenticatorConfigModel config = context.getAuthenticatorConfig();
     if (config != null &&
         "true".equalsIgnoreCase(config.getConfig().getOrDefault(CONFIG_OPT_CREDENTIAL,"false"))){
       PhoneOtpCredentialProvider ocp = (PhoneOtpCredentialProvider) context.getSession()
           .getProvider(CredentialProvider.class, PhoneOtpCredentialProviderFactory.PROVIDER_ID);
-      ocp.createCredential(context.getRealm(), context.getUser(), PhoneOtpCredentialModel.create(phoneNumber));
+      ocp.createCredential(context.getRealm(), context.getUser(), PhoneOtpCredentialModel.create(phoneNumber,tokenId,0));
     }
 
   }

@@ -93,6 +93,11 @@ public class DefaultPhoneProvider implements PhoneProvider {
     }
 
     @Override
+    public int otpExpires() {
+        return getStringConfigValue("otp-expires").map(Integer::valueOf).orElse(60 * 60);
+    }
+
+    @Override
     public Optional<String> canonicalizePhoneNumber() {
         return getStringConfigValue("canonicalize-phone-numbers");
     }
@@ -118,7 +123,7 @@ public class DefaultPhoneProvider implements PhoneProvider {
 
         TokenCodeRepresentation ongoing = getTokenCodeService().ongoingProcess(phoneNumber, type);
         if (ongoing != null) {
-            logger.info(String.format("No need of sending a new %s code for %s",type.getLabel(), phoneNumber));
+            logger.info(String.format("No need of sending a new %s code for %s",type.label, phoneNumber));
             return (int) (ongoing.getExpiresAt().getTime() - Instant.now().toEpochMilli()) / 1000;
         }
 
@@ -128,7 +133,7 @@ public class DefaultPhoneProvider implements PhoneProvider {
             session.getProvider(MessageSenderService.class, service).sendSmsMessage(type,phoneNumber,token.getCode(),tokenExpiresIn,kind);
             getTokenCodeService().persistCode(token, type, tokenExpiresIn);
 
-            logger.info(String.format("Sent %s code to %s over %s",type.getLabel(), phoneNumber, service));
+            logger.info(String.format("Sent %s code to %s over %s",type.label, phoneNumber, service));
 
         } catch (MessageSendException e) {
 

@@ -18,7 +18,7 @@ public abstract class FullSmsSenderAbstractService implements MessageSenderServi
     @Override
     public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code , int expires, String kind) throws MessageSendException{
         //TODO template from keycloak message bundle
-        final String MESSAGE = String.format("[%s] - " + type.getLabel() + " code: %s, expires: %s minute ",realmDisplay , code, expires / 60);
+        final String MESSAGE = String.format("[%s] - " + type.label + " code: %s, expires: %s minute ",realmDisplay , code, expires / 60);
         sendMessage(phoneNumber,MESSAGE);
     }
 }

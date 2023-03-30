@@ -13,7 +13,7 @@ public class SupportPhonePages {
 
     EXISTS("phoneNumberExists"),
     ABUSED("abusedMessageService") ,
-    NOT_MATCH("authenticationCodeDoesNotMatch"),
+    NOT_MATCH("phoneTokenCodeDoesNotMatch"),
     FAIL("sendVerificationCodeFail");
 
 

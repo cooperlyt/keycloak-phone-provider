@@ -65,7 +65,7 @@ public class EverybodyPhoneAuthenticator extends BaseDirectGrantAuthenticator {
         });
     if (user != null) {
       context.setUser(user);
-      phoneVerificationCodeProvider.tokenValidated(user, phoneNumber, tokenCode.getId());
+      phoneVerificationCodeProvider.tokenValidated(user, phoneNumber, tokenCode.getId(),false);
       context.success();
     }
   }

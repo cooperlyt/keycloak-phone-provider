@@ -19,7 +19,7 @@ public class SmsOtpMfaAuthenticatorFactory implements AuthenticatorFactory, Conf
 
     public final static String PROVIDER_ID = "sms-otp-authenticator";
 
-    public final static String COOKIE_MAX_AGE= "cookieMaxAge";
+//    public final static String COOKIE_MAX_AGE= "cookieMaxAge";
     private final static SmsOtpMfaAuthenticator instance = new SmsOtpMfaAuthenticator();
 
     @Override
@@ -54,12 +54,12 @@ public class SmsOtpMfaAuthenticatorFactory implements AuthenticatorFactory, Conf
 
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
-        ProviderConfigProperty rep =
-            new ProviderConfigProperty(COOKIE_MAX_AGE,
-                "Cookie Max Age",
-                "Max age in seconds of the SMS_OTP_COOKIE.",
-                STRING_TYPE, "3600");
-        return Collections.singletonList(rep);
+//        ProviderConfigProperty rep =
+//            new ProviderConfigProperty(COOKIE_MAX_AGE,
+//                "Cookie Max Age",
+//                "Max age in seconds of the SMS_OTP_COOKIE. Zero is Don't use Cookie",
+//                STRING_TYPE, "3600");
+        return null;
     }
 
     @Override

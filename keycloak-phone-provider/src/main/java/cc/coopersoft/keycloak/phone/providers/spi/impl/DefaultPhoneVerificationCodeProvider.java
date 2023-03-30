@@ -17,6 +17,7 @@ import org.keycloak.credential.CredentialProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.credential.dto.OTPSecretData;
 import org.keycloak.services.validation.Validation;
 import org.keycloak.util.JsonSerialization;
 
@@ -30,7 +31,6 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCodeProvider {
 
@@ -131,61 +131,72 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
 
         TokenCodeRepresentation tokenCode = ongoingProcess(phoneNumber, tokenCodeType);
         if (tokenCode == null)
-            throw new BadRequestException(String.format("There is no valid ongoing %s process", tokenCodeType.getLabel()));
+            throw new BadRequestException(String.format("There is no valid ongoing %s process", tokenCodeType.label));
 
         if (!tokenCode.getCode().equals(code)) throw new ForbiddenException("Code does not match with expected value");
 
-        logger.info(String.format("User %s correctly answered the %s code", user.getId(), tokenCodeType.getLabel()));
+        logger.info(String.format("User %s correctly answered the %s code", user.getId(), tokenCodeType.label));
 
-        tokenValidated(user,phoneNumber,tokenCode.getId());
+        tokenValidated(user,phoneNumber,tokenCode.getId(),tokenCodeType.isOTP);
 
+        if (tokenCodeType.isOTP)
+            updateUserOTPCredential(user,phoneNumber,tokenCode.getCode());
     }
 
     @Override
-    public void tokenValidated(UserModel user, String phoneNumber, String tokenCodeId) {
+    public void tokenValidated(UserModel user, String phoneNumber, String tokenCodeId, boolean isOTP) {
 
+        boolean updateUserPhoneNumber = !isOTP;
+        if (isOTP){
+            updateUserPhoneNumber = PhoneOtpCredentialModel.getSmsOtpCredentialData(user)
+                .map(PhoneOtpCredentialModel.SmsOtpCredentialData::getPhoneNumber)
+                .map(pn -> pn.equals(phoneNumber))
+                .orElse(false);
 
-        if (!Utils.isDuplicatePhoneAllowed(session)){
-            session.users()
-                .searchForUserByUserAttributeStream(session.getContext().getRealm(),"phoneNumber", phoneNumber)
-                .filter(u -> !u.getId().equals(user.getId()))
-                .forEach(u -> {
-                    logger.info(String.format("User %s also has phone number %s. Un-verifying.", u.getId(), phoneNumber));
-                    u.setSingleAttribute("phoneNumberVerified", "false");
-
-                    u.addRequiredAction(UpdatePhoneNumberRequiredAction.PROVIDER_ID);
-
-                    //remove otp Credentials
-                    u.credentialManager()
-                        .getStoredCredentialsByTypeStream(PhoneOtpCredentialModel.TYPE)
-                        .filter(c -> {
-                            try {
-                                PhoneOtpCredentialModel.SmsOtpCredentialData credentialData =
-                                    JsonSerialization.readValue(c.getCredentialData(), PhoneOtpCredentialModel.SmsOtpCredentialData.class);
-                                if (Validation.isBlank(credentialData.getPhoneNumber())){
-                                    return true;
-                                }
-                                return credentialData.getPhoneNumber().equals(user.getFirstAttribute("phoneNumber"));
-                            } catch (IOException e) {
-                                logger.warn("Unknown format Otp Credential", e);
-                                return true;
-                            }
-                        })
-                        .map(CredentialModel::getId)
-                        .toList()
-                        .forEach(id -> u.credentialManager().removeStoredCredentialById(id));
-                });
         }
 
 
-        user.setSingleAttribute("phoneNumberVerified", "true");
-        user.setSingleAttribute("phoneNumber", phoneNumber);
+        if (updateUserPhoneNumber){
+            if (!Utils.isDuplicatePhoneAllowed(session)){
+                session.users()
+                    .searchForUserByUserAttributeStream(session.getContext().getRealm(),"phoneNumber", phoneNumber)
+                    .filter(u -> !u.getId().equals(user.getId()))
+                    .forEach(u -> {
+                        logger.info(String.format("User %s also has phone number %s. Un-verifying.", u.getId(), phoneNumber));
+                        u.setSingleAttribute("phoneNumberVerified", "false");
 
+                        u.addRequiredAction(UpdatePhoneNumberRequiredAction.PROVIDER_ID);
 
+                        //remove otp Credentials
+                        u.credentialManager()
+                            .getStoredCredentialsByTypeStream(PhoneOtpCredentialModel.TYPE)
+                            .filter(c -> {
+                                try {
+                                    PhoneOtpCredentialModel.SmsOtpCredentialData credentialData =
+                                        JsonSerialization.readValue(c.getCredentialData(), PhoneOtpCredentialModel.SmsOtpCredentialData.class);
+                                    if (Validation.isBlank(credentialData.getPhoneNumber())){
+                                        return true;
+                                    }
+                                    return credentialData.getPhoneNumber().equals(user.getFirstAttribute("phoneNumber"));
+                                } catch (IOException e) {
+                                    logger.warn("Unknown format Otp Credential", e);
+                                    return true;
+                                }
+                            })
+                            .map(CredentialModel::getId)
+                            .toList()
+                            .forEach(id -> u.credentialManager().removeStoredCredentialById(id));
+                    });
+            }
+            user.setSingleAttribute("phoneNumberVerified", "true");
+            user.setSingleAttribute("phoneNumber", phoneNumber);
+
+            user.removeRequiredAction(UpdatePhoneNumberRequiredAction.PROVIDER_ID);
+        }
 
         validateProcess(tokenCodeId, user);
 
-        cleanUpAction(user);
+
     }
 
     @Override
@@ -196,26 +207,16 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
         getEntityManager().persist(entity);
     }
 
-    @Override
-    public void cleanUpAction(UserModel user) {
-        user.removeRequiredAction(UpdatePhoneNumberRequiredAction.PROVIDER_ID);
+
+    private void updateUserOTPCredential(UserModel user, String phoneNumber,  String code) {
         user.removeRequiredAction(ConfigSmsOtpRequiredAction.PROVIDER_ID);
         PhoneOtpCredentialProvider ocp = (PhoneOtpCredentialProvider)
                 session.getProvider(CredentialProvider.class, PhoneOtpCredentialProviderFactory.PROVIDER_ID);
-        String phoneNumber = user.getFirstAttribute("phoneNumber");
         if (ocp.isConfiguredFor(getRealm(), user, PhoneOtpCredentialModel.TYPE)) {
-            CredentialModel credential = user.credentialManager()
-                .getStoredCredentialsByTypeStream(PhoneOtpCredentialModel.TYPE)
-                .findFirst().orElseThrow();
-            credential.setCredentialData("{\"phoneNumber\":\"" + phoneNumber + "\"}");
-            PhoneOtpCredentialModel credentialModel = PhoneOtpCredentialModel.createFromCredentialModel(credential);
-            user.credentialManager().updateStoredCredential(credentialModel);
-//            session.userCredentialManager().updateCredential(getRealm(), user, credentialModel);
+            var credentialData = new PhoneOtpCredentialModel.SmsOtpCredentialData(phoneNumber,Utils.getOtpExpires(session));
+            PhoneOtpCredentialModel.updateOtpCredential(user,credentialData,code);
         }
     }
-
-
-
 
 
     @Override

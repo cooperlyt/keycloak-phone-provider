@@ -53,7 +53,7 @@ public class TokenCodeResource {
       throw new ForbiddenException("Phone number not found");
     }
 
-    logger.info(String.format("Requested %s code to %s", tokenCodeType.getLabel(), phoneNumber));
+    logger.info(String.format("Requested %s code to %s", tokenCodeType.label, phoneNumber));
     int tokenExpiresIn = phoneProvider.sendTokenCode(phoneNumber, tokenCodeType, kind);
 
     String response = String.format("{\"expires_in\":%s}", tokenExpiresIn);

@@ -19,7 +19,7 @@ public interface PhoneVerificationCodeProvider extends Provider {
 
     void validateProcess(String tokenCodeId, UserModel user);
 
-    void cleanUpAction(UserModel user);
+    //void cleanUpAction(UserModel user, boolean isOTP);
 
-    void tokenValidated(UserModel user, String phoneNumber, String tokenCodeId);
+    void tokenValidated(UserModel user, String phoneNumber, String tokenCodeId, boolean isOTP);
 }

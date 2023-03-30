@@ -17,6 +17,8 @@ public interface PhoneProvider extends Provider {
 
     boolean compatibleMode();
 
+    int otpExpires();
+
     Optional<String> canonicalizePhoneNumber();
 
     Optional<String> defaultPhoneRegion();
