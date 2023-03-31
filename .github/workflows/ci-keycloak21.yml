@@ -1,7 +1,5 @@
 name: 'keycloak21-ci'
 on:
-  push:
-    branches: [ keycloak21.x.x ]
   release:
     types: [ published ]
 jobs:
