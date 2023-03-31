@@ -68,7 +68,7 @@ anymore and I did not test user storage beyond Kerberos or LDAP. I may try to he
 ### **Installing:**
 
 + Docker
-  1. docker image is [coopersoft/keycloak:21.0.1_phone-2.2.2](https://hub.docker.com/repository/docker/coopersoft/keycloak)
+  1. docker image is [coopersoft/keycloak:21.0.5_phone-2.3.1](https://hub.docker.com/repository/docker/coopersoft/keycloak)
   2. for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/keycloak-phone-provider/master/examples/docker-compose.yml)
   3. run as `docker-compose up` , [docker-compose](https://docs.docker.com/compose/) is required!
 
