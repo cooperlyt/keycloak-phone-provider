@@ -1,5 +1,5 @@
 # Keycloak (Quarkus 21.x.x)  Phone Provider
-![Build Status](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/compile-and-liveness-check.yml/badge.svg)
+![ci](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/ci-keycloak21.yml/badge.svg)
 
  + Phone support like e-mail
  + One Time Password (OTP) by phone
