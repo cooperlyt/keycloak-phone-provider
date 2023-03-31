@@ -1,16 +1,26 @@
 package cc.coopersoft.keycloak.phone.authentication.requiredactions;
 
+import cc.coopersoft.keycloak.phone.Utils;
+import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
+import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
+import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
+import com.google.i18n.phonenumbers.NumberParseException;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
+import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.Response;
+import java.util.Optional;
+
+import static cc.coopersoft.keycloak.phone.authentication.authenticators.browser.PhoneUsernamePasswordForm.VERIFIED_PHONE_NUMBER;
 
 public class ConfigSmsOtpRequiredAction implements RequiredActionProvider {
 
@@ -20,29 +30,48 @@ public class ConfigSmsOtpRequiredAction implements RequiredActionProvider {
     public void evaluateTriggers(RequiredActionContext context) {
     }
 
+//    private Optional<PhoneOtpCredentialModel> getOTPCredential(RequiredActionContext context){
+//        return Optional.ofNullable(context.getUser())
+//                .flatMap(user -> user.credentialManager().getStoredCredentialsByTypeStream(PhoneOtpCredentialModel.TYPE).findFirst())
+//                .map(credentialModel -> (PhoneOtpCredentialModel) credentialModel);
+//    }
+
     @Override
     public void requiredActionChallenge(RequiredActionContext context) {
 
+        var userPhoneNumber = PhoneOtpCredentialModel.getSmsOtpCredentialData(context.getUser())
+            .map(PhoneOtpCredentialModel.SmsOtpCredentialData::getPhoneNumber)
+            .orElseGet(() -> Optional.ofNullable(context.getUser())
+                .flatMap(user -> Optional.ofNullable(user.getFirstAttribute(SupportPhonePages.FIELD_PHONE_NUMBER)))
+                .orElse(null)
+            );
+
         Response challenge = context.form()
+            .setAttribute(SupportPhonePages.FIELD_PHONE_NUMBER, userPhoneNumber)
                 .createForm("login-sms-otp-config.ftl");
         context.challenge(challenge);
     }
 
     @Override
     public void processAction(RequiredActionContext context) {
-        PhoneVerificationCodeProvider phoneVerificationCodeProvider = context.getSession().getProvider(PhoneVerificationCodeProvider.class);
-        String phoneNumber = context.getHttpRequest().getDecodedFormParameters().getFirst("phoneNumber");
-        String code = context.getHttpRequest().getDecodedFormParameters().getFirst("code");
+        var session = context.getSession();
+        PhoneVerificationCodeProvider phoneVerificationCodeProvider = session.getProvider(PhoneVerificationCodeProvider.class);
+        String phoneNumber = context.getHttpRequest().getDecodedFormParameters().getFirst(SupportPhonePages.FIELD_PHONE_NUMBER);
+        String code = context.getHttpRequest().getDecodedFormParameters().getFirst(SupportPhonePages.FIELD_VERIFICATION_CODE);
         try {
-            phoneVerificationCodeProvider.validateCode(context.getUser(), phoneNumber, code);
-            PhoneOtpCredentialProvider socp = (PhoneOtpCredentialProvider) context.getSession()
+            phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
+            phoneVerificationCodeProvider.validateCode(context.getUser(), phoneNumber, code, TokenCodeType.OTP);
+
+            PhoneOtpCredentialProvider ocp = (PhoneOtpCredentialProvider) context.getSession()
                     .getProvider(CredentialProvider.class, PhoneOtpCredentialProviderFactory.PROVIDER_ID);
-            socp.createCredential(context.getRealm(), context.getUser(), PhoneOtpCredentialModel.create(phoneNumber));
+            ocp.createCredential(context.getRealm(), context.getUser(),
+                PhoneOtpCredentialModel.create(phoneNumber,code,Utils.getOtpExpires(context.getSession())));
+            context.getAuthenticationSession().setAuthNote(VERIFIED_PHONE_NUMBER, phoneNumber);
             context.success();
         } catch (BadRequestException e) {
 
             Response challenge = context.form()
-                    .setError("noOngoingVerificationProcess")
+                    .setError(SupportPhonePages.Errors.NO_PROCESS.message())
                     .createForm("login-sms-otp-config.ftl");
             context.challenge(challenge);
 
@@ -50,8 +79,13 @@ public class ConfigSmsOtpRequiredAction implements RequiredActionProvider {
 
             Response challenge = context.form()
                     .setAttribute("phoneNumber", phoneNumber)
-                    .setError("verificationCodeDoesNotMatch")
-                    .createForm("login-update-phone-number.ftl");
+                    .setError(SupportPhonePages.Errors.NOT_MATCH.message())
+                    .createForm("login-sms-otp-config.ftl");
+            context.challenge(challenge);
+        } catch (PhoneNumberInvalidException e) {
+            Response challenge = context.form()
+                .setError(e.getErrorType().message())
+                .createForm("login-sms-otp-config.ftl");
             context.challenge(challenge);
         }
     }

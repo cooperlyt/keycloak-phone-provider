@@ -1,4 +1,4 @@
-# Keycloak (Quarkus)  Phone Provider
+# Keycloak (Quarkus 21.x.x)  Phone Provider
 ![Build Status](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/compile-and-liveness-check.yml/badge.svg)
 
  + Phone support like e-mail
@@ -37,6 +37,26 @@ This is what you can do for now:
   + Register only phone (username is phone number)
   + Register add user attribute with `redirect_uri` params
 
+## Features
+### New in Version 2.3.1
++ Canonicalize phone numbers using [Google's libphonenumbers](https://github.com/google/libphonenumber) 
++ Valid phone number using [Google's libphonenumbers](https://github.com/google/libphonenumber)
++ Cli param `number-regx` rename to `number-regex`, and match regex at after canonicalize phone number
++ Fixed Bug [#40 OTP Cookie bypass](https://github.com/cooperlyt/keycloak-phone-provider/issues/40)
++ Remove OTP setting `Cookie Max Age` and add cli param otp-expires
++ Refactor OTP , only use Credential's phone number (The certificate's phone number comes from Required action `Configure OTP over SMS` or setting `Create OTP Credential` in user registration  ), Regardless of the user's phone number
++ Cli param `hour-maximum` rename to `target-hour-maximum`
++ Add cli param `source-hour-maximum`
+
+Migration: 
++ Set cli param `canonicalize-phone-numbers` is "" or `compatible` is true , because in old user data phone number is not canonicalize.
++ Change `number-regx` to `number-regex` and change regex match after canonicalize phone number
+    
+
+### New in Version 2.2.2
++ fix phone number as username bug [#24](https://github.com/cooperlyt/keycloak-phone-provider/issues/24)
+
+
 
 ## Compatibility
 
@@ -48,7 +68,7 @@ anymore and I did not test user storage beyond Kerberos or LDAP. I may try to he
 ### **Installing:**
 
 + Docker
-  1. docker image is [coopersoft/keycloak:20.0.5_phone-2.2.2](https://hub.docker.com/repository/docker/coopersoft/keycloak)
+  1. docker image is [coopersoft/keycloak:21.0.1_phone-2.2.2](https://hub.docker.com/repository/docker/coopersoft/keycloak)
   2. for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/keycloak-phone-provider/master/examples/docker-compose.yml)
   3. run as `docker-compose up` , [docker-compose](https://docs.docker.com/compose/) is required!
 
@@ -82,9 +102,19 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
   kc.[sh|bat] start \
     --spi-phone-default-service=[dummy|aws|aliyun|cloopen| ...]  # Which sms provider
     --spi-phone-default-token-expires-in=60  # sms expires ,default 60 second
-    --spi-phone-default-hour-maximum=3 # How many send sms count in one hour.
-    --spi-phone-default-[$realm-]duplicate-phone=false # allow one phone register multi user
-    --spi-phone-default-[$realm-]number-regx=^\+?\d+$
+    --spi-phone-default-source-hour-maximum=3 # How many send from ip address sms count in one hour, Zero is no limit. default 3 
+    --spi-phone-default-target-hour-maximum=10 # How many send to phone number sms count in one hour, Zero is no limit, default 10 
+    --spi-phone-default-[$realm-]duplicate-phone=false # allow one phone register multi user, default: false
+    --spi-phone-default-[$realm-]default-number-regex=^\+?\d+$ #Notice: will match after canonicalize number. eg: INTERNATIONAL: +41 44 668 18 00 , NATIONAL: 044 668 18 00 , E164: +41446681800
+    --spi-phone-default-[$realm-]valid-phone=true # valid phone number, default: true
+    #whether to parse user-supplied phone numbers and put into canonical International E.163 format.  _Required for proper duplicate phone number detection_
+    --spi-phone-default-[$realm-]canonicalize-phone-numbers=E164 #[E164,INTERNATIONAL,NATIONAL,RFC3966], default: "" un-canonicalize;  
+    #a default region to be used when parsing user-supplied phone numbers. Lookup codes at https://www.unicode.org/cldr/cldr-aux/charts/30/supplemental/territory_information.html
+    --spi-phone-default-[$realm-]phone-default-region=US #default: use realm setting's default Locate; 
+    #if compatible is true then search user will be use all format phone number 
+    --spi-phone-default-[$realm-]compatible=false #default: false
+    #Prevent 2FA from always happening for a period of time
+    --spi-phone-default-[$realm-]otp-expires=3600 #default: 60 * 60; 1 hour
 
     ...  # provider param refer provider`s readme.md
 ```
@@ -100,6 +130,10 @@ You can create a customized theme base on `phone`.
 ```
 
 ### **Phone registration support**
+
+Two user attributes are going to be used by this provider: `phoneNumberVerified` (bool) and `phoneNumber` (str). Multiple
+users can have the same `phoneNumber`, but only one of them will have `phoneNumberVerified` = `true` at the end of a
+verification process. This accommodates the use case of pre-paid numbers that get recycled if inactive for too much time.
 
 Under `Authentication` > `Flows`:
 
@@ -156,13 +190,14 @@ On the `Authentication` page, bind `Browser with phone` to `Browser flow`
 
 ### **OTP by Phone**
 
-Two user attributes are going to be used by this provider: `phoneNumberVerified` (bool) and `phoneNumber` (str). Multiple
-users can have the same `phoneNumber`, but only one of them will have `phoneNumberVerified` = `true` at the end of a
-verification process. This accommodates the use case of pre-paid numbers that get recycled if inactive for too much time.
+
+OTP Phone use OTP Credential's phone number,Different from the user's phone number, Credential's phone number come from required actions `Configure OTP over SMS`, Unless the `Create OTP Credential` is enabled on user registration flow.
 
 
   On Authentication page, copy the browser flow and replace `OTP` with  `OTP Over SMS` . Don't forget to bind this flow copy as the de facto browser flow.
-  Finally, register the required actions `Update Phone Number` and `Configure OTP over SMS` in the Required Actions tab.
+  Finally, register the required actions `Configure OTP over SMS` in the Required Actions tab.
+
+
 
 ![OTP](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/b0.jpg)
 
@@ -221,6 +256,11 @@ Under `Authentication` > `Flows`:
 Set Bind `Reset credentials with phone` to `Reset credentials flow`
 
 ![Authentication setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/d0.jpg)
+
+
+## **Required Action**
++ `Update Phone Number` update user's phone number on next login.
++ `Configure OTP over SMS` update OTP Credential's phone number on next login.
 
 **Phone one key login**
   Testing , coming soon!

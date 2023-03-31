@@ -1,7 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
 import okhttp3.HttpUrl;
-import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -47,16 +46,13 @@ public class RegistrationRedirectParametersReader implements FormActionFactory, 
     return true;
   }
 
-  //TODO Should set type is 'MULTIVALUED_STRING_TYPE' but a bug in keycloak 19.0.1
-  // https://github.com/keycloak/keycloak/issues/13708
-  // 'STRING_TYPE' is temporary
   @Override
   public List<ProviderConfigProperty> getConfigProperties() {
     ProviderConfigProperty rep =
         new ProviderConfigProperty(PARAM_NAMES,
             "Accept query param",
             "Registration query param accept names.",
-            STRING_TYPE, null);
+            MULTIVALUED_STRING_TYPE, null);
     return Collections.singletonList(rep);
   }
 
@@ -138,7 +134,7 @@ public class RegistrationRedirectParametersReader implements FormActionFactory, 
 
     String params = authenticatorConfig.getConfig().get(PARAM_NAMES);
 
-    if (StringUtils.isBlank(params)) {
+    if (Validation.isBlank(params)) {
       logger.warn("accept params is not configure.");
       return;
     }

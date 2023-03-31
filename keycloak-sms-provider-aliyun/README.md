@@ -2,7 +2,7 @@
 
 www.aliyun.com
 
-**Not verify in Quarkus 19.0.1**
+**verify on Quarkus 21.0.1 #35 **
 
 ```sh
 cp target/providers/keycloak-phone-provider.jar ${KEYCLOAK_HOME}/providers/
@@ -12,7 +12,7 @@ cp target/providers/keycloak-sms-provider-aliyun.jar ${KEYCLOAK_HOME}/providers/
 
 ${KEYCLOAK_HOME}/bin/kc.sh build
 
-${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-message-service-default-service=aliyun \
+${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-default-service=aliyun \
   --spi-message-sender-service-aliyun-region=cn-hangzhou \
   --spi-message-sender-service-aliyun-key=${accessKey} \
   --spi-message-sender-service-aliyun-secret=${accessSecret} \

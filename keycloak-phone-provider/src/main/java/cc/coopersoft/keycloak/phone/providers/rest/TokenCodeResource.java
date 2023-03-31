@@ -2,11 +2,12 @@ package cc.coopersoft.keycloak.phone.providers.rest;
 
 import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
+import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
-import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.services.validation.Validation;
 
 import javax.validation.constraints.NotBlank;
 import javax.ws.rs.*;
@@ -34,9 +35,13 @@ public class TokenCodeResource {
   public Response getTokenCode(@NotBlank @QueryParam("phoneNumber") String phoneNumber,
                                @QueryParam("kind") String kind) {
 
-    if (StringUtils.isBlank(phoneNumber)) throw new BadRequestException("Must inform a phone number");
+    if (Validation.isBlank(phoneNumber)) throw new BadRequestException("Must supply a phone number");
 
-    if (!Utils.getPhoneNumberRegx(session).map(phoneNumber::matches).orElse(true)){
+    var phoneProvider = session.getProvider(PhoneProvider.class);
+
+    try {
+      phoneNumber = Utils.canonicalizePhoneNumber(session,phoneNumber);
+    } catch (PhoneNumberInvalidException e) {
       throw new BadRequestException("Phone number is invalid");
     }
 
@@ -44,13 +49,13 @@ public class TokenCodeResource {
     if( !TokenCodeType.REGISTRATION.equals(tokenCodeType) &&
         !TokenCodeType.AUTH.equals(tokenCodeType) &&
         !TokenCodeType.VERIFY.equals(tokenCodeType) &&
-        Utils.findUserByPhone(session.users(), session.getContext().getRealm(), phoneNumber).isEmpty()) {
+        Utils.findUserByPhone(session, session.getContext().getRealm(), phoneNumber).isEmpty()) {
       throw new ForbiddenException("Phone number not found");
     }
 
-    logger.info(String.format("Requested %s code to %s", tokenCodeType.getLabel(), phoneNumber));
-    int tokenExpiresIn = session.getProvider(PhoneProvider.class)
-        .sendTokenCode(phoneNumber, tokenCodeType, kind);
+    logger.info(String.format("Requested %s code to %s", tokenCodeType.label, phoneNumber));
+    int tokenExpiresIn = phoneProvider.sendTokenCode(phoneNumber,
+        session.getContext().getConnection().getRemoteAddr(), tokenCodeType, kind);
 
     String response = String.format("{\"expires_in\":%s}", tokenExpiresIn);
 

@@ -1,16 +1,15 @@
-/**
- * add by zhangzhl
- * 2020-07-27
- * 注册页手机号码必填验证
- */
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
+import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
+import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
+import com.google.i18n.phonenumbers.NumberParseException;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -80,8 +79,8 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
         .property().name(CONFIG_OPT_CREDENTIAL)
         .type(BOOLEAN_TYPE)
         .defaultValue(false)
-        .label("Create a phone OTP credential")
-        .helpText("Create a phone OTP credential.")
+        .label("Create OTP Credential")
+        .helpText("Create OTP credential by phone number.")
         .add()
         .build();
   }
@@ -137,15 +136,31 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
     KeycloakSession session = context.getSession();
 
     String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
-    context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
 
+    if (Validation.isBlank(phoneNumber)){
+      context.error(Errors.INVALID_REGISTRATION);
+      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING));
+      context.validationError(formData, errors);
+      return;
+    }
+
+    try {
+      phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
+    } catch (PhoneNumberInvalidException e) {
+      context.error(Errors.INVALID_REGISTRATION);
+      errors.add(new FormMessage(FIELD_PHONE_NUMBER, e.getErrorType().message()));
+      context.validationError(formData, errors);
+      return;
+    }
+
+    context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
 
     String verificationCode = formData.getFirst(FIELD_VERIFICATION_CODE);
     TokenCodeRepresentation tokenCode = getTokenCodeService(session).ongoingProcess(phoneNumber, TokenCodeType.REGISTRATION);
     if (Validation.isBlank(verificationCode) || tokenCode == null || !tokenCode.getCode().equals(verificationCode)) {
       context.error(Errors.INVALID_REGISTRATION);
       formData.remove(FIELD_VERIFICATION_CODE);
-      errors.add(new FormMessage(FIELD_VERIFICATION_CODE, "verificationCodeDoesNotMatch"));
+      errors.add(new FormMessage(FIELD_VERIFICATION_CODE, SupportPhonePages.Errors.NOT_MATCH.message()));
       context.validationError(formData, errors);
       return;
     }
@@ -158,20 +173,30 @@ public class RegistrationPhoneVerificationCode implements FormAction, FormAction
   public void success(FormContext context) {
 
     UserModel user = context.getUser();
+    var session = context.getSession();
 
     MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
+
     String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
-    String tokenId = context.getSession().getAttribute("tokenId", String.class);
+
+    try {
+      phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
+    } catch (PhoneNumberInvalidException e) {
+      //verified in validate process
+      throw new IllegalStateException();
+    }
+
+    String tokenId = session.getAttribute("tokenId", String.class);
 
     logger.info(String.format("registration user %s phone success, tokenId is: %s", user.getId(), tokenId));
-    getTokenCodeService(context.getSession()).tokenValidated(user, phoneNumber, tokenId);
+    getTokenCodeService(context.getSession()).tokenValidated(user, phoneNumber, tokenId,false);
 
     AuthenticatorConfigModel config = context.getAuthenticatorConfig();
     if (config != null &&
         "true".equalsIgnoreCase(config.getConfig().getOrDefault(CONFIG_OPT_CREDENTIAL,"false"))){
       PhoneOtpCredentialProvider ocp = (PhoneOtpCredentialProvider) context.getSession()
           .getProvider(CredentialProvider.class, PhoneOtpCredentialProviderFactory.PROVIDER_ID);
-      ocp.createCredential(context.getRealm(), context.getUser(), PhoneOtpCredentialModel.create(phoneNumber));
+      ocp.createCredential(context.getRealm(), context.getUser(), PhoneOtpCredentialModel.create(phoneNumber,tokenId,0));
     }
 
   }

@@ -1,6 +1,7 @@
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
 import cc.coopersoft.keycloak.phone.Utils;
+import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;
@@ -144,7 +145,7 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
         return false;
       }
       if (Utils.isDuplicatePhoneAllowed(context.getSession())){
-        logger.warn("Duplicate phone allowed! phone number can't as username.");
+        logger.warn("Duplicate phone allowed! phone number can't be used as username.");
         return false;
       }
       return true;
@@ -193,18 +194,46 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
   @Override
   public void validate(ValidationContext context) {
 
+    KeycloakSession session = context.getSession();
+
+
     MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
     context.getEvent().detail(Details.REGISTER_METHOD, "form");
 
     String phoneNumber = formData.getFirst(FIELD_PHONE_NUMBER);
-    context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
 
+    boolean success = true;
+    List<FormMessage> errors = new ArrayList<>();
+    if (Validation.isBlank(phoneNumber)) {
+      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message()));
+      context.error(Errors.INVALID_REGISTRATION);
+      context.validationError(formData, errors);
+      success = false;
+    }else {
+      try {
+        phoneNumber = Utils.canonicalizePhoneNumber(session,phoneNumber);
+        if (!Utils.isDuplicatePhoneAllowed(session) &&
+            Utils.findUserByPhone(session, context.getRealm(), phoneNumber).isPresent()) {
+          context.error(Errors.INVALID_REGISTRATION);
+          errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.EXISTS.message()));
+          context.validationError(formData, errors);
+          success = false;
+        }
+      } catch (PhoneNumberInvalidException e) {
+
+        context.error(Errors.INVALID_REGISTRATION);
+        errors.add(new FormMessage(FIELD_PHONE_NUMBER, e.getErrorType().message()));
+        context.validationError(formData, errors);
+        success = false;
+      }
+    }
+
+    context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
     if (isPhoneNumberAsUsername(context)){
       context.getEvent().detail(Details.USERNAME, phoneNumber);
       formData.putSingle(UserModel.USERNAME,phoneNumber);
     }
 
-    KeycloakSession session = context.getSession();
     UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
     UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION_USER_CREATION, formData);
 
@@ -229,21 +258,6 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       }
     }
 
-    boolean success = true;
-    List<FormMessage> errors = new ArrayList<>();
-    if (Validation.isBlank(phoneNumber)) {
-      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message()));
-      context.error(Errors.INVALID_REGISTRATION);
-      context.validationError(formData, errors);
-      success = false;
-    } else if (!Utils.isDuplicatePhoneAllowed(context.getSession()) &&
-        Utils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber).isPresent()) {
-      context.error(Errors.INVALID_REGISTRATION);
-      errors.add(new FormMessage(FIELD_PHONE_NUMBER, SupportPhonePages.Errors.EXISTS.message()));
-      context.validationError(formData, errors);
-      success = false;
-    }
-
     try {
       profile.validate();
     } catch (ValidationException pve) {
@@ -257,7 +271,6 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       success = false;
       errors.addAll(Validation.getFormErrorsFromValidation(pve.getErrors()));
     }
-
 
     if (success) {
       context.success();
@@ -274,6 +287,13 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
     String email = formData.getFirst(UserModel.EMAIL);
     String username = formData.getFirst(UserModel.USERNAME);
 
+    var session = context.getSession();
+    try {
+      phoneNumber = Utils.canonicalizePhoneNumber(session,phoneNumber);
+    } catch (PhoneNumberInvalidException e) {
+      // verified in validate process
+      throw new IllegalStateException();
+    }
 
     if (context.getRealm().isRegistrationEmailAsUsername()){
       username = email;
@@ -290,7 +310,6 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       context.getEvent().detail(Details.EMAIL,email);
     }
 
-    KeycloakSession session = context.getSession();
     UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
     UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION_USER_CREATION, formData);
     UserModel user = profile.create();

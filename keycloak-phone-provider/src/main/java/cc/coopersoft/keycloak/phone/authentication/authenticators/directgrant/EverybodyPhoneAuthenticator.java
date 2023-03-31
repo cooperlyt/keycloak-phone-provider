@@ -51,7 +51,7 @@ public class EverybodyPhoneAuthenticator extends BaseDirectGrantAuthenticator {
       return;
     }
 
-    UserModel user = Utils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber)
+    UserModel user = Utils.findUserByPhone(context.getSession(), context.getRealm(), phoneNumber)
         .orElseGet(() -> {
           if (context.getSession().users().getUserByUsername(context.getRealm(),phoneNumber) != null) {
             invalidCredentials(context, AuthenticationFlowError.USER_CONFLICT);
@@ -65,7 +65,7 @@ public class EverybodyPhoneAuthenticator extends BaseDirectGrantAuthenticator {
         });
     if (user != null) {
       context.setUser(user);
-      phoneVerificationCodeProvider.tokenValidated(user, phoneNumber, tokenCode.getId());
+      phoneVerificationCodeProvider.tokenValidated(user, phoneNumber, tokenCode.getId(),false);
       context.success();
     }
   }

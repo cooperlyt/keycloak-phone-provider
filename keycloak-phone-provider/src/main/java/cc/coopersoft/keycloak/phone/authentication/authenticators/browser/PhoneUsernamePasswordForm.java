@@ -2,10 +2,10 @@ package cc.coopersoft.keycloak.phone.authentication.authenticators.browser;
 
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
+import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
-import cc.coopersoft.common.OptionalStringUtils;
+import cc.coopersoft.common.OptionalUtils;
 import cc.coopersoft.keycloak.phone.Utils;
-import org.apache.commons.lang.StringUtils;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -25,6 +25,7 @@ import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.messages.Messages;
+import org.keycloak.services.validation.Validation;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -75,7 +76,7 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
   @Override
   protected boolean validateForm(AuthenticationFlowContext context, MultivaluedMap<String, String> inputData) {
 
-    boolean byPhone = OptionalStringUtils
+    boolean byPhone = OptionalUtils
         .ofBlank(inputData.getFirst(FIELD_PATH_PHONE_ACTIVATED))
         .map(s -> "true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s))
         .orElse(false);
@@ -86,17 +87,16 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
     String phoneNumber = inputData.getFirst(FIELD_PHONE_NUMBER);
 
 
-    if (StringUtils.isBlank(phoneNumber)) {
+    if (Validation.isBlank(phoneNumber)) {
       context.getEvent().error(Errors.USERNAME_MISSING);
       context.form().setAttribute(ATTEMPTED_PHONE_ACTIVATED, true);
       Response challengeResponse = challenge(context, SupportPhonePages.Errors.MISSING.message(), FIELD_PHONE_NUMBER);
       context.forceChallenge(challengeResponse);
       return false;
     }
-    phoneNumber = phoneNumber.trim();
 
     String code = inputData.getFirst(FIELD_VERIFICATION_CODE);
-    if (StringUtils.isBlank(code)) {
+    if (Validation.isBlank(code)) {
       invalidVerificationCode(context, phoneNumber);
       return false;
     }
@@ -108,22 +108,32 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
     context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
     context.form().setAttribute(ATTEMPTED_PHONE_ACTIVATED, true)
         .setAttribute(ATTEMPTED_PHONE_NUMBER, number);
-    Response challengeResponse = challenge(context, MESSAGE_VERIFICATION_CODE_NOT_MATCH, FIELD_VERIFICATION_CODE);
+    Response challengeResponse = challenge(context, SupportPhonePages.Errors.NOT_MATCH.message(), FIELD_VERIFICATION_CODE);
     context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challengeResponse);
   }
 
   private boolean validatePhone(AuthenticationFlowContext context, String phoneNumber, String code) {
     context.clearUser();
-    return Utils.findUserByPhone(context.getSession().users(), context.getRealm(), phoneNumber)
-        .map(user -> validateVerificationCode(context, user, phoneNumber, code) && validateUser(context, user, phoneNumber))
-        .orElseGet(() -> {
-          context.getEvent().error(Errors.USER_NOT_FOUND);
-          context.form().setAttribute(ATTEMPTED_PHONE_ACTIVATED, true)
-              .setAttribute(ATTEMPTED_PHONE_NUMBER, phoneNumber);
-          Response challengeResponse = challenge(context, MESSAGE_PHONE_USER_NOT_FOUND, FIELD_PHONE_NUMBER);
-          context.failureChallenge(AuthenticationFlowError.INVALID_USER, challengeResponse);
-          return false;
-        });
+    try {
+     var validPhoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
+      return Utils.findUserByPhone(context.getSession(), context.getRealm(), validPhoneNumber)
+          .map(user -> validateVerificationCode(context, user, validPhoneNumber, code) && validateUser(context, user, validPhoneNumber))
+          .orElseGet(() -> {
+            context.getEvent().error(Errors.USER_NOT_FOUND);
+            context.form().setAttribute(ATTEMPTED_PHONE_ACTIVATED, true)
+                .setAttribute(ATTEMPTED_PHONE_NUMBER, phoneNumber);
+            Response challengeResponse = challenge(context, SupportPhonePages.Errors.USER_NOT_FOUND.message(), FIELD_PHONE_NUMBER);
+            context.failureChallenge(AuthenticationFlowError.INVALID_USER, challengeResponse);
+            return false;
+          });
+    } catch (PhoneNumberInvalidException e) {
+      context.getEvent().error(Errors.USERNAME_MISSING);
+      context.form().setAttribute(ATTEMPTED_PHONE_ACTIVATED, true)
+          .setAttribute(ATTEMPTED_PHONE_NUMBER, phoneNumber);
+      Response challengeResponse = challenge(context,e.getErrorType().message(), FIELD_PHONE_NUMBER);
+      context.failureChallenge(AuthenticationFlowError.INVALID_USER, challengeResponse);
+      return false;
+    }
   }
 
   private boolean validateVerificationCode(AuthenticationFlowContext context, UserModel user, String phoneNumber, String code) {
@@ -233,7 +243,7 @@ public class PhoneUsernamePasswordForm extends UsernamePasswordForm implements A
       if (user == null &&
           isLoginWithPhoneNumber(context) &&
           !Utils.isDuplicatePhoneAllowed(context.getSession())){
-        user = Utils.findUserByPhone(context.getSession().users(), context.getRealm(), username).orElse(null);
+        user = Utils.findUserByPhone(context.getSession(), context.getRealm(), username).orElse(null);
       }
     } catch (ModelDuplicateException mde) {
       ServicesLogger.LOGGER.modelDuplicateException(mde);

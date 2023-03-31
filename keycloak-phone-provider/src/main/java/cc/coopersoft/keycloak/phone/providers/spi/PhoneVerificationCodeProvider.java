@@ -9,7 +9,7 @@ public interface PhoneVerificationCodeProvider extends Provider {
 
     TokenCodeRepresentation ongoingProcess(String phoneNumber, TokenCodeType tokenCodeType);
 
-    boolean isAbusing(String phoneNumber, TokenCodeType tokenCodeType,int hourMaximum);
+    boolean isAbusing(String phoneNumber, TokenCodeType tokenCodeType,String sourceAddr ,int sourceHourMaximum,int targetHourMaximum);
 
     void persistCode(TokenCodeRepresentation tokenCode, TokenCodeType tokenCodeType, int tokenExpiresIn);
 
@@ -19,7 +19,7 @@ public interface PhoneVerificationCodeProvider extends Provider {
 
     void validateProcess(String tokenCodeId, UserModel user);
 
-    void cleanUpAction(UserModel user);
+    //void cleanUpAction(UserModel user, boolean isOTP);
 
-    void tokenValidated(UserModel user, String phoneNumber, String tokenCodeId);
+    void tokenValidated(UserModel user, String phoneNumber, String tokenCodeId, boolean isOTP);
 }

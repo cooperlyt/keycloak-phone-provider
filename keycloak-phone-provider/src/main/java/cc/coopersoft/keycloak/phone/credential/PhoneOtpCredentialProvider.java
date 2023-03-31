@@ -4,15 +4,24 @@ import cc.coopersoft.keycloak.phone.authentication.authenticators.browser.SmsOtp
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
 import org.jboss.logging.Logger;
+import org.keycloak.common.util.ObjectUtil;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.*;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.credential.dto.OTPSecretData;
+import org.keycloak.util.JsonSerialization;
+
+import java.io.IOException;
+import java.util.Optional;
 
 /**
  *  证书使用 CredentialValidator 来认证，例如 password 证书 使用登录认证，本例中使用 phone OTP 认证
+ *   //not have credential , SmsOtpMfaAuthenticator setRequiredActions will add
+ *   ConfigSmsOtpRequiredAction to add an OPT credential
+ *   -> OTP
  */
 public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCredentialModel>, CredentialInputValidator {
 
@@ -44,6 +53,7 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
 
         String phoneNumber = user.getFirstAttribute("phoneNumber");
 
+
         String code = input.getChallengeResponse();
 
         if (!(input instanceof UserCredentialModel)) return false;
@@ -51,12 +61,43 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
         if (phoneNumber == null) return false;
         if (code == null) return false;
 
-        try {
-            getTokenCodeService().validateCode(user, phoneNumber, code, TokenCodeType.OTP);
-            return true;
-        } catch (Exception e) {
+
+        if (ObjectUtil.isBlank(input.getCredentialId())) {
+            logger.debugf("CredentialId is null when validating credential of user %s", user.getUsername());
             return false;
         }
+
+        CredentialModel credential = user.credentialManager().getStoredCredentialById(input.getCredentialId());
+        var invalid = Optional.ofNullable(user.credentialManager().getStoredCredentialById(input.getCredentialId()))
+            .map(credentialModel -> {
+                try {
+                    return JsonSerialization.readValue(credentialModel.getCredentialData(), PhoneOtpCredentialModel.SmsOtpCredentialData.class);
+                } catch (IOException e) {
+                    throw new IllegalArgumentException(e);
+                }
+            })
+            .map(PhoneOtpCredentialModel.SmsOtpCredentialData::isSecretInvalid)
+            .filter(invalidSecret -> invalidSecret)
+            .orElse(false);
+        if (invalid){
+            try {
+                getTokenCodeService().validateCode(user, phoneNumber, code, TokenCodeType.OTP);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return Optional.ofNullable(credential.getSecretData())
+            .map(secretData -> {
+                try {
+                    return JsonSerialization.readValue(secretData, OTPSecretData.class);
+                } catch (IOException e) {
+                    throw new IllegalArgumentException(e);
+                }
+            })
+            .flatMap(secretData -> Optional.ofNullable(secretData.getValue()))
+            .map(CredentialCode -> CredentialCode.equals(code))
+            .orElse(false);
     }
 
     @Override
@@ -70,7 +111,6 @@ public class PhoneOtpCredentialProvider implements CredentialProvider<PhoneOtpCr
             credential.setCreatedDate(Time.currentTimeMillis());
         }
         return user.credentialManager().createStoredCredential(credential);
-//        return getCredentialStore().createCredential(realm, user, credential);
     }
 
     @Override

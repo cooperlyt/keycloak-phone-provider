@@ -8,11 +8,7 @@ public enum TokenCodeType {
     RESET("reset credential"),
     REGISTRATION("registration");
 
-    private String label;
-
-    public String getLabel() {
-        return label;
-    }
+    public final String label;
 
     TokenCodeType(String label) {
         this.label  = label;

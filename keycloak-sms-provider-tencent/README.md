@@ -10,7 +10,7 @@ cp target/providers/keycloak-sms-provider-tencent.jar ${KEYCLOAK_HOME}/providers
 
 ${KEYCLOAK_HOME}/bin/kc.sh build
 
-${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-message-service-default-service=tencent \
+${KEYCLOAK_HOME}/bin/kc.sh start  --spi-phone-default-service=tencent \
   --spi-message-sender-service-tencent-secret=${secretId} \
   --spi-message-sender-service-tencent-key=${secretkey} \
   --spi-message-sender-service-tencent-region=${region} \
