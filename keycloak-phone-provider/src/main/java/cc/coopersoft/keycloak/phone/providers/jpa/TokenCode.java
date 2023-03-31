@@ -16,11 +16,17 @@ import java.util.Date;
                         "AND t.expiresAt >= :now AND t.type = :type"
         ),
         @NamedQuery(
-                name = "processesSince",
-                query = "FROM TokenCode t WHERE t.realmId = :realmId " +
+                name = "processesSinceTarget",
+                query = "SELECT COUNT(t) FROM TokenCode t WHERE t.realmId = :realmId " +
                         "AND t.phoneNumber = :phoneNumber " +
                         "AND t.createdAt >= :date AND t.type = :type"
         ),
+        @NamedQuery(
+            name = "processesSinceSource",
+            query = "SELECT COUNT(t) FROM TokenCode t WHERE t.realmId = :realmId " +
+                "AND t.ip = :addr " +
+                "AND t.createdAt >= :date AND t.type = :type"
+        )
 })
 public class TokenCode {
 

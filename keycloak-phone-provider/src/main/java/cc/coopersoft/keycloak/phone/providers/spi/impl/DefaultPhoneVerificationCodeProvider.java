@@ -81,19 +81,27 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
     }
 
     @Override
-    public boolean isAbusing(String phoneNumber, TokenCodeType tokenCodeType,int hourMaximum) {
+    public boolean isAbusing(String phoneNumber, TokenCodeType tokenCodeType,
+                             String sourceAddr, int sourceHourMaximum, int targetHourMaximum) {
 
         Date oneHourAgo = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1));
 
-        List<TokenCode> entities = getEntityManager()
-                .createNamedQuery("processesSince", TokenCode.class)
+        long targetCount = (getEntityManager()
+                .createNamedQuery("processesSinceTarget", Long.class)
                 .setParameter("realmId", getRealm().getId())
                 .setParameter("phoneNumber", phoneNumber)
                 .setParameter("date", oneHourAgo, TemporalType.TIMESTAMP)
                 .setParameter("type", tokenCodeType.name())
-                .getResultList();
+                .getSingleResult());
+        long sourceCount = (getEntityManager()
+            .createNamedQuery("processesSinceSource", Long.class)
+            .setParameter("realmId", getRealm().getId())
+            .setParameter("addr", sourceAddr)
+            .setParameter("date", oneHourAgo, TemporalType.TIMESTAMP)
+            .setParameter("type", tokenCodeType.name())
+            .getSingleResult());
 
-        return entities.size() > hourMaximum;
+        return targetCount > targetHourMaximum || sourceCount > sourceHourMaximum;
     }
 
     @Override
@@ -137,9 +145,9 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
 
         logger.info(String.format("User %s correctly answered the %s code", user.getId(), tokenCodeType.label));
 
-        tokenValidated(user,phoneNumber,tokenCode.getId(),tokenCodeType.isOTP);
+        tokenValidated(user,phoneNumber,tokenCode.getId(),TokenCodeType.OTP.equals(tokenCodeType));
 
-        if (tokenCodeType.isOTP)
+        if (TokenCodeType.OTP.equals(tokenCodeType))
             updateUserOTPCredential(user,phoneNumber,tokenCode.getCode());
     }
 

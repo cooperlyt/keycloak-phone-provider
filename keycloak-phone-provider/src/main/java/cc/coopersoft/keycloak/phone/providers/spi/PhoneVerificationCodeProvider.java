@@ -9,7 +9,7 @@ public interface PhoneVerificationCodeProvider extends Provider {
 
     TokenCodeRepresentation ongoingProcess(String phoneNumber, TokenCodeType tokenCodeType);
 
-    boolean isAbusing(String phoneNumber, TokenCodeType tokenCodeType,int hourMaximum);
+    boolean isAbusing(String phoneNumber, TokenCodeType tokenCodeType,String sourceAddr ,int sourceHourMaximum,int targetHourMaximum);
 
     void persistCode(TokenCodeRepresentation tokenCode, TokenCodeType tokenCodeType, int tokenExpiresIn);
 

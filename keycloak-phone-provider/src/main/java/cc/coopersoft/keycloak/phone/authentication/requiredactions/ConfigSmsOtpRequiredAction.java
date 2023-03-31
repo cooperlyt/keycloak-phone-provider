@@ -60,7 +60,7 @@ public class ConfigSmsOtpRequiredAction implements RequiredActionProvider {
         String code = context.getHttpRequest().getDecodedFormParameters().getFirst(SupportPhonePages.FIELD_VERIFICATION_CODE);
         try {
             phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
-            phoneVerificationCodeProvider.validateCode(context.getUser(), phoneNumber, code, TokenCodeType.OTP_CONFIGURE);
+            phoneVerificationCodeProvider.validateCode(context.getUser(), phoneNumber, code, TokenCodeType.OTP);
 
             PhoneOtpCredentialProvider ocp = (PhoneOtpCredentialProvider) context.getSession()
                     .getProvider(CredentialProvider.class, PhoneOtpCredentialProviderFactory.PROVIDER_ID);

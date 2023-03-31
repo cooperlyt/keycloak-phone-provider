@@ -1,20 +1,16 @@
 package cc.coopersoft.keycloak.phone.providers.constants;
 
 public enum TokenCodeType {
-    VERIFY("verification", false),
-    AUTH("authentication", false),
+    VERIFY("verification"),
+    AUTH("authentication"),
 
-    OTP("OTP", true),
-    OTP_CONFIGURE("OTP configure", true),
-    RESET("reset credential", false),
-    REGISTRATION("registration", false);
+    OTP("OTP"),
+    RESET("reset credential"),
+    REGISTRATION("registration");
 
     public final String label;
 
-    public final boolean isOTP;
-
-    TokenCodeType(String label, boolean isOTP) {
+    TokenCodeType(String label) {
         this.label  = label;
-        this.isOTP = isOTP;
     }
 }

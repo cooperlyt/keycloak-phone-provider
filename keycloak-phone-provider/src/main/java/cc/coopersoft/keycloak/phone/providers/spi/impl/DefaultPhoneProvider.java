@@ -23,7 +23,8 @@ public class DefaultPhoneProvider implements PhoneProvider {
     private final KeycloakSession session;
     private final String service;
     private final int tokenExpiresIn;
-    private final int hourMaximum;
+    private final int targetHourMaximum;
+    private final int sourceHourMaximum;
 
     private final Scope config;
 
@@ -48,7 +49,8 @@ public class DefaultPhoneProvider implements PhoneProvider {
                 this.service + "' will be used. You can use keycloak start param '--spi-phone-default-service' to specify a different one. ");
 
         this.tokenExpiresIn = config.getInt("tokenExpiresIn", 60);
-        this.hourMaximum = config.getInt("hourMaximum",3);
+        this.targetHourMaximum = config.getInt("targetHourMaximum",3);
+        this.sourceHourMaximum = config.getInt("sourceHourMaximum", 10);
     }
 
     @Override
@@ -113,11 +115,11 @@ public class DefaultPhoneProvider implements PhoneProvider {
     }
 
     @Override
-    public int sendTokenCode(String phoneNumber,TokenCodeType type, String kind){
+    public int sendTokenCode(String phoneNumber,String sourceAddr,TokenCodeType type, String kind){
 
         logger.info("send code to:" + phoneNumber );
 
-        if (getTokenCodeService().isAbusing(phoneNumber, type,hourMaximum)) {
+        if (getTokenCodeService().isAbusing(phoneNumber, type,sourceAddr, sourceHourMaximum, targetHourMaximum)) {
             throw new ForbiddenException("You requested the maximum number of messages the last hour");
         }
 
