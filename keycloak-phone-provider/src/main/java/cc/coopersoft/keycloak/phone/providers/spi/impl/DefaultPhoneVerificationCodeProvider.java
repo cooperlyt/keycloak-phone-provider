@@ -17,7 +17,6 @@ import org.keycloak.credential.CredentialProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.models.credential.dto.OTPSecretData;
 import org.keycloak.services.validation.Validation;
 import org.keycloak.util.JsonSerialization;
 
@@ -29,7 +28,6 @@ import javax.ws.rs.ForbiddenException;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCodeProvider {
