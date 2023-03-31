@@ -1,6 +1,7 @@
 name: 'build-test'
 on:
-  push
+  push:
+    branches:[ master ]
 
 jobs:
   build-and-liveness-check:
