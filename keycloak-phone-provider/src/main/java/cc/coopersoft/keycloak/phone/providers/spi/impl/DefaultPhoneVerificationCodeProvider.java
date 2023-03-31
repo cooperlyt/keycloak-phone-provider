@@ -86,22 +86,31 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
 
         Date oneHourAgo = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1));
 
-        long targetCount = (getEntityManager()
+        if (targetHourMaximum > 0){
+            long targetCount = (getEntityManager()
                 .createNamedQuery("processesSinceTarget", Long.class)
                 .setParameter("realmId", getRealm().getId())
                 .setParameter("phoneNumber", phoneNumber)
                 .setParameter("date", oneHourAgo, TemporalType.TIMESTAMP)
                 .setParameter("type", tokenCodeType.name())
                 .getSingleResult());
-        long sourceCount = (getEntityManager()
-            .createNamedQuery("processesSinceSource", Long.class)
-            .setParameter("realmId", getRealm().getId())
-            .setParameter("addr", sourceAddr)
-            .setParameter("date", oneHourAgo, TemporalType.TIMESTAMP)
-            .setParameter("type", tokenCodeType.name())
-            .getSingleResult());
+            if (targetCount > targetHourMaximum)
+                return true;
+        }
 
-        return targetCount > targetHourMaximum || sourceCount > sourceHourMaximum;
+        if (sourceHourMaximum > 0){
+            long sourceCount = (getEntityManager()
+                .createNamedQuery("processesSinceSource", Long.class)
+                .setParameter("realmId", getRealm().getId())
+                .setParameter("addr", sourceAddr)
+                .setParameter("date", oneHourAgo, TemporalType.TIMESTAMP)
+                .setParameter("type", tokenCodeType.name())
+                .getSingleResult());
+            if (sourceCount > sourceHourMaximum)
+                return true;
+        }
+
+        return false;
     }
 
     @Override
