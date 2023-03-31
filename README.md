@@ -37,7 +37,6 @@ This is what you can do for now:
   + Register only phone (username is phone number)
   + Register add user attribute with `redirect_uri` params
 
-Current version: `2.3.1-snapshot`
 ## Features
 ### New in Version 2.3.1
 + Canonicalize phone numbers using [Google's libphonenumbers](https://github.com/google/libphonenumber) 
@@ -46,8 +45,8 @@ Current version: `2.3.1-snapshot`
 + Fixed Bug [#40 OTP Cookie bypass](https://github.com/cooperlyt/keycloak-phone-provider/issues/40)
 + Remove OTP setting `Cookie Max Age` and add cli param otp-expires
 + Refactor OTP , only use Credential's phone number (The certificate's phone number comes from Required action `Configure OTP over SMS` or setting `Create OTP Credential` in user registration  ), Regardless of the user's phone number
-+ Cli param `hour-maximum` rename to `source-hour-maximum`
-+ Add cli param `target-hour-maximum`
++ Cli param `hour-maximum` rename to `target-hour-maximum`
++ Add cli param `source-hour-maximum`
 
 Migration: 
 + Set cli param `canonicalize-phone-numbers` is "" or `compatible` is true , because in old user data phone number is not canonicalize.
