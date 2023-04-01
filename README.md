@@ -188,14 +188,14 @@ On the `Authentication` page, bind `Browser with phone` to `Browser flow`
 ![Login By phone](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/e0.jpg)
 
 
-### **OTP by Phone**
+### **2FA by Phone OTP**
 
 
-OTP Phone use OTP Credential's phone number,Different from the user's phone number, Credential's phone number come from required actions `Configure OTP over SMS`, Unless the `Create OTP Credential` is enabled on user registration flow.
+ Phone OTP use OTP Credential's phone number,Different from the user's phone number, Credential's phone number come from required actions `Configure OTP over SMS`, Unless the `Create OTP Credential` is enabled on user registration flow.
 
 
   On Authentication page, copy the browser flow and replace `OTP` with  `OTP Over SMS` . Don't forget to bind this flow copy as the de facto browser flow.
-  Finally, register the required actions `Configure OTP over SMS` in the Required Actions tab.
+  Finally, Enable the required actions `Configure OTP over SMS` in the Required Actions tab.
 
 
 
