@@ -191,7 +191,7 @@ On the `Authentication` page, bind `Browser with phone` to `Browser flow`
 ### **2FA by Phone OTP**
 
 
- Phone OTP use OTP Credential's phone number,Different from the user's phone number, Credential's phone number come from required actions `Configure OTP over SMS`, Unless the `Create OTP Credential` is enabled on user registration flow.
+ Phone OTP uses OTP Credential's phone number,Different from the user's phone number, Credential's phone number come from required actions `Configure OTP over SMS`, Unless the `Create OTP Credential` is enabled on user registration flow.
 
 
   On Authentication page, copy the browser flow and replace `OTP` with  `OTP Over SMS` . Don't forget to bind this flow copy as the de facto browser flow.
