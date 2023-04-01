@@ -102,8 +102,8 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
   kc.[sh|bat] start \
     --spi-phone-default-service=[dummy|aws|aliyun|cloopen| ...]  # Which sms provider
     --spi-phone-default-token-expires-in=60  # sms expires ,default 60 second
-    --spi-phone-default-source-hour-maximum=3 # How many send from ip address sms count in one hour, Zero is no limit. default 3 
-    --spi-phone-default-target-hour-maximum=10 # How many send to phone number sms count in one hour, Zero is no limit, default 10 
+    --spi-phone-default-source-hour-maximum=10 # How many send from ip address sms count in one hour, Zero is no limit. default 10 
+    --spi-phone-default-target-hour-maximum=3 # How many send to phone number sms count in one hour, Zero is no limit, default 3 
     --spi-phone-default-[$realm-]duplicate-phone=false # allow one phone register multi user, default: false
     --spi-phone-default-[$realm-]default-number-regex=^\+?\d+$ #Notice: will match after canonicalize number. eg: INTERNATIONAL: +41 44 668 18 00 , NATIONAL: 044 668 18 00 , E164: +41446681800
     --spi-phone-default-[$realm-]valid-phone=true # valid phone number, default: true
