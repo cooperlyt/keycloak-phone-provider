@@ -1,5 +1,5 @@
-# Keycloak (Quarkus 20.x.x)  Phone Provider
-![ci](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/ci-keycloak20.yml/badge.svg)
+# Keycloak (Quarkus 21.x.x)  Phone Provider
+![Build Status](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/compile-and-liveness-check.yml/badge.svg)
 
  + Phone support like e-mail
  + One Time Password (OTP) by phone
@@ -38,6 +38,10 @@ This is what you can do for now:
   + Register add user attribute with `redirect_uri` params
 
 ## Features
+
+### New in Version 2.3.2
++ fix phone login form display error!
+
 ### New in Version 2.3.1
 + Canonicalize phone numbers using [Google's libphonenumbers](https://github.com/google/libphonenumber) 
 + Valid phone number using [Google's libphonenumbers](https://github.com/google/libphonenumber)
@@ -60,7 +64,7 @@ Migration:
 
 ## Compatibility
 
-This was initially developed using 20.0.1 version of Quarkus Keycloak as baseline.  Wildfily keycloak is not supported
+This was initially developed using Quarkus Keycloak as baseline.  Wildfily keycloak is not supported
 anymore and I did not test user storage beyond Kerberos or LDAP. I may try to help you but I cannot guarantee.
 
 ## Usage
@@ -68,7 +72,7 @@ anymore and I did not test user storage beyond Kerberos or LDAP. I may try to he
 ### **Installing:**
 
 + Docker
-  1. docker image is [coopersoft/keycloak:20.0.5_phone-2.3.1](https://hub.docker.com/repository/docker/coopersoft/keycloak)
+  1. docker image is [coopersoft/keycloak:21.0.2_phone-2.3.1](https://hub.docker.com/repository/docker/coopersoft/keycloak)
   2. for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/keycloak-phone-provider/master/examples/docker-compose.yml)
   3. run as `docker-compose up` , [docker-compose](https://docs.docker.com/compose/) is required!
 
@@ -102,8 +106,8 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
   kc.[sh|bat] start \
     --spi-phone-default-service=[dummy|aws|aliyun|cloopen| ...]  # Which sms provider
     --spi-phone-default-token-expires-in=60  # sms expires ,default 60 second
-    --spi-phone-default-source-hour-maximum=3 # How many send from ip address sms count in one hour, Zero is no limit. default 3 
-    --spi-phone-default-target-hour-maximum=10 # How many send to phone number sms count in one hour, Zero is no limit, default 10 
+    --spi-phone-default-source-hour-maximum=10 # How many send from ip address sms count in one hour, Zero is no limit. default 10 
+    --spi-phone-default-target-hour-maximum=3 # How many send to phone number sms count in one hour, Zero is no limit, default 3 
     --spi-phone-default-[$realm-]duplicate-phone=false # allow one phone register multi user, default: false
     --spi-phone-default-[$realm-]default-number-regex=^\+?\d+$ #Notice: will match after canonicalize number. eg: INTERNATIONAL: +41 44 668 18 00 , NATIONAL: 044 668 18 00 , E164: +41446681800
     --spi-phone-default-[$realm-]valid-phone=true # valid phone number, default: true
@@ -188,14 +192,14 @@ On the `Authentication` page, bind `Browser with phone` to `Browser flow`
 ![Login By phone](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/e0.jpg)
 
 
-### **OTP by Phone**
+### **2FA by Phone OTP**
 
 
-OTP Phone use OTP Credential's phone number,Different from the user's phone number, Credential's phone number come from required actions `Configure OTP over SMS`, Unless the `Create OTP Credential` is enabled on user registration flow.
+ Phone OTP uses OTP Credential's phone number,Different from the user's phone number, Credential's phone number come from required actions `Configure OTP over SMS`, Unless the `Create OTP Credential` is enabled on user registration flow.
 
 
   On Authentication page, copy the browser flow and replace `OTP` with  `OTP Over SMS` . Don't forget to bind this flow copy as the de facto browser flow.
-  Finally, register the required actions `Configure OTP over SMS` in the Required Actions tab.
+  Finally, Enable the required actions `Configure OTP over SMS` in the Required Actions tab.
 
 
 
