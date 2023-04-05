@@ -7,7 +7,7 @@
     <groupId>cc.coopersoft</groupId>
     <artifactId>keycloak-phone-provider-parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.3.1</version>
+    <version>2.3.2-snapshot</version>
 
     <name>keycloak-phone-provider</name>
     <description>keycloak phone support.</description>

@@ -38,6 +38,10 @@ This is what you can do for now:
   + Register add user attribute with `redirect_uri` params
 
 ## Features
+
+### New in Version 2.3.2
++ fix phone login form display error!
+
 ### New in Version 2.3.1
 + Canonicalize phone numbers using [Google's libphonenumbers](https://github.com/google/libphonenumber) 
 + Valid phone number using [Google's libphonenumbers](https://github.com/google/libphonenumber)
