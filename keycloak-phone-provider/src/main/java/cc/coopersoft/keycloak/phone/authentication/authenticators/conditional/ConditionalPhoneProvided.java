@@ -15,7 +15,7 @@ public class ConditionalPhoneProvided implements  ConditionalAuthenticator {
   @Override
   public boolean matchCondition(AuthenticationFlowContext context) {
     var config = context.getAuthenticatorConfig().getConfig();
-    boolean negateOutput = Boolean.parseBoolean(config.get(ConditionalUserAttributeValueFactory.CONF_NOT));
+    boolean negateOutput = Boolean.parseBoolean(config.getOrDefault(ConditionalUserAttributeValueFactory.CONF_NOT,"false"));
 
     boolean result = OptionalUtils.ofBlank(OptionalUtils.ofBlank(
             context.getHttpRequest().getDecodedFormParameters().getFirst("phone_number"))
