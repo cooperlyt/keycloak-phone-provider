@@ -39,6 +39,9 @@ This is what you can do for now:
 
 ## Features
 
+### New in Version 2.3.3
++ Add `Condition - phone provided` [#46](https://github.com/cooperlyt/keycloak-phone-provider/issues/46)
+
 ### New in Version 2.3.2
 + fix phone login form display error!
 
@@ -72,7 +75,7 @@ anymore and I did not test user storage beyond Kerberos or LDAP. I may try to he
 ### **Installing:**
 
 + Docker
-  1. docker image is [coopersoft/keycloak:21.0.2_phone-2.3.2](https://hub.docker.com/repository/docker/coopersoft/keycloak)
+  1. docker image is [coopersoft/keycloak:21.0.2_phone-2.3.3](https://hub.docker.com/repository/docker/coopersoft/keycloak)
   2. for examples  [docker-compose.yml](https://raw.githubusercontent.com/cooper-lyt/keycloak-phone-provider/master/examples/docker-compose.yml)
   3. run as `docker-compose up` , [docker-compose](https://docs.docker.com/compose/) is required!
 
@@ -219,6 +222,10 @@ Bind `Direct Grant Flow` to `Direct grant with phone`
 
 ![Setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/c0.jpg)
 
+Either Phone/Otp or Username/Password :
+![Setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/f0.jpg)
+
+
 ### **Everybody phone number( if not exists create user by phone number) get Access token use endpoints:**
 
 Under `Authentication` > `Flows`:
@@ -261,10 +268,14 @@ Set Bind `Reset credentials with phone` to `Reset credentials flow`
 
 ![Authentication setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/d0.jpg)
 
+## **Conditional**
+ `Condition - phone provided` 
 
 ## **Required Action**
 + `Update Phone Number` update user's phone number on next login.
 + `Configure OTP over SMS` update OTP Credential's phone number on next login.
+
+
 
 **Phone one key login**
   Testing , coming soon!
