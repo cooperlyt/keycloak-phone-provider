@@ -223,7 +223,7 @@ Bind `Direct Grant Flow` to `Direct grant with phone`
 ![Setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/c0.jpg)
 
 Either Phone/Otp or Username/Password :
-![Setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/f0.jpg)
+![Setting](https://github.com/cooper-lyt/keycloak-phone-provider/raw/master/examples/document/f0.png)
 
 
 ### **Everybody phone number( if not exists create user by phone number) get Access token use endpoints:**
