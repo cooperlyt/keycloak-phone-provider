@@ -165,7 +165,7 @@ Under `Authentication` > `Flows`:
 
 Set all added items as `Required`.
 
-On the `Authentication` page, bind `Registration with phone` to `Registration flow`
+On the `Authentication` page, bind `Registration with phone` to `Registration flow` and select it to be `Required`.
 
 Under `Realm Settings` > `Themes`
 Set `Login Theme` to `phone`
