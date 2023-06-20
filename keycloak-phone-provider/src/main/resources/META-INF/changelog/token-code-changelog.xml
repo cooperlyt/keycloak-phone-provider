@@ -43,4 +43,11 @@
     </createIndex>
 
   </changeSet>
+  
+  <changeSet author="cooper" id="token-code-6.2">
+    <modifyDataType
+      columnName="BY_WHOM"
+      newDataType="VARCHAR(80)"
+      tableName="PHONE_MESSAGE_TOKEN_CODE"/>
+  </changeSet>
 </databaseChangeLog>
