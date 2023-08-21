@@ -10,7 +10,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.dto.OTPSecretData;
 import org.keycloak.util.JsonSerialization;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
