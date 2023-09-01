@@ -6,6 +6,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.jboss.logging.Logger;
 import org.keycloak.broker.provider.util.SimpleHttp;
+import org.keycloak.models.KeycloakSession;
 import org.keycloak.Config.Scope;
 
 import java.io.IOException;
@@ -44,8 +45,8 @@ public class BulksmsSmsSenderServiceProvider extends FullSmsSenderAbstractServic
         }
     }
 
-    BulksmsSmsSenderServiceProvider(Scope config, String realmDisplay) {
-        super(realmDisplay);
+    BulksmsSmsSenderServiceProvider(Scope config, KeycloakSession session) {
+        super(session);
 
         String configUrl = config.get(CONFIG_API_SERVER);
         this.url = configUrl != null ? configUrl : "https://api.bulksms.com/v1/messages";

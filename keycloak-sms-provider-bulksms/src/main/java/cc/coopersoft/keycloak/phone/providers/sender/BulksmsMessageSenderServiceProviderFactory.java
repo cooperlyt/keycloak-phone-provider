@@ -12,7 +12,7 @@ public class BulksmsMessageSenderServiceProviderFactory implements MessageSender
 
     @Override
     public MessageSenderService create(KeycloakSession session) {
-        return new BulksmsSmsSenderServiceProvider(config,session.getContext().getRealm().getDisplayName());
+        return new BulksmsSmsSenderServiceProvider(config, session);
     }
 
     @Override
