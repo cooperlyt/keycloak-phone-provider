@@ -1,4 +1,4 @@
-# Keycloak (Quarkus 21.x.x)  Phone Provider
+# Keycloak (Quarkus 22.x.x)  Phone Provider
 ![Build Status](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/compile-and-liveness-check.yml/badge.svg)
 ![ci](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/ci-keycloak20.yml/badge.svg)
 ![ci](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/ci-keycloak21.yml/badge.svg)
