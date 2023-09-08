@@ -7,6 +7,7 @@ import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.MessageSenderService;
+import cc.coopersoft.keycloak.phone.Utils;
 import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
 import org.keycloak.models.KeycloakSession;
@@ -129,18 +130,24 @@ public class DefaultPhoneProvider implements PhoneProvider {
 
         TokenCodeRepresentation token = TokenCodeRepresentation.forPhoneNumber(phoneNumber);
 
-        try {
-            session.getProvider(MessageSenderService.class, service).sendSmsMessage(type, phoneNumber, token.getCode(),
-                    tokenExpiresIn, kind);
-            getTokenCodeService().persistCode(token, type, tokenExpiresIn);
+        if (TokenCodeType.REGISTRATION.equals(type)
+                || Utils.findUserByPhone(session, session.getContext().getRealm(), phoneNumber).isPresent()) {
+            try {
+                session.getProvider(MessageSenderService.class, service).sendSmsMessage(type, phoneNumber,
+                        token.getCode(), tokenExpiresIn, kind);
+                getTokenCodeService().persistCode(token, type, tokenExpiresIn);
 
-            logger.info(String.format("Sent %s code to %s over %s", type.label, phoneNumber, service));
+                logger.info(String.format("Sent %s code to %s over %s", type.label, phoneNumber, service));
 
-        } catch (MessageSendException e) {
+            } catch (MessageSendException e) {
 
-            logger.error(String.format("Message sending to %s failed with %s: %s",
-                    phoneNumber, e.getErrorCode(), e.getErrorMessage()));
-            throw new ServiceUnavailableException("Internal server error");
+                logger.error(String.format("Message sending to %s failed with %s: %s",
+                        phoneNumber, e.getErrorCode(), e.getErrorMessage()));
+                throw new ServiceUnavailableException("Internal server error");
+            }
+        } else {
+            logger.info(String.format("Unknown phone number %s, not sending %s code to %s", phoneNumber, type.label,
+                    sourceAddr));
         }
 
         return tokenExpiresIn;
