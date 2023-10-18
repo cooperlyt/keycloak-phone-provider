@@ -12,12 +12,13 @@ import org.keycloak.models.*;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.services.validation.Validation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.keycloak.provider.ProviderConfigProperty.MULTIVALUED_STRING_TYPE;
-import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
 
 public class RegistrationRedirectParametersReader implements FormActionFactory, FormAction {
 
