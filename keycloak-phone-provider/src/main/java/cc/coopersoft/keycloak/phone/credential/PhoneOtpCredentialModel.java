@@ -3,6 +3,7 @@ package cc.coopersoft.keycloak.phone.credential;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialModel;
@@ -10,7 +11,6 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.dto.OTPSecretData;
 import org.keycloak.util.JsonSerialization;
 
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;

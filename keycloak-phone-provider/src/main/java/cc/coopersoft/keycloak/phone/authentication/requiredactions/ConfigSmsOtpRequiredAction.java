@@ -8,16 +8,13 @@ import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
-import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
-import com.google.i18n.phonenumbers.NumberParseException;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.Response;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
-import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.core.Response;
 import java.util.Optional;
 
 import static cc.coopersoft.keycloak.phone.authentication.authenticators.browser.PhoneUsernamePasswordForm.VERIFIED_PHONE_NUMBER;
