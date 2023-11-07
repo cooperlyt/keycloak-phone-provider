@@ -26,7 +26,7 @@ services:
     ports:
       - 8080:8080
     command:
-      - start-dev --spi-phone-default-service=dummy
+      - start-dev --spi-phone-default-service=melli
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin

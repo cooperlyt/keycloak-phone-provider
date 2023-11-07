@@ -36,6 +36,9 @@ module add --name=keycloak-sms-provider-yunxin --resources=keycloak-sms-provider
 module add --name=tencentcloud-sdk --resources=tencentcloud-sdk-java-3.1.158.jar  --dependencies=javax.xml.bind.api,com.google.code.gson,org.apache.commons.logging,com.squareup.okhttp3
 module add --name=keycloak-sms-provider-tencent --resources=keycloak-sms-provider-tencent.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,tencentcloud-sdk
 
+# melli provider
+module add --name=keycloak-sms-provider-melli --resources=keycloak-sms-provider-melli.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider
+
 
 embed-server --server-config=standalone-ha.xml --std-out=echo
 batch
@@ -78,6 +81,8 @@ batch
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-yunxin)
 /subsystem=keycloak-server/spi=messageSenderService/provider=yunxin/:add(enabled=true,properties={APP_SECRET => ${env.YUNXIN_APP_SECRET:}})
 
+# melli provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-melli)
 
 run-batch
 stop-embedded-server
@@ -123,6 +128,8 @@ batch
 /subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-yunxin)
 /subsystem=keycloak-server/spi=messageSenderService/provider=yunxin/:add(enabled=true,properties={APP_SECRET => ${env.YUNXIN_APP_SECRET:}})
 
+# melli provider
+/subsystem=keycloak-server:list-add(name=providers,value=module:keycloak-sms-provider-melli)
 
 run-batch
 stop-embedded-server

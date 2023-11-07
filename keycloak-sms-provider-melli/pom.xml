@@ -19,6 +19,12 @@
             <version>2.3.4-snapshot</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>cc.coopersoft</groupId>
+            <artifactId>keycloak-phone-provider</artifactId>
+            <version>2.3.4-snapshot</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

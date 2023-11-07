@@ -27,6 +27,6 @@ public class MelliMessageSenderServiceProviderFactory implements MessageSenderSe
 
     @Override
     public String getId() {
-        return "dummy";
+        return "melli";
     }
 }
