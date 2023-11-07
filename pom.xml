@@ -61,6 +61,7 @@
         <module>keycloak-sms-provider-yunxin</module>
         <module>keycloak-sms-provider-aliyun</module>
         <module>keycloak-sms-provider-tencent</module>
+        <module>keycloak-sms-provider-melli</module>
 
     </modules>
 
