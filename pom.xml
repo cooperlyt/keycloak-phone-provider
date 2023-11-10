@@ -49,6 +49,15 @@
         <version.keycloak>21.0.2</version.keycloak>
     </properties>
 
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/cooperlyt/keycloak-phone-provider</url>
+        </repository>
+    </distributionManagement>
+
     <modules>
         <module>keycloak-phone-provider</module>
         <module>keycloak-phone-provider.resources</module>
