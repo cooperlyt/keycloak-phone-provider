@@ -4,11 +4,13 @@ import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
 
+import lombok.SneakyThrows;
 import org.jboss.logging.Logger;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
@@ -32,8 +34,9 @@ public abstract class FullSmsSenderAbstractService implements MessageSenderServi
         this.realmDisplay = session.getContext().getRealm().getDisplayName();
     }
 
-    public abstract void sendMessage(String phoneNumber, String message) throws MessageSendException;
+    public abstract void sendMessage(String phoneNumber, String message) throws MessageSendException, IOException;
 
+    @SneakyThrows
     @Override
     public void sendSmsMessage(TokenCodeType type, String phoneNumber, String code, int expires, String kind)
             throws MessageSendException {
