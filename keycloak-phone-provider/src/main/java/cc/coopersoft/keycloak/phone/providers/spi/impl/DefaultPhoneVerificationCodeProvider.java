@@ -7,6 +7,7 @@ import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
+import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.jpa.TokenCode;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
@@ -54,10 +55,11 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
     public TokenCodeRepresentation ongoingProcess(String phoneNumber, TokenCodeType tokenCodeType) {
 
         try {
+            String resultPhoneNumber = Utils.canonicalizePhoneNumber(session, phoneNumber);
             TokenCode entity = getEntityManager()
                     .createNamedQuery("ongoingProcess", TokenCode.class)
                     .setParameter("realmId", getRealm().getId())
-                    .setParameter("phoneNumber", phoneNumber)
+                    .setParameter("phoneNumber", resultPhoneNumber)
                     .setParameter("now", new Date(), TemporalType.TIMESTAMP)
                     .setParameter("type", tokenCodeType.name())
                     .getSingleResult();
@@ -75,6 +77,9 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
             return tokenCodeRepresentation;
         } catch (NoResultException e) {
             return null;
+        } catch (PhoneNumberInvalidException e) {
+            logger.warn("Invalid number: "+phoneNumber);
+            throw new BadRequestException("Phone number is invalid");
         }
     }
 
