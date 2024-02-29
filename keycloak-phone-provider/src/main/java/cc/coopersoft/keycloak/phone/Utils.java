@@ -4,6 +4,7 @@ import cc.coopersoft.common.OptionalUtils;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
+import jakarta.validation.constraints.NotNull;
 import org.jboss.logging.Logger;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.models.KeycloakSession;
@@ -16,7 +17,6 @@ import org.keycloak.models.credential.dto.OTPSecretData;
 import org.keycloak.services.validation.Validation;
 import org.keycloak.util.JsonSerialization;
 
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;

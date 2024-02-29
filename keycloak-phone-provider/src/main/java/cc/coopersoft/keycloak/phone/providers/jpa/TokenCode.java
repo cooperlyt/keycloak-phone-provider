@@ -1,8 +1,8 @@
 package cc.coopersoft.keycloak.phone.providers.jpa;
 
+import jakarta.persistence.*;
 import lombok.Data;
 
-import javax.persistence.*;
 import java.util.Date;
 
 @Entity

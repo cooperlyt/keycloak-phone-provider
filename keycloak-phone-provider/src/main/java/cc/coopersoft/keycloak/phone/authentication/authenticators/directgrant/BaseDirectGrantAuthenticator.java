@@ -1,6 +1,8 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant;
 
 import cc.coopersoft.common.OptionalUtils;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
@@ -10,8 +12,6 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.representations.idm.OAuth2ErrorRepresentation;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Optional;
 
 public abstract class BaseDirectGrantAuthenticator implements Authenticator {
