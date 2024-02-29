@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCodeProvider {
 
@@ -199,7 +200,7 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
                                 }
                             })
                             .map(CredentialModel::getId)
-                            .toList()
+                                .collect(Collectors.toList())
                             .forEach(id -> u.credentialManager().removeStoredCredentialById(id));
                     });
             }
