@@ -12,8 +12,8 @@ import org.keycloak.Config.Scope;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.services.validation.Validation;
 
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.ServiceUnavailableException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.ServiceUnavailableException;
 import java.time.Instant;
 import java.util.Optional;
 

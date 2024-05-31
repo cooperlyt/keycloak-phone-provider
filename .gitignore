@@ -40,6 +40,7 @@ gradle-app.setting
 out/
 .idea/
 .idea_modules/
+.run/
 *.iml
 *.ipr
 *.iws
