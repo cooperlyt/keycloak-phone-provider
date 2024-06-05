@@ -6,8 +6,8 @@
 
         <#if !usernameHidden?? && supportPhone??>
 
-            <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+            <script src="${url.resourcesPath}/js/vue.js"></script>
+            <script src="${url.resourcesPath}/js/axios.min.js"></script>
             <style>
                 [v-cloak] > * {
                     display: none;
