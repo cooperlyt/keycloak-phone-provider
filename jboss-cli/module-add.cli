@@ -3,16 +3,16 @@
 
 # main provider
 module add --name=com.googlecode.libphonenumber --resources=libphonenumber-8.13.7.jar
-module add --name=keycloak-phone-provider --resources=keycloak-phone-provider.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-common,org.hibernate,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-services,org.keycloak.keycloak-model-jpa,org.jboss.logging,javax.api,javax.ws.rs.api,javax.transaction.api,javax.persistence.api,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,org.apache.commons.lang,javax.xml.bind.api,com.squareup.okhttp3,com.googlecode.libphonenumber
+module add --name=keycloak-phone-provider --resources=keycloak-phone-provider.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-common,org.hibernate,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-services,org.keycloak.keycloak-model-jpa,org.jboss.logging,jakarta.api,jakarta.ws.rs.api,jakarta.transaction.api,jakarta.persistence.api,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,org.apache.commons.lang,jakarta.xml.bind.api,com.squareup.okhttp3,com.googlecode.libphonenumber
 
 # dummy provider
 module add --name=keycloak-sms-provider-dummy --resources=keycloak-sms-provider-dummy.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider
 
 # cloopen provider
   # need gson 2.8.6, keycloak 10.0.2 gson version is low need higher
-# module add --name=com.google.code.gson.higher --resources=gson-2.8.6.jar --dependencies=javax.sql.api,sun.jdk
+# module add --name=com.google.code.gson.higher --resources=gson-2.8.6.jar --dependencies=jakarta.sql.api,sun.jdk
 
-module add --name=cloopen-sms-sdk --resources=java-sms-sdk-1.0.3.jar --dependencies=javax.xml.bind.api,com.google.code.gson,org.dom4j,org.apache.httpcomponents,org.apache.commons.codec,org.apache.commons.logging
+module add --name=cloopen-sms-sdk --resources=java-sms-sdk-1.0.3.jar --dependencies=jakarta.xml.bind.api,com.google.code.gson,org.dom4j,org.apache.httpcomponents,org.apache.commons.codec,org.apache.commons.logging
 module add --name=keycloak-sms-provider-cloopen --resources=keycloak-sms-provider-cloopen.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,cloopen-sms-sdk
 
 # totalvoice provider
@@ -20,20 +20,20 @@ module add --name=totalvoice.sdk --resources=totalvoice-java-1.1.1.jar --depende
 module add --name=keycloak-sms-provider-totalvoice --resources=keycloak-sms-provider-totalvoice.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,totalvoice.sdk
 
 # twilio provider
-module add --name=twilio.sdk --resources=twilio-7.53.0.jar  --dependencies=com.google.guava,org.apache.httpcomponents,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-annotations,com.fasterxml.jackson.core.jackson-databind,javax.xml.bind.api
+module add --name=twilio.sdk --resources=twilio-7.53.0.jar --dependencies=com.google.guava,org.apache.httpcomponents,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-annotations,com.fasterxml.jackson.core.jackson-databind,jakarta.xml.bind.api
 module add --name=keycloak-sms-provider-twilio --resources=keycloak-sms-provider-twilio.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,twilio.sdk
 
 # aliyun provider
 module add --name=org.ini4j --resources=ini4j-0.5.4.jar
 module add --name=org.jacoco.agent --resources=org.jacoco.agent-0.8.5-runtime.jar
-module add --name=aliyun-java-sdk --resources=aliyun-java-sdk-core-4.5.3.jar --dependencies=com.google.code.gson,org.apache.httpcomponents,org.apache.commons.logging,javax.xml.bind.api,org.slf4j,io.opentracing.opentracing-api,io.opentracing.opentracing-util,org.ini4j,org.jacoco.agent
+module add --name=aliyun-java-sdk --resources=aliyun-java-sdk-core-4.5.3.jar --dependencies=com.google.code.gson,org.apache.httpcomponents,org.apache.commons.logging,jakarta.xml.bind.api,org.slf4j,io.opentracing.opentracing-api,io.opentracing.opentracing-util,org.ini4j,org.jacoco.agent
 module add --name=keycloak-sms-provider-aliyun --resources=keycloak-sms-provider-aliyun.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,aliyun-java-sdk
 
 # yunxin provider
 module add --name=keycloak-sms-provider-yunxin --resources=keycloak-sms-provider-yunxin.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,org.apache.httpcomponents
 
 # tencent provider
-module add --name=tencentcloud-sdk --resources=tencentcloud-sdk-java-3.1.158.jar  --dependencies=javax.xml.bind.api,com.google.code.gson,org.apache.commons.logging,com.squareup.okhttp3
+module add --name=tencentcloud-sdk --resources=tencentcloud-sdk-java-3.1.158.jar --dependencies=jakarta.xml.bind.api,com.google.code.gson,org.apache.commons.logging,com.squareup.okhttp3
 module add --name=keycloak-sms-provider-tencent --resources=keycloak-sms-provider-tencent.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.jboss.logging,keycloak-phone-provider,tencentcloud-sdk
 
 

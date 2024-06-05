@@ -24,7 +24,7 @@ import org.keycloak.userprofile.UserProfileContext;
 import org.keycloak.userprofile.UserProfileProvider;
 import org.keycloak.userprofile.ValidationException;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -235,23 +235,23 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
     }
 
     UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
-    UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION_USER_CREATION, formData);
+    UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION, formData);
 
-    String username = profile.getAttributes().getFirstValue(UserModel.USERNAME);
+    String username = profile.getAttributes().getFirst(UserModel.USERNAME);
     context.getEvent().detail(Details.USERNAME, username);
 
     boolean hideName = isHideName(context);
     boolean hideEmail = isHideEmail(context);
 
     if (!hideName){
-      String firstName = profile.getAttributes().getFirstValue(UserModel.FIRST_NAME);
-      String lastName = profile.getAttributes().getFirstValue(UserModel.LAST_NAME);
+      String firstName = profile.getAttributes().getFirst(UserModel.FIRST_NAME);
+      String lastName = profile.getAttributes().getFirst(UserModel.LAST_NAME);
       context.getEvent().detail(Details.FIRST_NAME, firstName);
       context.getEvent().detail(Details.LAST_NAME, lastName);
     }
 
     if (!hideEmail){
-      String email = profile.getAttributes().getFirstValue(UserModel.EMAIL);
+      String email = profile.getAttributes().getFirst(UserModel.EMAIL);
       context.getEvent().detail(Details.EMAIL, email);
       if (context.getRealm().isRegistrationEmailAsUsername()){
         context.getEvent().detail(Details.USERNAME, email);
@@ -311,7 +311,7 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
     }
 
     UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
-    UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION_USER_CREATION, formData);
+    UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION, formData);
     UserModel user = profile.create();
 
 //    UserModel user = context.getSession().users().addUser(context.getRealm(), username);

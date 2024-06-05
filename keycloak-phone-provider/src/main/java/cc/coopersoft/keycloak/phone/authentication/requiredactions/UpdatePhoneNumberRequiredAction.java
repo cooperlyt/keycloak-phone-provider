@@ -9,9 +9,9 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.Response;
 
 public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
