@@ -8,7 +8,7 @@ import okhttp3.Response;
 import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 public class TwoFactorSmsSenderServiceProvider extends FullSmsSenderAbstractService {
 

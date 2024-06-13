@@ -1,9 +1,8 @@
 package cc.coopersoft.keycloak.phone.providers.rest;
 
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
+import jakarta.ws.rs.Path;
 import org.keycloak.models.KeycloakSession;
-
-import javax.ws.rs.Path;
 
 public class SmsResource {
 

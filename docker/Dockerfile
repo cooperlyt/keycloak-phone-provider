@@ -1,4 +1,3 @@
-
 FROM quay.io/keycloak/keycloak:@version.keycloak@
 
 
