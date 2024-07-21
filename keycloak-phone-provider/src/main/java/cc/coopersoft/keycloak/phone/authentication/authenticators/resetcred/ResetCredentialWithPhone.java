@@ -23,8 +23,8 @@ import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.services.validation.Validation;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -44,22 +44,29 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
 
     String existingUserId = context.getAuthenticationSession().getAuthNote(AbstractIdpAuthenticator.EXISTING_USER_INFO);
     if (existingUserId != null) {
-      UserModel existingUser = AbstractIdpAuthenticator.getExistingUser(context.getSession(), context.getRealm(), context.getAuthenticationSession());
+      UserModel existingUser = AbstractIdpAuthenticator.getExistingUser(context.getSession(), context.getRealm(),
+          context.getAuthenticationSession());
 
-      logger.debugf("Forget-password triggered when reauthenticating user after first broker login. Prefilling reset-credential-choose-user screen with user '%s' ", existingUser.getUsername());
+      logger.debugf(
+          "Forget-password triggered when reauthenticating user after first broker login. Prefilling reset-credential-choose-user screen with user '%s' ",
+          existingUser.getUsername());
       context.setUser(existingUser);
       Response challenge = context.form().createPasswordReset();
       context.challenge(challenge);
       return;
     }
 
-    String actionTokenUserId = context.getAuthenticationSession().getAuthNote(DefaultActionTokenKey.ACTION_TOKEN_USER_ID);
+    String actionTokenUserId = context.getAuthenticationSession()
+        .getAuthNote(DefaultActionTokenKey.ACTION_TOKEN_USER_ID);
     if (actionTokenUserId != null) {
       UserModel existingUser = context.getSession().users().getUserById(context.getRealm(), actionTokenUserId);
 
-      // Action token logics handles checks for user ID validity and user being enabled
+      // Action token logics handles checks for user ID validity and user being
+      // enabled
 
-      logger.debugf("Forget-password triggered when reauthenticating user after authentication via action token. Skipping reset-credential-choose-user screen and using user '%s' ", existingUser.getUsername());
+      logger.debugf(
+          "Forget-password triggered when reauthenticating user after authentication via action token. Skipping reset-credential-choose-user screen and using user '%s' ",
+          existingUser.getUsername());
       context.setUser(existingUser);
       context.success();
       return;
@@ -83,8 +90,6 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
     context.success();
   }
 
-
-
   protected boolean validateForm(AuthenticationFlowContext context, MultivaluedMap<String, String> inputData) {
     boolean byPhone = OptionalUtils
         .ofBlank(inputData.getFirst(FIELD_PATH_PHONE_ACTIVATED))
@@ -97,7 +102,7 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
     String username = inputData.getFirst(AuthenticationManager.FORM_USERNAME);
 
     UserModel user;
-    if (!byPhone){
+    if (!byPhone) {
       if (Validation.isBlank(username)) {
         context.getEvent().error(Errors.USERNAME_MISSING);
         Response challenge = challenge(context, Validation.FIELD_USERNAME, Messages.MISSING_USERNAME);
@@ -105,17 +110,18 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
         return false;
       }
       user = getUserByUsername(context, username.trim());
-    }else{
+    } else {
 
       if (Validation.isBlank(phoneNumber)) {
         context.getEvent().error(Errors.USERNAME_MISSING);
-        Response challenge = challenge(context, FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message(), phoneNumber);
+        Response challenge = challenge(context, FIELD_PHONE_NUMBER, SupportPhonePages.Errors.MISSING.message(),
+            phoneNumber);
         context.forceChallenge(challenge);
         return false;
       }
 
       try {
-        phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
+        phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(), phoneNumber);
       } catch (PhoneNumberInvalidException e) {
         context.getEvent().error(Errors.USERNAME_MISSING);
         Response challenge = challenge(context, FIELD_PHONE_NUMBER,
@@ -123,7 +129,6 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
         context.forceChallenge(challenge);
         return false;
       }
-
 
       String verificationCode = inputData.getFirst(FIELD_VERIFICATION_CODE);
       if (Validation.isBlank(verificationCode)) {
@@ -133,12 +138,12 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
       user = Utils.findUserByPhone(context.getSession(), context.getRealm(), phoneNumber)
           .orElse(null);
 
-      if (user != null && !validateVerificationCode(context, user, phoneNumber, verificationCode.trim())){
+      if (user != null && !validateVerificationCode(context, user, phoneNumber, verificationCode.trim())) {
         return false;
       }
     }
 
-    return validateUser(context,user,byPhone,byPhone ? phoneNumber : username);
+    return validateUser(context, user, byPhone, byPhone ? phoneNumber : username);
   }
 
   protected UserModel getUserByUsername(AuthenticationFlowContext context, String username) {
@@ -176,31 +181,35 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
   }
 
   protected boolean validateUser(AuthenticationFlowContext context,
-                                 UserModel user, boolean byPhone, String attempted) {
+      UserModel user, boolean byPhone, String attempted) {
 
-    if (user == null){
+    if (user == null) {
       context.getEvent().error(Errors.USER_NOT_FOUND);
-      if(!byPhone){
+      if (!byPhone) {
         context.getEvent().detail(Details.USERNAME, attempted);
       }
-      Response challenge = byPhone ? challenge(context, FIELD_PHONE_NUMBER, SupportPhonePages.Errors.USER_NOT_FOUND.message(), attempted) : challenge(context, Validation.FIELD_USERNAME, Messages.INVALID_USERNAME_OR_EMAIL);
+      Response challenge = byPhone
+          ? challenge(context, FIELD_PHONE_NUMBER, SupportPhonePages.Errors.USER_NOT_FOUND.message(), attempted)
+          : challenge(context, Validation.FIELD_USERNAME, Messages.INVALID_USERNAME_OR_EMAIL);
       context.forceChallenge(challenge);
       return false;
     }
 
-    if (byPhone ? isDisabledByBruteForce(context, user, attempted) : isDisabledByBruteForce(context, user)) return false;
+    if (byPhone ? isDisabledByBruteForce(context, user, attempted) : isDisabledByBruteForce(context, user))
+      return false;
     if (!user.isEnabled()) {
-      if(!byPhone){
+      if (!byPhone) {
         context.getEvent().detail(Details.USERNAME, attempted);
       }
       context.getEvent().user(user);
       context.getEvent().error(Errors.USER_DISABLED);
-      Response challenge = byPhone ? challenge(context,FIELD_PHONE_NUMBER, Errors.USER_DISABLED, attempted) : challenge(context,Validation.FIELD_USERNAME,Errors.USER_DISABLED);
+      Response challenge = byPhone ? challenge(context, FIELD_PHONE_NUMBER, Errors.USER_DISABLED, attempted)
+          : challenge(context, Validation.FIELD_USERNAME, Errors.USER_DISABLED);
       context.forceChallenge(challenge);
       return false;
     }
 
-    if (byPhone){
+    if (byPhone) {
       context.getAuthenticationSession().setAuthNote(SHOULD_SEND_EMAIL, "false");
     }
     context.setUser(user);
@@ -209,13 +218,14 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
 
   protected void invalidVerificationCode(AuthenticationFlowContext context, String phoneNumber) {
     context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
-    Response challenge = challenge(context, FIELD_VERIFICATION_CODE, SupportPhonePages.Errors.NOT_MATCH.message(), phoneNumber);
+    Response challenge = challenge(context, FIELD_VERIFICATION_CODE, SupportPhonePages.Errors.NOT_MATCH.message(),
+        phoneNumber);
     context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
   }
 
   protected Response challenge(AuthenticationFlowContext context,
-                               String field, String message,
-                               String phoneNumber) {
+      String field, String message,
+      String phoneNumber) {
     return context.form()
         .addError(new FormMessage(field, message))
         .setAttribute(ATTRIBUTE_SUPPORT_PHONE, true)
@@ -225,16 +235,18 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
   }
 
   protected Response challenge(AuthenticationFlowContext context,
-                               String field, String message) {
+      String field, String message) {
     return context.form()
         .addError(new FormMessage(field, message))
         .setAttribute(ATTRIBUTE_SUPPORT_PHONE, true)
         .createPasswordReset();
   }
 
-  private boolean validateVerificationCode(AuthenticationFlowContext context, UserModel user, String phoneNumber, String code) {
+  private boolean validateVerificationCode(AuthenticationFlowContext context, UserModel user, String phoneNumber,
+      String code) {
     try {
-      context.getSession().getProvider(PhoneVerificationCodeProvider.class).validateCode(user, phoneNumber, code, TokenCodeType.RESET);
+      context.getSession().getProvider(PhoneVerificationCodeProvider.class).validateCode(user, phoneNumber, code,
+          TokenCodeType.RESET);
       logger.debug("verification code success!");
       return true;
     } catch (Exception e) {
@@ -244,7 +256,6 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
       return false;
     }
   }
-
 
   @Override
   public boolean requiresUser() {
@@ -260,7 +271,6 @@ public class ResetCredentialWithPhone implements Authenticator, AuthenticatorFac
   public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
 
   }
-
 
   @Override
   public String getDisplayType() {

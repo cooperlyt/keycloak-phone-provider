@@ -1,7 +1,5 @@
 package cc.coopersoft.keycloak.phone.providers.spi;
 
-import org.keycloak.provider.Provider;
-import org.keycloak.provider.ProviderFactory;
 import org.keycloak.provider.Spi;
 
 public class PhoneSpi implements Spi {
@@ -17,12 +15,12 @@ public class PhoneSpi implements Spi {
     }
 
     @Override
-    public Class<? extends Provider> getProviderClass() {
+    public Class<PhoneProvider> getProviderClass() {
         return PhoneProvider.class;
     }
 
     @Override
-    public Class<? extends ProviderFactory> getProviderFactoryClass() {
+    public Class<PhoneProviderFactory> getProviderFactoryClass() {
         return PhoneProviderFactory.class;
     }
 }

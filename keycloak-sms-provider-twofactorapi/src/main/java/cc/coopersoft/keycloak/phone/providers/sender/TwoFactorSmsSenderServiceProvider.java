@@ -7,8 +7,9 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
+import org.keycloak.models.KeycloakSession;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 public class TwoFactorSmsSenderServiceProvider extends FullSmsSenderAbstractService {
 
@@ -23,8 +24,8 @@ public class TwoFactorSmsSenderServiceProvider extends FullSmsSenderAbstractServ
                 .build();
     }
 
-    TwoFactorSmsSenderServiceProvider(Scope config, String realmDisplay) {
-        super(realmDisplay);
+    TwoFactorSmsSenderServiceProvider(KeycloakSession session, Scope config) {
+        super(session);
         this.twoFactorApiKey = config.get("twoFactorApiKey");
 
     }

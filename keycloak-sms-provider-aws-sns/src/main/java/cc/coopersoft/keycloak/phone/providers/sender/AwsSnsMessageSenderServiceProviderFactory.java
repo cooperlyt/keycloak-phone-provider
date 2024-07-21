@@ -12,7 +12,7 @@ public class AwsSnsMessageSenderServiceProviderFactory implements MessageSenderS
 
     @Override
     public MessageSenderService create(KeycloakSession keycloakSession) {
-        return new AwsSnsSmsSenderService(keycloakSession.getContext().getRealm().getDisplayName(), config);
+        return new AwsSnsSmsSenderService(keycloakSession, config);
     }
 
     @Override

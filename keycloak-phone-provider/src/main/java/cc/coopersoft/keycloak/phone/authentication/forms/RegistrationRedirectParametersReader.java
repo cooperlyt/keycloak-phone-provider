@@ -17,7 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.keycloak.provider.ProviderConfigProperty.MULTIVALUED_STRING_TYPE;
-import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
 
 public class RegistrationRedirectParametersReader implements FormActionFactory, FormAction {
 
@@ -26,10 +25,8 @@ public class RegistrationRedirectParametersReader implements FormActionFactory, 
   public static final String PROVIDER_ID = "registration-redirect-parameter";
   public static final String PARAM_NAMES = "acceptParameter";
 
-
   private static AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
-      AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED};
-
+      AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED };
 
   @Override
   public String getDisplayType() {
@@ -48,11 +45,10 @@ public class RegistrationRedirectParametersReader implements FormActionFactory, 
 
   @Override
   public List<ProviderConfigProperty> getConfigProperties() {
-    ProviderConfigProperty rep =
-        new ProviderConfigProperty(PARAM_NAMES,
-            "Accept query param",
-            "Registration query param accept names.",
-            MULTIVALUED_STRING_TYPE, null);
+    ProviderConfigProperty rep = new ProviderConfigProperty(PARAM_NAMES,
+        "Accept query param",
+        "Registration query param accept names.",
+        MULTIVALUED_STRING_TYPE, null);
     return Collections.singletonList(rep);
   }
 
@@ -110,7 +106,6 @@ public class RegistrationRedirectParametersReader implements FormActionFactory, 
   @Override
   public void success(FormContext context) {
 
-
     String redirectUri = context.getAuthenticationSession().getRedirectUri();
     logger.info("add user attribute form redirectUri:" + redirectUri);
     if (Validation.isBlank(redirectUri)) {
@@ -123,7 +118,8 @@ public class RegistrationRedirectParametersReader implements FormActionFactory, 
       logger.error("redirectUri is null");
       return;
     }
-    //url.queryParameterNames().forEach(s -> logger.info("redirect param name ->" + s));
+    // url.queryParameterNames().forEach(s -> logger.info("redirect param name ->" +
+    // s));
     UserModel user = context.getUser();
     AuthenticatorConfigModel authenticatorConfig = context.getAuthenticatorConfig();
 

@@ -7,14 +7,15 @@ import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import cc.coopersoft.keycloak.phone.providers.spi.FullSmsSenderAbstractService;
 import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
+import org.keycloak.models.KeycloakSession;
 
 public class TwilioSmsSenderServiceProvider extends FullSmsSenderAbstractService {
 
     private static final Logger logger = Logger.getLogger(TwilioSmsSenderServiceProvider.class);
     private final String twilioPhoneNumber;
 
-    TwilioSmsSenderServiceProvider(Scope config, String realmDisplay) {
-        super(realmDisplay);
+    TwilioSmsSenderServiceProvider(KeycloakSession session, Scope config) {
+        super(session);
         Twilio.init(config.get("account"), config.get("token"));
         this.twilioPhoneNumber = config.get("number");
 

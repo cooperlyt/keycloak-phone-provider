@@ -3,7 +3,7 @@ package cc.coopersoft.keycloak.phone.providers.rest;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import org.keycloak.models.KeycloakSession;
 
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 public class SmsResource {
 
