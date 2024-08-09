@@ -7,7 +7,7 @@
     <groupId>cc.coopersoft</groupId>
     <artifactId>keycloak-phone-provider-parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.3.4-snapshot</version>
+    <version>2.4.1-snapshot</version>
 
     <name>keycloak-phone-provider</name>
     <description>keycloak phone support.</description>
@@ -71,6 +71,7 @@
         <module>keycloak-sms-provider-aliyun</module>
         <module>keycloak-sms-provider-tencent</module>
         <module>keycloak-sms-provider-twofactorapi</module>
+        <module>keycloak-wx-provider-app</module>
     </modules>
 
     <dependencies>

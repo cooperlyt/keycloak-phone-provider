@@ -39,7 +39,7 @@ public class AuthenticationCodeAuthenticatorFactory implements AuthenticatorFact
         return new AuthenticationCodeAuthenticator(session);
     }
 
-    private static AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
+    private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
             AuthenticationExecutionModel.Requirement.REQUIRED,
             // AuthenticationExecutionModel.Requirement.DISABLED
     };

@@ -1,4 +1,4 @@
-# Keycloak (Quarkus 21.x.x)  Phone Provider
+# Keycloak (Quarkus 25.x.x)  Phone Provider - Bate
 ![Build Status](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/compile-and-liveness-check.yml/badge.svg)
 ![ci](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/ci-keycloak20.yml/badge.svg)
 ![ci](https://github.com/cooperlyt/keycloak-phone-provider/actions/workflows/ci-keycloak21.yml/badge.svg)
@@ -23,6 +23,7 @@ Currently, there are implementations for:
 + TotalVoice
 + Twilio,
 + YunTongXun SMS
++ WeiXin App grant
 
 More services can be added with ease due to the modularity of the code.  In fact, nothing would stop you from implementing a
 sender of TTS calls or WhatsApp messages.
@@ -276,6 +277,20 @@ Set Bind `Reset credentials with phone` to `Reset credentials flow`
 + `Update Phone Number` update user's phone number on next login.
 + `Configure OTP over SMS` update OTP Credential's phone number on next login.
 
+## ** WeiXin APP Grant
+
+Under `Authentication` > `Flows`:
++ Copy the `Direct Grant` flow to `Direct grant weixin app ` flow
++ Click on `Actions` > `Add step` on the `WX APP auth` line and move to first
++ Delete or disable other
+
+Under `Clients` > `$YOUR_CLIENT` > `Advanced` > `Authentication Flow Overrides`
+Set Direct Grant Flow to `Direct grant weixin app`
+
+
++ `POST /realms/{realmName}/protocol/openid-connect/token`
+  `Content-Type: application/x-www-form-urlencoded`
+  `grant_type=password&code=$CODE&client_id=$CLIENT_ID&client_secret=$CLIENT_SECRECT`
 
 
 **Phone one key login**
