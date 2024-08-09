@@ -24,7 +24,7 @@ import org.keycloak.userprofile.UserProfileContext;
 import org.keycloak.userprofile.UserProfileProvider;
 import org.keycloak.userprofile.ValidationException;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +32,7 @@ import static cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePage
 import static org.keycloak.provider.ProviderConfigProperty.BOOLEAN_TYPE;
 
 /**
- * replace  org.keycloak.authentication.forms.RegistrationUserCreation.java
+ * replace org.keycloak.authentication.forms.RegistrationUserCreation.java
  */
 public class RegistrationPhoneUserCreation implements FormActionFactory, FormAction {
 
@@ -42,12 +42,11 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
 
   public static final String CONFIG_PHONE_NUMBER_AS_USERNAME = "phoneNumberAsUsername";
 
-  public static final String CONFIG_INPUT_NAME="isInputName";
+  public static final String CONFIG_INPUT_NAME = "isInputName";
 
-  public static final String CONFIG_INPUT_EMAIL="isInputEmail";
+  public static final String CONFIG_INPUT_EMAIL = "isInputEmail";
   private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
-      AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED};
-
+      AuthenticationExecutionModel.Requirement.REQUIRED, AuthenticationExecutionModel.Requirement.DISABLED };
 
   @Override
   public String getDisplayType() {
@@ -76,7 +75,8 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
         .property().name(CONFIG_PHONE_NUMBER_AS_USERNAME)
         .type(BOOLEAN_TYPE)
         .label("Phone number as username")
-        .helpText("Allow users to set phone number as username. If Realm has `email as username` set to true, this is invalid!")
+        .helpText(
+            "Allow users to set phone number as username. If Realm has `email as username` set to true, this is invalid!")
         .defaultValue(true)
         .add()
         .property().name(CONFIG_INPUT_NAME)
@@ -103,7 +103,6 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
   public boolean isUserSetupAllowed() {
     return false;
   }
-
 
   @Override
   public List<ProviderConfigProperty> getConfigProperties() {
@@ -136,15 +135,15 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
 
   // FormAction
 
-  private boolean isPhoneNumberAsUsername(FormContext context){
+  private boolean isPhoneNumberAsUsername(FormContext context) {
     if (context.getAuthenticatorConfig() == null || "true".equals(context.getAuthenticatorConfig().getConfig()
-        .getOrDefault(CONFIG_PHONE_NUMBER_AS_USERNAME,"true"))){
+        .getOrDefault(CONFIG_PHONE_NUMBER_AS_USERNAME, "true"))) {
 
-      if (context.getRealm().isRegistrationEmailAsUsername()){
+      if (context.getRealm().isRegistrationEmailAsUsername()) {
         logger.warn("Realm set email as username, can't use phone number.");
         return false;
       }
-      if (Utils.isDuplicatePhoneAllowed(context.getSession())){
+      if (Utils.isDuplicatePhoneAllowed(context.getSession())) {
         logger.warn("Duplicate phone allowed! phone number can't be used as username.");
         return false;
       }
@@ -153,19 +152,19 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
     return false;
   }
 
-  private boolean isHideName(FormContext context){
+  private boolean isHideName(FormContext context) {
     return context.getAuthenticatorConfig() == null ||
         !"true".equalsIgnoreCase(context.getAuthenticatorConfig().getConfig()
-        .getOrDefault(CONFIG_INPUT_NAME,"true"));
+            .getOrDefault(CONFIG_INPUT_NAME, "true"));
   }
 
-  private boolean isHideEmail(FormContext context){
+  private boolean isHideEmail(FormContext context) {
     if (context.getAuthenticatorConfig() == null ||
         "true".equalsIgnoreCase(context.getAuthenticatorConfig().getConfig()
-        .getOrDefault(CONFIG_INPUT_EMAIL,"true"))){
+            .getOrDefault(CONFIG_INPUT_EMAIL, "true"))) {
       return false;
     }
-    if (context.getRealm().isRegistrationEmailAsUsername()){
+    if (context.getRealm().isRegistrationEmailAsUsername()) {
       logger.warn("`email as username` is set, so can't hide email input.");
       return false;
     }
@@ -178,15 +177,15 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
 
     form.setAttribute("phoneNumberRequired", true);
 
-    if (isPhoneNumberAsUsername(context)){
+    if (isPhoneNumberAsUsername(context)) {
       form.setAttribute("registrationPhoneNumberAsUsername", true);
     }
 
-    if (isHideName(context)){
+    if (isHideName(context)) {
       form.setAttribute("hideName", true);
     }
 
-    if (isHideEmail(context)){
+    if (isHideEmail(context)) {
       form.setAttribute("hideEmail", true);
     }
   }
@@ -195,7 +194,6 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
   public void validate(ValidationContext context) {
 
     KeycloakSession session = context.getSession();
-
 
     MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
     context.getEvent().detail(Details.REGISTER_METHOD, "form");
@@ -209,9 +207,9 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       context.error(Errors.INVALID_REGISTRATION);
       context.validationError(formData, errors);
       success = false;
-    }else {
+    } else {
       try {
-        phoneNumber = Utils.canonicalizePhoneNumber(session,phoneNumber);
+        phoneNumber = Utils.canonicalizePhoneNumber(session, phoneNumber);
         if (!Utils.isDuplicatePhoneAllowed(session) &&
             Utils.findUserByPhone(session, context.getRealm(), phoneNumber).isPresent()) {
           context.error(Errors.INVALID_REGISTRATION);
@@ -229,31 +227,31 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
     }
 
     context.getEvent().detail(FIELD_PHONE_NUMBER, phoneNumber);
-    if (isPhoneNumberAsUsername(context)){
+    if (isPhoneNumberAsUsername(context)) {
       context.getEvent().detail(Details.USERNAME, phoneNumber);
-      formData.putSingle(UserModel.USERNAME,phoneNumber);
+      formData.putSingle(UserModel.USERNAME, phoneNumber);
     }
 
     UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
-    UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION_USER_CREATION, formData);
+    UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION, formData);
 
-    String username = profile.getAttributes().getFirstValue(UserModel.USERNAME);
+    String username = profile.getAttributes().getFirst(UserModel.USERNAME);
     context.getEvent().detail(Details.USERNAME, username);
 
     boolean hideName = isHideName(context);
     boolean hideEmail = isHideEmail(context);
 
-    if (!hideName){
-      String firstName = profile.getAttributes().getFirstValue(UserModel.FIRST_NAME);
-      String lastName = profile.getAttributes().getFirstValue(UserModel.LAST_NAME);
+    if (!hideName) {
+      String firstName = profile.getAttributes().getFirst(UserModel.FIRST_NAME);
+      String lastName = profile.getAttributes().getFirst(UserModel.LAST_NAME);
       context.getEvent().detail(Details.FIRST_NAME, firstName);
       context.getEvent().detail(Details.LAST_NAME, lastName);
     }
 
-    if (!hideEmail){
-      String email = profile.getAttributes().getFirstValue(UserModel.EMAIL);
+    if (!hideEmail) {
+      String email = profile.getAttributes().getFirst(UserModel.EMAIL);
       context.getEvent().detail(Details.EMAIL, email);
-      if (context.getRealm().isRegistrationEmailAsUsername()){
+      if (context.getRealm().isRegistrationEmailAsUsername()) {
         context.getEvent().detail(Details.USERNAME, email);
       }
     }
@@ -275,7 +273,7 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
     if (success) {
       context.success();
     }
-    context.validationError(formData,errors);
+    context.validationError(formData, errors);
   }
 
   @Override
@@ -289,37 +287,38 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
 
     var session = context.getSession();
     try {
-      phoneNumber = Utils.canonicalizePhoneNumber(session,phoneNumber);
+      phoneNumber = Utils.canonicalizePhoneNumber(session, phoneNumber);
     } catch (PhoneNumberInvalidException e) {
       // verified in validate process
       throw new IllegalStateException();
     }
 
-    if (context.getRealm().isRegistrationEmailAsUsername()){
+    if (context.getRealm().isRegistrationEmailAsUsername()) {
       username = email;
-    } else if (isPhoneNumberAsUsername(context)){
+    } else if (isPhoneNumberAsUsername(context)) {
       username = phoneNumber;
-      formData.add(UserModel.USERNAME,phoneNumber);
+      formData.add(UserModel.USERNAME, phoneNumber);
     }
 
     context.getEvent().detail(Details.USERNAME, username)
         .detail(Details.REGISTER_METHOD, "form")
-        .detail(FIELD_PHONE_NUMBER,phoneNumber);
+        .detail(FIELD_PHONE_NUMBER, phoneNumber);
 
-    if (!isHideEmail(context)){
-      context.getEvent().detail(Details.EMAIL,email);
+    if (!isHideEmail(context)) {
+      context.getEvent().detail(Details.EMAIL, email);
     }
 
     UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class);
-    UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION_USER_CREATION, formData);
+    UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION, formData);
     UserModel user = profile.create();
 
-//    UserModel user = context.getSession().users().addUser(context.getRealm(), username);
+    // UserModel user = context.getSession().users().addUser(context.getRealm(),
+    // username);
     user.setEnabled(true);
     context.setUser(user);
 
     context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, username);
-    //AttributeFormDataProcessor.process(formData);
+    // AttributeFormDataProcessor.process(formData);
 
     context.getEvent().user(user);
     context.getEvent().success();
@@ -342,7 +341,7 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
 
   @Override
   public boolean configuredFor(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
-    return true;//!realmModel.isRegistrationEmailAsUsername();
+    return true;// !realmModel.isRegistrationEmailAsUsername();
   }
 
   @Override

@@ -10,23 +10,19 @@ import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
 import org.jboss.logging.Logger;
-import org.jboss.resteasy.spi.HttpResponse;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.CredentialValidator;
-import org.keycloak.common.util.ServerCookie;
 import org.keycloak.credential.CredentialProvider;
+import org.keycloak.http.HttpResponse;
 import org.keycloak.models.*;
-import org.keycloak.models.credential.dto.OTPSecretData;
 import org.keycloak.services.validation.Validation;
-import org.keycloak.util.JsonSerialization;
 
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Optional;
 
@@ -51,25 +47,21 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
       return false;
 
     return Optional.of(context.getHttpRequest().getHttpHeaders().getCookies())
-            .flatMap(cookies ->
-                    Optional.ofNullable(cookies.get("SMS_OTP_ANSWERED"))
-                    .flatMap(cookie -> OptionalUtils.ofBlank(cookie.getValue()))
-                    .flatMap(credentialId ->
-                        Optional.ofNullable(cookies.get(credentialId))
-                            .flatMap(cookie -> OptionalUtils.ofBlank(cookie.getValue()))
-                            .map(secret ->  context.getUser()
-                                .credentialManager()
-                                .isValid(new UserCredentialModel(credentialId, getType(context.getSession()), secret)))
-                    )
-            ).orElse(false);
+        .flatMap(cookies -> Optional.ofNullable(cookies.get("SMS_OTP_ANSWERED"))
+            .flatMap(cookie -> OptionalUtils.ofBlank(cookie.getValue()))
+            .flatMap(credentialId -> Optional.ofNullable(cookies.get(credentialId))
+                .flatMap(cookie -> OptionalUtils.ofBlank(cookie.getValue()))
+                .map(secret -> context.getUser()
+                    .credentialManager()
+                    .isValid(new UserCredentialModel(credentialId, getType(context.getSession()), secret)))))
+        .orElse(false);
   }
 
   protected void setCookie(AuthenticationFlowContext context, String credentialId, String secret) {
 
-
     int maxCookieAge = Utils.getOtpExpires(context.getSession());
 
-    if (maxCookieAge <= 0 ){
+    if (maxCookieAge <= 0) {
       return;
     }
 
@@ -91,20 +83,28 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
         false, true);
   }
 
-  public void addCookie(AuthenticationFlowContext context, String name, String value, String path, String domain, String comment, int maxAge, boolean secure, boolean httpOnly) {
-    HttpResponse response = context.getSession().getContext().getContextObject(HttpResponse.class);
-    StringBuilder cookieBuf = new StringBuilder();
-    ServerCookie.appendCookieValue(cookieBuf, 1, name, value, path, domain, comment, maxAge, secure, httpOnly, null);
-    String cookie = cookieBuf.toString();
-    response.getOutputHeaders().add(HttpHeaders.SET_COOKIE, cookie);
+  public void addCookie(AuthenticationFlowContext context, String name, String value, String path, String domain,
+      String comment, int maxAge, boolean secure, boolean httpOnly) {
+    HttpResponse response = context.getSession().getContext().getHttpResponse();
+    NewCookie newCookie = new NewCookie.Builder(name)
+        .value(value)
+        .path(path)
+        .domain(domain)
+        .version(1)
+        .comment(comment)
+        .maxAge(maxAge)
+        .secure(secure)
+        .build();
+    response.setCookieIfAbsent(newCookie);
   }
 
   @Override
   public PhoneOtpCredentialProvider getCredentialProvider(KeycloakSession session) {
-    return (PhoneOtpCredentialProvider) session.getProvider(CredentialProvider.class, PhoneOtpCredentialProviderFactory.PROVIDER_ID);
+    return (PhoneOtpCredentialProvider) session.getProvider(CredentialProvider.class,
+        PhoneOtpCredentialProviderFactory.PROVIDER_ID);
   }
 
-  private String getCredentialPhoneNumber(UserModel user){
+  private String getCredentialPhoneNumber(UserModel user) {
     return PhoneOtpCredentialModel.getSmsOtpCredentialData(user)
         .map(PhoneOtpCredentialModel.SmsOtpCredentialData::getPhoneNumber)
         .orElseThrow(() -> new IllegalStateException("Not have OTP Credential"));
@@ -130,12 +130,12 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
 
     PhoneProvider phoneProvider = context.getSession().getProvider(PhoneProvider.class);
     try {
-      int expires = phoneProvider.sendTokenCode(phoneNumber,context.getConnection().getRemoteAddr(),
+      int expires = phoneProvider.sendTokenCode(phoneNumber, context.getConnection().getRemoteAddr(),
           TokenCodeType.OTP, null);
       context.form()
           .setInfo("codeSent", phoneNumber)
           .setAttribute("expires", expires)
-          .setAttribute("initSend",true);
+          .setAttribute("initSend", true);
     } catch (ForbiddenException e) {
       logger.warn("otp send code Forbidden Exception!", e);
       context.form().setError(SupportPhonePages.Errors.ABUSED.message());
@@ -144,10 +144,10 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
       context.form().setError(SupportPhonePages.Errors.FAIL.message());
     }
 
-    var credentialData = new PhoneOtpCredentialModel.SmsOtpCredentialData(phoneNumber,0);
-    PhoneOtpCredentialModel.updateOtpCredential(context.getUser(),credentialData,null);
+    var credentialData = new PhoneOtpCredentialModel.SmsOtpCredentialData(phoneNumber, 0);
+    PhoneOtpCredentialModel.updateOtpCredential(context.getUser(), credentialData, null);
 
-    Response challenge = challenge(context,phoneNumber);
+    Response challenge = challenge(context, phoneNumber);
     context.challenge(challenge);
   }
 
@@ -162,35 +162,36 @@ public class SmsOtpMfaAuthenticator implements Authenticator, CredentialValidato
     if (credentialId == null || credentialId.isEmpty()) {
       var defaultOtpCredential = getCredentialProvider(context.getSession())
           .getDefaultCredential(context.getSession(), context.getRealm(), context.getUser());
-      credentialId = defaultOtpCredential==null ? "" : defaultOtpCredential.getId();
+      credentialId = defaultOtpCredential == null ? "" : defaultOtpCredential.getId();
     }
 
-    if (Validation.isBlank(secret)){
+    if (Validation.isBlank(secret)) {
       context.form()
           .setError(SupportPhonePages.Errors.NOT_MATCH.message());
-      Response challenge = challenge(context,phoneNumber);
+      Response challenge = challenge(context, phoneNumber);
       context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
     }
 
     UserCredentialModel input = new UserCredentialModel(credentialId, getType(context.getSession()), secret);
 
-    boolean validated = getCredentialProvider(context.getSession()).isValid(context.getRealm(), context.getUser(), input);
+    boolean validated = getCredentialProvider(context.getSession()).isValid(context.getRealm(), context.getUser(),
+        input);
 
     if (!validated) {
       context.form()
           .setError(SupportPhonePages.Errors.NOT_MATCH.message());
-      Response challenge = challenge(context,phoneNumber);
+      Response challenge = challenge(context, phoneNumber);
       context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
       return;
     }
-    setCookie(context,credentialId,secret);
+    setCookie(context, credentialId, secret);
     context.success();
   }
 
-  protected Response challenge(AuthenticationFlowContext context,String phoneNumber) {
+  protected Response challenge(AuthenticationFlowContext context, String phoneNumber) {
     return context.form()
         .setAttribute(ATTRIBUTE_SUPPORT_PHONE, true)
-        .setAttribute(SupportPhonePages.ATTEMPTED_PHONE_NUMBER,phoneNumber)
+        .setAttribute(SupportPhonePages.ATTEMPTED_PHONE_NUMBER, phoneNumber)
         .createForm(PAGE);
   }
 

@@ -2,8 +2,6 @@ package cc.coopersoft.keycloak.phone.providers.sender;
 
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import cc.coopersoft.keycloak.phone.providers.spi.FullSmsSenderAbstractService;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.jboss.logging.Logger;
 import org.keycloak.broker.provider.util.SimpleHttp;
 import org.keycloak.models.KeycloakSession;
@@ -28,7 +26,9 @@ public class BulksmsSmsSenderServiceProvider extends FullSmsSenderAbstractServic
     private final String from;
     private final String encoding;
     private final String routingGroup;
+    private final KeycloakSession session;
 
+    @SuppressWarnings("unused") // fields used in json serialization
     private static class BulksmsMessage {
         public String from;
         public String to;
@@ -55,12 +55,12 @@ public class BulksmsSmsSenderServiceProvider extends FullSmsSenderAbstractServic
         this.from = config.get(CONFIG_FROM);
         this.encoding = config.get(CONFIG_ENCODING);
         this.routingGroup = config.get(CONFIG_ROUTING_GROUP);
+        this.session = session;
     }
 
     @Override
     public void sendMessage(String phoneNumber, String message) throws MessageSendException {
-        HttpClient httpclient = HttpClients.createDefault();
-        SimpleHttp req = SimpleHttp.doPost(url, httpclient);
+        SimpleHttp req = SimpleHttp.doPost(url, session);
         req.json(new BulksmsMessage[] {
                 new BulksmsMessage(this.from, phoneNumber, message, this.encoding, this.routingGroup) });
         req.authBasic(this.username, this.password);

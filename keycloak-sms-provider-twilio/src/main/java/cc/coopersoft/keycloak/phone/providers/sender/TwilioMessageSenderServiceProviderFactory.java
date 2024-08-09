@@ -12,7 +12,7 @@ public class TwilioMessageSenderServiceProviderFactory implements MessageSenderS
 
     @Override
     public MessageSenderService create(KeycloakSession session) {
-        return new TwilioSmsSenderServiceProvider(config,session.getContext().getRealm().getDisplayName());
+        return new TwilioSmsSenderServiceProvider(session, config);
     }
 
     @Override

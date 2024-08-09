@@ -10,7 +10,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.dto.OTPSecretData;
 import org.keycloak.util.JsonSerialization;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
@@ -26,39 +26,42 @@ public class PhoneOtpCredentialModel extends CredentialModel {
         this.secretData = secretData;
     }
 
-    private static Optional<CredentialModel> getOtpCredentialModel(@NotNull UserModel user){
+    private static Optional<CredentialModel> getOtpCredentialModel(@NotNull UserModel user) {
         return user.credentialManager()
-            .getStoredCredentialsByTypeStream(PhoneOtpCredentialModel.TYPE).findFirst();
+                .getStoredCredentialsByTypeStream(PhoneOtpCredentialModel.TYPE).findFirst();
     }
 
-    public static Optional<PhoneOtpCredentialModel.SmsOtpCredentialData> getSmsOtpCredentialData(@NotNull UserModel user){
+    public static Optional<PhoneOtpCredentialModel.SmsOtpCredentialData> getSmsOtpCredentialData(
+            @NotNull UserModel user) {
         return getOtpCredentialModel(user)
-            .map(credentialModel -> {
-                try {
-                    return JsonSerialization.readValue(credentialModel.getCredentialData(), PhoneOtpCredentialModel.SmsOtpCredentialData.class);
-                } catch (IOException e) {
-                    throw new IllegalArgumentException(e);
-                }
-            });
+                .map(credentialModel -> {
+                    try {
+                        return JsonSerialization.readValue(credentialModel.getCredentialData(),
+                                PhoneOtpCredentialModel.SmsOtpCredentialData.class);
+                    } catch (IOException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                });
     }
 
     public static void updateOtpCredential(@NotNull UserModel user,
-                                           @NotNull PhoneOtpCredentialModel.SmsOtpCredentialData credentialData,
-                                           String secretValue){
+            @NotNull PhoneOtpCredentialModel.SmsOtpCredentialData credentialData,
+            String secretValue) {
         getOtpCredentialModel(user)
-            .ifPresent(credential -> {
-                try {
-                    credential.setCredentialData(JsonSerialization.writeValueAsString(credentialData));
-                    credential.setSecretData(JsonSerialization.writeValueAsString(new OTPSecretData(secretValue)));
-                    PhoneOtpCredentialModel credentialModel = PhoneOtpCredentialModel.createFromCredentialModel(credential);
-                    user.credentialManager().updateStoredCredential(credentialModel);
-                }catch (IOException ioe) {
-                    throw new RuntimeException(ioe);
-                }
-            });
+                .ifPresent(credential -> {
+                    try {
+                        credential.setCredentialData(JsonSerialization.writeValueAsString(credentialData));
+                        credential.setSecretData(JsonSerialization.writeValueAsString(new OTPSecretData(secretValue)));
+                        PhoneOtpCredentialModel credentialModel = PhoneOtpCredentialModel
+                                .createFromCredentialModel(credential);
+                        user.credentialManager().updateStoredCredential(credentialModel);
+                    } catch (IOException ioe) {
+                        throw new RuntimeException(ioe);
+                    }
+                });
     }
 
-    public static PhoneOtpCredentialModel create(String phoneNumber, String secretValue,int expires) {
+    public static PhoneOtpCredentialModel create(String phoneNumber, String secretValue, int expires) {
         SmsOtpCredentialData credentialData = new SmsOtpCredentialData(phoneNumber, expires);
         OTPSecretData secretData = new OTPSecretData(secretValue);
         PhoneOtpCredentialModel credentialModel = new PhoneOtpCredentialModel(credentialData, secretData);
@@ -69,8 +72,10 @@ public class PhoneOtpCredentialModel extends CredentialModel {
     public static PhoneOtpCredentialModel createFromCredentialModel(CredentialModel credentialModel) {
 
         try {
-            SmsOtpCredentialData credentialData = JsonSerialization.readValue(credentialModel.getCredentialData(), SmsOtpCredentialData.class);
-            OTPSecretData secretData = JsonSerialization.readValue(credentialModel.getSecretData(), OTPSecretData.class);
+            SmsOtpCredentialData credentialData = JsonSerialization.readValue(credentialModel.getCredentialData(),
+                    SmsOtpCredentialData.class);
+            OTPSecretData secretData = JsonSerialization.readValue(credentialModel.getSecretData(),
+                    OTPSecretData.class);
             PhoneOtpCredentialModel credential = new PhoneOtpCredentialModel(credentialData, secretData);
 
             credential.setUserLabel(credentialModel.getUserLabel());
@@ -105,8 +110,6 @@ public class PhoneOtpCredentialModel extends CredentialModel {
         return secretData;
     }
 
-
-
     @Getter
     public static class SmsOtpCredentialData {
         private final String phoneNumber;
@@ -116,17 +119,17 @@ public class PhoneOtpCredentialModel extends CredentialModel {
         private final int expires;
 
         @JsonIgnore
-        public boolean isSecretInvalid(){
-            if (expires <= 0){
+        public boolean isSecretInvalid() {
+            if (expires <= 0) {
                 return true;
             }
-            return  new Date().getTime() > expires * 1000L + secretCreate;
+            return new Date().getTime() > expires * 1000L + secretCreate;
         }
 
         @JsonCreator
-//        @ConstructorProperties("phoneNumber")
-        public SmsOtpCredentialData(@JsonProperty("phoneNumber")String phoneNumber,
-                                    @JsonProperty("expires") int expires) {
+        // @ConstructorProperties("phoneNumber")
+        public SmsOtpCredentialData(@JsonProperty("phoneNumber") String phoneNumber,
+                @JsonProperty("expires") int expires) {
             this.phoneNumber = phoneNumber;
             this.secretCreate = new Date().getTime();
             this.expires = expires;

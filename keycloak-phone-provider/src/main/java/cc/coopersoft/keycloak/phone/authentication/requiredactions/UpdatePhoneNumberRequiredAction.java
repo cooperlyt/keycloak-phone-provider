@@ -4,14 +4,12 @@ import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
-import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
-import com.google.i18n.phonenumbers.NumberParseException;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.Response;
 
 public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
@@ -30,11 +28,14 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
     @Override
     public void processAction(RequiredActionContext context) {
-        PhoneVerificationCodeProvider phoneVerificationCodeProvider = context.getSession().getProvider(PhoneVerificationCodeProvider.class);
-        String phoneNumber = context.getHttpRequest().getDecodedFormParameters().getFirst(SupportPhonePages.FIELD_PHONE_NUMBER);
-        String code = context.getHttpRequest().getDecodedFormParameters().getFirst(SupportPhonePages.FIELD_VERIFICATION_CODE);
+        PhoneVerificationCodeProvider phoneVerificationCodeProvider = context.getSession()
+                .getProvider(PhoneVerificationCodeProvider.class);
+        String phoneNumber = context.getHttpRequest().getDecodedFormParameters()
+                .getFirst(SupportPhonePages.FIELD_PHONE_NUMBER);
+        String code = context.getHttpRequest().getDecodedFormParameters()
+                .getFirst(SupportPhonePages.FIELD_VERIFICATION_CODE);
         try {
-            phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(),phoneNumber);
+            phoneNumber = Utils.canonicalizePhoneNumber(context.getSession(), phoneNumber);
             phoneVerificationCodeProvider.validateCode(context.getUser(), phoneNumber, code);
             context.success();
         } catch (BadRequestException e) {
@@ -53,9 +54,9 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
             context.challenge(challenge);
         } catch (PhoneNumberInvalidException e) {
             Response challenge = context.form()
-                .setAttribute("phoneNumber", phoneNumber)
-                .setError(e.getErrorType().message())
-                .createForm("login-update-phone-number.ftl");
+                    .setAttribute("phoneNumber", phoneNumber)
+                    .setError(e.getErrorType().message())
+                    .createForm("login-update-phone-number.ftl");
             context.challenge(challenge);
         }
     }
