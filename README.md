@@ -8,6 +8,7 @@
  + Register with phone
  + Authentication by phone
  + Reset password by phone
+ + WeiXin APP Grant
 
 sms
 voice
