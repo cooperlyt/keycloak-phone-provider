@@ -24,7 +24,8 @@ Currently, there are implementations for:
 + TotalVoice
 + Twilio,
 + YunTongXun SMS
-+ WeiXin App grant
++ Bulk SMS
++ Two Factor
 
 More services can be added with ease due to the modularity of the code.  In fact, nothing would stop you from implementing a
 sender of TTS calls or WhatsApp messages.
