@@ -12,7 +12,7 @@ public class TwoFactorMessageSenderServiceProviderFactory implements MessageSend
 
     @Override
     public MessageSenderService create(KeycloakSession session) {
-        return new TwoFactorSmsSenderServiceProvider(config,session.getContext().getRealm().getDisplayName());
+        return new TwoFactorSmsSenderServiceProvider(session, config);
     }
 
     @Override

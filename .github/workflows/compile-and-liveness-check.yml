@@ -10,7 +10,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin' 
-          java-version: '17'
+          java-version: '21'
       - shell: bash
         run: cd examples && ./docker-build.sh test
       - run: cd examples && docker compose --verbose up --build --wait

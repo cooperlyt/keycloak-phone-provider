@@ -9,6 +9,7 @@ import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
+import org.keycloak.models.KeycloakSession;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +19,8 @@ public class AwsSnsSmsSenderService extends FullSmsSenderAbstractService {
     private static final Logger logger = Logger.getLogger(AwsSnsSmsSenderService.class);
     private final Config.Scope config;
 
-    public AwsSnsSmsSenderService(String realmDisplay, Config.Scope config) {
-        super(realmDisplay);
+    public AwsSnsSmsSenderService(KeycloakSession session, Config.Scope config) {
+        super(session);
         this.config = config;
     }
 
@@ -49,13 +50,14 @@ public class AwsSnsSmsSenderService extends FullSmsSenderAbstractService {
     }
 
     private static void sendSMSMessage(AmazonSNS snsClient, String message,
-                                       String phoneNumber, Map<String, MessageAttributeValue> smsAttributes) {
+            String phoneNumber, Map<String, MessageAttributeValue> smsAttributes) {
         PublishResult result = snsClient.publish(new PublishRequest()
                 .withMessage(message)
                 .withPhoneNumber(phoneNumber)
                 .withMessageAttributes(smsAttributes));
 
-        logger.debug(String.format("Sent phone verification code via aws sns with message id %s", result.getMessageId()));
+        logger.debug(
+                String.format("Sent phone verification code via aws sns with message id %s", result.getMessageId()));
     }
 
     @Override

@@ -6,14 +6,15 @@ import cc.coopersoft.keycloak.phone.providers.spi.FullSmsSenderAbstractService;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
 import org.json.JSONObject;
 import org.keycloak.Config.Scope;
+import org.keycloak.models.KeycloakSession;
 
 public class TotalVoiceSmsSenderServiceProvider extends FullSmsSenderAbstractService {
 
     private final TotalVoiceClient client;
     private final Sms smsClient;
 
-    TotalVoiceSmsSenderServiceProvider(Scope config, String realmDisplay) {
-        super(realmDisplay);
+    TotalVoiceSmsSenderServiceProvider(KeycloakSession session, Scope config) {
+        super(session);
         this.client = new TotalVoiceClient(config.get("token"));
         this.smsClient = new Sms(client);
     }

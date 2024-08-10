@@ -12,7 +12,7 @@ public class TotalVoiceMessageSenderServiceProviderFactory implements MessageSen
 
     @Override
     public MessageSenderService create(KeycloakSession session) {
-        return new TotalVoiceSmsSenderServiceProvider(config, session.getContext().getRealm().getDisplayName());
+        return new TotalVoiceSmsSenderServiceProvider(session, config);
     }
 
     @Override
