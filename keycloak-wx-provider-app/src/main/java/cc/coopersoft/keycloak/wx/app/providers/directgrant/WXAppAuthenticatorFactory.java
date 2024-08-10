@@ -42,13 +42,13 @@ public class WXAppAuthenticatorFactory implements AuthenticatorFactory {
         .add()
         .property().name(WX_API_ID)
         .type(ProviderConfigProperty.STRING_TYPE)
-        .label("WX API ID")
-        .helpText("WX API ID")
+        .label("API ID")
+        .helpText("Wei Xin APP API ID")
         .add()
         .property().name(WX_API_SECRET)
         .type(ProviderConfigProperty.STRING_TYPE)
-        .label("WX API secret")
-        .helpText("WX API secret")
+        .label("API secret")
+        .helpText("Wei Xin APP API secret")
         .add()
         .build();
   }
