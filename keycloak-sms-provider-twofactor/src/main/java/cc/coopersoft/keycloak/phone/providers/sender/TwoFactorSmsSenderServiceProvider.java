@@ -9,24 +9,18 @@ import org.jboss.logging.Logger;
 import org.keycloak.Config.Scope;
 import org.keycloak.models.KeycloakSession;
 
-import jakarta.annotation.PostConstruct;
-
 public class TwoFactorSmsSenderServiceProvider extends FullSmsSenderAbstractService {
 
     private static final Logger logger = Logger.getLogger(TwoFactorSmsSenderServiceProvider.class);
-    private String twoFactorApiKey;
+    private final String apiKey;
     private static final String twoFactorUrl = "https://2factor.in/API/V1/";
-    private OkHttpClient client;
-
-    @PostConstruct
-    public void doSetUp() {
-        client = new OkHttpClient().newBuilder()
-                .build();
-    }
+    private final OkHttpClient client;
 
     TwoFactorSmsSenderServiceProvider(KeycloakSession session, Scope config) {
         super(session);
-        this.twoFactorApiKey = config.get("twoFactorApiKey");
+        apiKey = config.get("key");
+        client = new OkHttpClient().newBuilder()
+            .build();
 
     }
 
@@ -34,15 +28,15 @@ public class TwoFactorSmsSenderServiceProvider extends FullSmsSenderAbstractServ
     public void sendMessage(String phoneNumber, String message) throws MessageSendException {
 
         Request request = new Request.Builder()
-                .url(twoFactorUrl + twoFactorApiKey + "/SMS/" + phoneNumber + "/AUTOGEN/OTP1")
+                .url(twoFactorUrl + apiKey + "/SMS/" + phoneNumber + "/AUTOGEN/OTP1")
                 .get()
                 .build();
         try (Response response = client.newCall(request).execute()) {
-            String responseString = response.body().string();
-            if (response.isSuccessful()) {
+
+            if (response.isSuccessful() && response.body() != null) {
+                String responseString = response.body().string();
                 logger.info(responseString + ": sms sent successfully");
             } else {
-                logger.error(responseString + ": sms sending failed");
                 throw new MessageSendException(response.code(),
                         String.valueOf(response.code()),
                         response.message());

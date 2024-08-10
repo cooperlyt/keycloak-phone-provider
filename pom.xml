@@ -70,7 +70,7 @@
         <module>keycloak-sms-provider-yunxin</module>
         <module>keycloak-sms-provider-aliyun</module>
         <module>keycloak-sms-provider-tencent</module>
-        <module>keycloak-sms-provider-twofactorapi</module>
+        <module>keycloak-sms-provider-twofactor</module>
         <module>keycloak-wx-provider-app</module>
     </modules>
 

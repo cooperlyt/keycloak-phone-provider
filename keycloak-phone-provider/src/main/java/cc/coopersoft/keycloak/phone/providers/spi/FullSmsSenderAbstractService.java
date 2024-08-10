@@ -1,5 +1,6 @@
 package cc.coopersoft.keycloak.phone.providers.spi;
 
+import cc.coopersoft.common.OptionalUtils;
 import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.exception.MessageSendException;
@@ -65,9 +66,13 @@ public abstract class FullSmsSenderAbstractService implements MessageSenderServi
                 final Optional<String> userLocale = user.map(u -> u.getFirstAttribute(UserModel.LOCALE));
 
                 // Use locale from user or default to realm locale
-                final String localeName = userLocale.isPresent() ? userLocale.get()
-                        : session.getContext().getRealm().getDefaultLocale();
-                final Locale locale = Locale.forLanguageTag(localeName);
+                final String localeName = userLocale.orElseGet(() -> session.getContext().getRealm().getDefaultLocale());
+
+
+                final Locale locale = OptionalUtils.ofBlank(localeName).map(Locale::forLanguageTag).orElseGet(() -> {
+                    logger.warn("user's locale and realm's default locale is not config,sms message language Locale.getDefault will be used!");
+                    return Locale.getDefault();
+                }) ;
 
                 // Get message template from login theme bundle
                 final Properties messages = loginTheme.getMessages(locale);

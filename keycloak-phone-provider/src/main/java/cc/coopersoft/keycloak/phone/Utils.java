@@ -12,6 +12,8 @@ import com.google.i18n.phonenumbers.*;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 
 import jakarta.validation.constraints.NotNull;
+import org.keycloak.utils.StringUtil;
+
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -77,7 +79,10 @@ public class Utils {
     private static String defaultRegion(KeycloakSession session) {
         var defaultRegion = session.getProvider(PhoneProvider.class).defaultPhoneRegion();
         return defaultRegion
-                .orElseGet(() -> localeToCountry(session.getContext().getRealm().getDefaultLocale()).orElse(null));
+                .orElseGet(() -> OptionalUtils.ofBlank(session.getContext().getRealm().getDefaultLocale())
+                    .flatMap(Utils::localeToCountry)
+                    .orElseGet(() -> Locale.getDefault().getCountry())
+                );
     }
 
     /**
@@ -92,7 +97,10 @@ public class Utils {
         var phoneNumberUtil = PhoneNumberUtil.getInstance();
         var resultPhoneNumber = phoneNumber.trim();
         var defaultRegion = defaultRegion(session);
+
         logger.info(String.format("default region '%s' will be used", defaultRegion));
+
+
         try {
             var parsedNumber = phoneNumberUtil.parse(resultPhoneNumber, defaultRegion);
             if (provider.validPhoneNumber() && !phoneNumberUtil.isValidNumber(parsedNumber)) {

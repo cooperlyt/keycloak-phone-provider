@@ -30,6 +30,6 @@ public class TwoFactorMessageSenderServiceProviderFactory implements MessageSend
 
     @Override
     public String getId() {
-        return "two-factor";
+        return "twofactor";
     }
 }

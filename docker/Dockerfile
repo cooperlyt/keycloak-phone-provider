@@ -26,29 +26,37 @@ COPY providers/keycloak-phone-provider.resources.jar /opt/keycloak/providers/
 #dummy provider
 COPY providers/keycloak-sms-provider-dummy.jar /opt/keycloak/providers/
 
-#yuntongxin provider
+#yuntongxin sms provider
 COPY providers/keycloak-sms-provider-cloopen.jar /opt/keycloak/providers/
 
-#totalvoice provider
+#totalvoice sms provider
 COPY providers/keycloak-sms-provider-totalvoice.jar /opt/keycloak/providers/
 
-#twilio provider
+#twilio sms provider
 COPY providers/keycloak-sms-provider-twilio.jar /opt/keycloak/providers/
 
-#yunxin provider
+#yunxin sms provider
 COPY providers/keycloak-sms-provider-yunxin.jar /opt/keycloak/providers/
 
-#tencent provider
+#tencent sms provider
 COPY providers/keycloak-sms-provider-tencent.jar /opt/keycloak/providers/
 
-#aliyun provider
+#aliyun sms provider
 COPY providers/keycloak-sms-provider-aliyun.jar /opt/keycloak/providers/
 
-#aws provider
+#aws sms provider
 COPY providers/keycloak-sms-provider-aws-sns.jar /opt/keycloak/providers/
+
+#bulksms sms provider
+COPY providers/keycloak-sms-provider-bulksms.jar /opt/keycloak/providers/
+
+#Two-factor sms provider
+COPY providers/keycloak-sms-provider-twofactor.jar /opt/keycloak/providers/
 
 #wx app provider
 COPY providers/keycloak-wx-provider-app.jar /opt/keycloak/providers/
+
+
 
 RUN mkdir /opt/keycloak/certs
 
