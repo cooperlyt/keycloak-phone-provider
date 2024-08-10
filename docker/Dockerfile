@@ -40,12 +40,15 @@ COPY providers/keycloak-sms-provider-yunxin.jar /opt/keycloak/providers/
 
 #tencent provider
 COPY providers/keycloak-sms-provider-tencent.jar /opt/keycloak/providers/
-#
+
 #aliyun provider
 COPY providers/keycloak-sms-provider-aliyun.jar /opt/keycloak/providers/
 
 #aws provider
 COPY providers/keycloak-sms-provider-aws-sns.jar /opt/keycloak/providers/
+
+#wx app provider
+COPY providers/keycloak-wx-provider-app.jar /opt/keycloak/providers/
 
 RUN mkdir /opt/keycloak/certs
 
