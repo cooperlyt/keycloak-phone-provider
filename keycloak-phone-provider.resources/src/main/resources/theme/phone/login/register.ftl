@@ -167,7 +167,7 @@
                         <input tabindex="0" id="code" name="code"
                                aria-invalid="<#if messagesPerField.existsError('registerCode')>true</#if>"
                                type="text" class="${properties.kcInputClass!}"
-                               autocomplete="off"/>
+                               autocomplete="one-time-code"/>
                         <#if messagesPerField.existsError('registerCode')>
                             <span id="input-error-password" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
                                 ${kcSanitize(messagesPerField.get('registerCode'))?no_esc}

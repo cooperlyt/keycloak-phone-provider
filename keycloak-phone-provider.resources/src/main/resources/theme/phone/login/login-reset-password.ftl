@@ -103,7 +103,7 @@
                                 <div class="col-xs-8" style="padding: 0 5px 0 0">
                                     <input type="text" id="code" name="code"
                                            aria-invalid="<#if messagesPerField.existsError('code','phoneNumber')>true</#if>"
-                                           class="${properties.kcInputClass!}" autocomplete="off"/>
+                                           class="${properties.kcInputClass!}" autocomplete="one-time-code"/>
                                 </div>
                                 <div class="col-xs-4" style="padding: 0 0 0 5px">
                                     <input tabindex="0" style="height: 36px"

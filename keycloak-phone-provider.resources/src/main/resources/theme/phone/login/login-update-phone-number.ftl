@@ -42,7 +42,7 @@
                 <label for="code" class="${properties.kcLabelClass!}">${msg("verificationCode")}</label>
                 <input tabindex="0" id="code" class="${properties.kcInputClass!}" name="code"
                        type="text" <#if phoneNumber??>autofocus</#if>
-                       autocomplete="off"/>
+                       autocomplete="one-time-code"/>
               </div>
               <div id="kc-form-buttons" class="${properties.kcFormGroupClass!}">
                 <input type="hidden" id="id-hidden-input" name="credentialId"
