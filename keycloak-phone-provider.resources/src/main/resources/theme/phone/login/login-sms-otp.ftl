@@ -27,8 +27,7 @@
                             </div>
                             <div class="col-xs-8" style="padding: 0 5px 0 0">
                                 <input tabindex="0" id="code" class="${properties.kcInputClass!}" name="code"
-                                       type="text" autofocus
-                                       autocomplete="off"/>
+                                       type="text" autofocus autocomplete="one-time-code"/>
                             </div>
                             <div class="col-xs-4" style="padding: 0 0 0 5px">
                                 <input tabindex="0" style="height: 36px"
