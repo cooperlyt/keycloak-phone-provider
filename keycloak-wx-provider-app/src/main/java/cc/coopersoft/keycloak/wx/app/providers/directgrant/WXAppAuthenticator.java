@@ -134,9 +134,19 @@ public class WXAppAuthenticator implements Authenticator {
             .equals("true");
   }
 
+  private boolean isSingleApp(AuthenticationFlowContext context) {
+    return context.getAuthenticatorConfig() == null ||
+        context.getAuthenticatorConfig().getConfig().getOrDefault(WXAppAuthenticatorFactory.SINGLE_APP, "false")
+            .equals("false");
+  }
+
+  private String getWXAppId(AuthenticationFlowContext context){
+    return context.getAuthenticatorConfig().getConfig().get(WXAppAuthenticatorFactory.WX_API_ID);
+  }
+
   private Optional<WXAPICredentials> getWXAPICredentials(AuthenticationFlowContext context){
 
-    String appid = context.getAuthenticatorConfig().getConfig().get(WXAppAuthenticatorFactory.WX_API_ID);
+    String appid = getWXAppId(context); //context.getAuthenticatorConfig().getConfig().get(WXAppAuthenticatorFactory.WX_API_ID);
     String secret = context.getAuthenticatorConfig().getConfig().get(WXAppAuthenticatorFactory.WX_API_SECRET);
 
     if (StringUtil.isNotBlank(appid) && StringUtil.isNotBlank(secret)){
@@ -156,18 +166,33 @@ public class WXAppAuthenticator implements Authenticator {
     var userProvider = context.getSession().users();
 
     return userProvider.searchForUserByUserAttributeStream(context.getRealm(), USER_UNION_ID_ATTRIBUTE, unionId).findFirst()
-        .or(() -> userProvider.searchForUserByUserAttributeStream(context.getRealm(), USER_OPEN_ID_ATTRIBUTE, openId).findFirst())
+        //.or(() -> userProvider.searchForUserByUserAttributeStream(context.getRealm(), USER_OPEN_ID_ATTRIBUTE, openId).findFirst())
         .or(() -> createEveryUser(context,unionId,openId));
 
   }
 
+  /**
+   * 考虑一下是否可以生成一个虚拟用户，即不持久化UserModel而仅在认证上下文中使用并颁发证书，仅在用户注册时才持久化用户
+   * 每次微信小程序登录请求都会得到openId  和 unionId
+   * 不持久化可以使用户库保持干净
+   * 问题： 不持久化会不会影响 jwt token 的验证及 token 超时 新token的更新。
+   *
+   * @param context
+   * @param unionId
+   * @param openId
+   * @return
+   */
   private Optional<UserModel> createEveryUser(AuthenticationFlowContext context, String unionId, String openId){
     if (isAllowEvery(context)){
       UserModel newUser = context.getSession().users().addUser(context.getRealm(), unionId);
 
+      //context.getSession().users().
+
       newUser.setEnabled(true);
       newUser.setSingleAttribute(USER_UNION_ID_ATTRIBUTE, unionId);
-      newUser.setSingleAttribute(USER_OPEN_ID_ATTRIBUTE, openId);
+
+      newUser.setSingleAttribute(isSingleApp(context) ? USER_OPEN_ID_ATTRIBUTE : USER_OPEN_ID_ATTRIBUTE + "_" + getWXAppId(context), openId);
+
       //context.getAuthenticationSession().setClientNote(OIDCLoginProtocol.LOGIN_HINT_PARAM, unionId);
       logger.info("create user by wx :" + unionId);
       return Optional.of(newUser);

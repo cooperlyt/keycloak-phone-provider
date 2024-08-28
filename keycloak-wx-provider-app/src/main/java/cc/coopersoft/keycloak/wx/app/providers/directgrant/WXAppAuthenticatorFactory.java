@@ -26,6 +26,8 @@ public class WXAppAuthenticatorFactory implements AuthenticatorFactory {
 
   public static final String WX_API_SECRET = "app_secret";
 
+  public static final String SINGLE_APP = "app_single";
+
   private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
       AuthenticationExecutionModel.Requirement.REQUIRED,
   };
@@ -40,10 +42,16 @@ public class WXAppAuthenticatorFactory implements AuthenticatorFactory {
         .helpText("Auto register user.")
         .defaultValue(true)
         .add()
+        .property().name(SINGLE_APP)
+        .type(ProviderConfigProperty.BOOLEAN_TYPE)
+        .label("Single app")
+        .helpText("If On add user attribute 'wx_open_id' else is 'wx_open_id_$appid'")
+        .defaultValue(false)
+        .add()
         .property().name(WX_API_ID)
         .type(ProviderConfigProperty.STRING_TYPE)
-        .label("API ID")
-        .helpText("Wei Xin APP API ID")
+        .label("APP ID")
+        .helpText("Wei Xin APP ID")
         .add()
         .property().name(WX_API_SECRET)
         .type(ProviderConfigProperty.STRING_TYPE)
