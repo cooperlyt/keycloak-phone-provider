@@ -6,6 +6,8 @@ import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProvider;
 import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialProviderFactory;
 import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAuthenticator;
@@ -25,8 +27,6 @@ import org.keycloak.userprofile.UserProfile;
 import org.keycloak.userprofile.UserProfileContext;
 import org.keycloak.userprofile.UserProfileProvider;
 
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Collections;
 
@@ -54,9 +54,9 @@ public class PhoneLoginAndAutoCreateUserForm extends UsernamePasswordForm {
         }
         UserModel user = getUser(context, username);
         if (user == null) {
-            user = createUserModel(formData, context);
+            createUserModel(formData, context);
         }
-        return new PhoneUsernamePasswordForm().validateUser(context, user, formData);
+        return new PhoneUsernamePasswordForm().validateUser(context, formData);
     }
 
     private UserModel createUserModel(MultivaluedMap<String, String> inputData, AuthenticationFlowContext context) {
@@ -64,7 +64,7 @@ public class PhoneLoginAndAutoCreateUserForm extends UsernamePasswordForm {
         UserModel user;
         inputData.put(Details.USERNAME, Collections.singletonList(username));
         UserProfileProvider profileProvider = context.getSession().getProvider(UserProfileProvider.class);
-        UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION_USER_CREATION, inputData);
+        UserProfile profile = profileProvider.create(UserProfileContext.REGISTRATION, inputData);
         user = profile.create();
         user.setEnabled(true);
         user.setAttribute("phoneNumber", Collections.singletonList(username));
