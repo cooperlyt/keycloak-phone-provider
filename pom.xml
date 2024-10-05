@@ -72,6 +72,7 @@
         <module>keycloak-sms-provider-tencent</module>
         <module>keycloak-sms-provider-twofactor</module>
         <module>keycloak-wx-provider-app</module>
+        <module>keycloak-sms-provider-whatsapp</module>
     </modules>
 
     <dependencies>
