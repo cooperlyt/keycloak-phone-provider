@@ -11,6 +11,11 @@ import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidExcept
 import cc.coopersoft.keycloak.phone.providers.jpa.TokenCode;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TemporalType;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import org.jboss.logging.Logger;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.credential.CredentialModel;
@@ -21,11 +26,6 @@ import org.keycloak.models.UserModel;
 import org.keycloak.services.validation.Validation;
 import org.keycloak.util.JsonSerialization;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
-import jakarta.persistence.TemporalType;
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ForbiddenException;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
@@ -86,7 +86,7 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
 
     @Override
     public boolean isAbusing(String phoneNumber, TokenCodeType tokenCodeType,
-            String sourceAddr, int sourceHourMaximum, int targetHourMaximum) {
+                             String sourceAddr, int sourceHourMaximum, int targetHourMaximum) {
 
         Date oneHourAgo = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1));
 

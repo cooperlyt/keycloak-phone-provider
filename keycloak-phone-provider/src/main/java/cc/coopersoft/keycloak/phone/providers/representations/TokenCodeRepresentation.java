@@ -1,6 +1,7 @@
 package cc.coopersoft.keycloak.phone.providers.representations;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.keycloak.models.utils.KeycloakModelUtils;
@@ -11,6 +12,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class TokenCodeRepresentation {
 
     private String id;

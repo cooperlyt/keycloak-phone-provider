@@ -3,18 +3,20 @@ package cc.coopersoft.keycloak.phone;
 import cc.coopersoft.common.OptionalUtils;
 import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
+import jakarta.validation.constraints.NotNull;
 import org.jboss.logging.Logger;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
-import com.google.i18n.phonenumbers.*;
-import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
-
-import jakarta.validation.constraints.NotNull;
-import org.keycloak.utils.StringUtil;
-
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -43,7 +45,7 @@ public class Utils {
         }
 
         return numbers.stream().flatMap(number -> userProvider
-                .searchForUserByUserAttributeStream(realm, "phoneNumber", number))
+                        .searchForUserByUserAttributeStream(realm, "phoneNumber", number))
                 .max((u1, u2) -> {
                     var result = comparatorAttributesAnyMatch(u1, u2, "phoneNumberVerified", "true"::equals);
                     if (result == 0) {
@@ -63,7 +65,7 @@ public class Utils {
     // }
 
     private static int comparatorAttributesAnyMatch(UserModel user1, UserModel user2,
-            String attribute, Predicate<? super String> predicate) {
+                                                    String attribute, Predicate<? super String> predicate) {
         return Boolean.compare(user1.getAttributeStream(attribute).anyMatch(predicate),
                 user2.getAttributeStream(attribute).anyMatch(predicate));
     }
@@ -80,15 +82,14 @@ public class Utils {
         var defaultRegion = session.getProvider(PhoneProvider.class).defaultPhoneRegion();
         return defaultRegion
                 .orElseGet(() -> OptionalUtils.ofBlank(session.getContext().getRealm().getDefaultLocale())
-                    .flatMap(Utils::localeToCountry)
-                    .orElseGet(() -> Locale.getDefault().getCountry())
+                        .flatMap(Utils::localeToCountry)
+                        .orElseGet(() -> Locale.getDefault().getCountry())
                 );
     }
 
     /**
      * Parses a phone number with google's libphonenumber and then outputs it's
      * international canonical form
-     *
      */
     public static String canonicalizePhoneNumber(KeycloakSession session, @NotNull String phoneNumber)
             throws PhoneNumberInvalidException {
@@ -145,6 +146,18 @@ public class Utils {
 
     public static int getOtpExpires(KeycloakSession session) {
         return session.getProvider(PhoneProvider.class).otpExpires();
+    }
+
+    public static String standardizePhoneNumber(KeycloakSession session, String phoneNumber) {
+        phoneNumber = phoneNumber.trim();
+        String defaultCountryCode = CountryCodes.getCode(Utils.defaultRegion(session));
+        if (phoneNumber.startsWith("0")) {
+            return defaultCountryCode + phoneNumber.substring(1);
+        } else if (phoneNumber.startsWith(defaultCountryCode)) {
+            return phoneNumber;
+        } else {
+            return defaultCountryCode + phoneNumber;
+        }
     }
 
 }
