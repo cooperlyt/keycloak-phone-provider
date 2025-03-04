@@ -4,6 +4,7 @@ import cc.coopersoft.keycloak.phone.Utils;
 import cc.coopersoft.keycloak.phone.authentication.forms.SupportPhonePages;
 import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 
@@ -14,6 +15,11 @@ import jakarta.ws.rs.core.Response;
 public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
     public static final String PROVIDER_ID = "UPDATE_PHONE_NUMBER";
+
+    @Override
+    public InitiatedActionSupport initiatedActionSupport() {
+        return InitiatedActionSupport.SUPPORTED;
+    }
 
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
