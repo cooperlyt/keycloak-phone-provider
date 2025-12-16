@@ -99,6 +99,7 @@ If you want to build the project, simply run  `examples/docker-build.sh` after c
     `keycloak-sms-provider-yunxin`  
     `keycloak-sms-provider-aliyun`  
     `keycloak-sms-provider-tencent`  
+    `keycloak-sms-provider-smsc`
 
 + Local
   1. local keycloak installed: copy the `target\providers` to keycloak home directory
