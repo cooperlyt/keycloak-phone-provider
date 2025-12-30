@@ -11,12 +11,12 @@ import org.keycloak.Config.Scope;
 public class TwilioSmsSenderServiceProvider extends FullSmsSenderAbstractService {
 
     private static final Logger logger = Logger.getLogger(TwilioSmsSenderServiceProvider.class);
-    private final String twilioPhoneNumber;
+    private final String messagingServiceSid;
 
     TwilioSmsSenderServiceProvider(Scope config, String realmDisplay) {
         super(realmDisplay);
         Twilio.init(config.get("account"), config.get("token"));
-        this.twilioPhoneNumber = config.get("number");
+        this.messagingServiceSid = config.get("service");
 
     }
 
@@ -25,7 +25,7 @@ public class TwilioSmsSenderServiceProvider extends FullSmsSenderAbstractService
 
         Message msg = Message.creator(
                 new PhoneNumber(phoneNumber),
-                new PhoneNumber(twilioPhoneNumber),
+                messagingServiceSid,
                 message).create();
 
         if (msg.getStatus() == Message.Status.FAILED) {
