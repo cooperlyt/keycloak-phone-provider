@@ -299,7 +299,7 @@ public class RegistrationPhoneUserCreation implements FormActionFactory, FormAct
       username = email;
     } else if (isPhoneNumberAsUsername(context)){
       username = phoneNumber;
-      formData.add(UserModel.USERNAME,phoneNumber);
+      formData.putSingle(UserModel.USERNAME,phoneNumber);
     }
 
     context.getEvent().detail(Details.USERNAME, username)
