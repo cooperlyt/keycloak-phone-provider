@@ -57,4 +57,11 @@
             newDataType="VARCHAR(255)"
             tableName="PHONE_MESSAGE_TOKEN_CODE"/>
   </changeSet>
+  
+  <changeSet author="cooper" id="token-code-6.4">
+    <modifyDataType
+      columnName="HOST"
+      newDataType="VARCHAR(255)"
+      tableName="PHONE_MESSAGE_TOKEN_CODE" />
+  </changeSet>
 </databaseChangeLog>
